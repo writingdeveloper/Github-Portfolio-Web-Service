@@ -1,0 +1,154 @@
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(http-equiv='X-UA-Compatible', content='ie=edge')
+  title Project Detail
+  link(rel='stylesheet', href='/stylesheets/detail.css')
+  // BootStrap CDN
+  script(src='https://code.jquery.com/jquery-3.3.1.min.js')
+  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
+  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css')
+  script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
+  // Main Script Load
+  script(src='/javascripts/setting.js')
+section#works.l-section(role='region')
+  .l-section-holder
+    h2.section-heading
+      span.secondary Portfolio
+      span.primary= name
+    #portfolio.section-content.gallery.alternate
+      article#work1.gallery-item(role='article')
+        figure.gallery-figure(role='group')
+          .gallery-image
+            img.gallery-image-thumb(src=`/images/${imgurl}` onerror=`this.src='/images/app/${type}.png'`)
+          figcaption.gallery-caption
+            h3.gallery-title= name
+            ul.gallery-spec
+              li.gallery-spec-item
+                strong.gallery-spec-key Programming Language
+                span.gallery-spec-value= sumlang
+              li.gallery-spec-item
+                strong.gallery-spec-key Term
+                span.gallery-spec-value= startDate +'~'+ endDate
+            #work1Description
+              p= explanation
+            .ui-group
+              a.ui-button(role='button', href=`${url}`, target='_blank') Demo
+              a.ui-button(role='button', href=`${githuburl}`, target='_blank') Github Repo
+        div(id="readme" class="Box Box--condensed instapaper_body md")
+          !=markdown
+footer#footer.l-footer(role='contentinfo')
+  .l-section-holder.l-footer-holder.footer-widget-group
+    // 크레딧
+    #credits.footer-widget
+      h2.footer-heading Credits
+      .footer-content
+        ul.credit-list
+          li.credit-item
+            .credit-left
+              a(href='https://fonts.google.com/specimen/Open+Sans', target='_blank') Open Sans
+              |  font
+            span.sr-only by
+            .credit-right Steve Matteson
+          li.credit-item
+            .credit-left
+              a(href='https://fonts.google.com/specimen/Quicksand', target='_blank') Quicksand
+              |  font
+            span.sr-only by
+            .credit-right Andrew Paglinawan
+          li.credit-item
+            .credit-left
+              a(href='http://www.flaticon.com/packs/creative-outlines/', target='_blank') Creative Outlines
+              |  iconpack
+            span.sr-only by
+            .credit-right Gregor Cresnar
+          li.credit-item
+            .credit-left
+              a(href='http://sass-lang.com/') Sass
+            span.sr-only by
+            .credit-right Hampton Catlin, Natalie Weizenbaum, Chris Eppstein and MIT
+          li.credit-item
+            .credit-left
+              a(href='http://compass-style.org/', target='_blank') Compass
+            span.sr-only by
+            .credit-right Christopher M.Eppstein
+          li.credit-item
+            .credit-left
+              a(href='https://findawayer.github.io/', target='_blank') Web Design
+            span.sr-only by
+            .credit-right Tae Sung Im
+    // 연락처
+    #contacts.footer-widget
+      h2.footer-heading Contacts
+      .footer-content
+        ul.unstyled-list
+          li
+            //
+            a(href='mailto:super2451894@gmail.com', title='이메일')
+              //
+              img(src="https://png.icons8.com/material-outlined/50/ffffff/new-post.png" class="icons")
+              //
+
+              span.iconed-text super2451894@gmail.com
+              //
+              //
+          li
+            //
+            span(title='전화')
+              //
+              img(src='https://png.icons8.com/material/50/ffffff/google-mobile.png' class="icons")
+              //
+
+              span.iconed-text +82 10 3736 9328
+              //
+              //
+          li
+            //
+            span(title='카카오톡')
+              //
+              img(src='https://png.icons8.com/ios/50/ffffff/speech-bubble.png' class="icons")
+              //
+
+              span.iconed-text leesihung@KakaoTalk
+              //
+              //
+          li
+            //
+            a(href='https://github.com/sangumee', target='_blank', title='깃허브')
+              //
+              img(src='https://png.icons8.com/windows/50/ffffff/github.png' class="icons")
+              //
+
+              span.iconed-text Github Account
+              //
+              //
+aside#backToTop.is-visible
+  a#backToTopButton(role='button', href='#')
+    img(src='https://png.icons8.com/ios-glyphs/50/666666/collapse-arrow.png' id="go_up")
+    span.text
+      | page
+      br
+      b top
+aside#Delete.is-visible
+  form(method="post" action=`/${userId}/${id}/delete_process`)
+    input(type='image' src='https://png.icons8.com/ios/35/000000/waste-filled.png' id="go_up" onclick="return checkDelete()")
+  a#DeleteButton(role='button')
+    span.text
+      | Delete
+      br
+      b this
+aside#Home.is-visible
+  a#HomeButton(role='button', href='/')
+    img(src="https://png.icons8.com/ios/50/000000/home-page.png" id="go_up")
+    span.text
+      | Go
+      br
+      b home
+aside#Update.is-visible
+  a#UpdateButton(role='button', href=`/update/${id}`)
+    img(src="https://png.icons8.com/windows/50/000000/edit-file.png" id="go_up")
+    span.text
+      | Update
+      br
+      b this

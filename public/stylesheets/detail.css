@@ -1,0 +1,523 @@
+/* CSS Document */
+@charset "utf-8";
+
+.l-section {
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    position: relative;
+    box-sizing: border-box;
+    margin: 0 auto;
+}
+
+.l-section-holder {
+    max-width: 1320px;
+    margin: 0 auto;
+}
+
+ul,
+menu,
+dir {
+
+    list-style-type: none;
+}
+
+.section-heading .secondary {
+    display: block;
+    font-size: 24px;
+    opacity: .5;
+    text-align: center;
+}
+
+.section-heading .primary {
+    display: block;
+    font-size: 64px;
+    padding-bottom: .25em;
+    position: relative;
+    text-align: center;
+}
+
+.section-heading .primary::after {
+    background: #30b7e8;
+    border-radius: .25em;
+    display: block;
+    width: 1.25em;
+    height: 2px;
+    margin-left: -.625em;
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    content: "";
+}
+
+.section-heading+.section-content {
+    margin-top: 5rem;
+}
+
+.gallery-figure {
+    position: relative;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    flex-flow: row wrap;
+}
+
+figure {
+    margin: 0;
+}
+
+.gallery-caption {
+    margin-left: 2rem;
+    -webkit-box-flex: 1;
+    -webkit-flex: 1;
+    -ms-flex: 1;
+    flex: 1;
+}
+
+.gallery-title {
+    position: relative;
+    margin-top: 0px;
+    margin-bottom: 75px;
+    padding-top: 0px;
+    height: 25px;
+}
+
+.gallery-title::before {
+    color: #30b7e8;
+    display: inline-block;
+    width: 60px;
+    position: relative;
+    left: -0.25em;
+    vertical-align: -0.1em;
+    line-height: 1;
+    font-size: 64px;
+    font-weight: 400;
+    content: counter(article, decimal-leading-zero);
+}
+
+.gallery-spec {
+    margin: 2em 0;
+    padding: 0;
+}
+
+
+.gallery-image-thumb {
+    width: 100%;
+    max-width: 765px;
+    height: 444px;
+}
+
+.gallery-item {
+    margin: 0 0 5rem;
+    list-style: none;
+    counter-increment: article;
+}
+
+.gallery-spec-key {
+    min-width: 130px;
+    padding-right: .5em;
+    font-family: "Quicksand", sans-serif;
+}
+
+.gallery-spec-key,
+.gallery-spec-value {
+    font-size: 17px;
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.ui-group {
+    margin: 1rem 0;
+    padding: 0;
+    text-align: center;
+}
+
+.ui-button {
+    background: #30b7e8;
+    border-radius: 44px;
+    color: white;
+    display: inline-block;
+    min-width: 7em;
+    height: 44px;
+    margin: 0;
+    overflow: hidden;
+    padding: 12px 16px 14px;
+    vertical-align: middle;
+    letter-spacing: -.03em;
+    line-height: 18px;
+    font-family: "Quicksand", sans-serif;
+    font-size: 1em;
+    font-weight: 500;
+    text-align: center;
+    box-sizing: border-box;
+    -moz-user-select: -moz-none;
+    -ms-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    position: relative;
+    margin-left: 10px;
+}
+
+#work1Description>p {
+    font-size: 17px;
+}
+
+.categ.html {
+    background: #8dca35;
+    color: white;
+}
+
+.categ {
+    border-radius: .25em;
+    display: inline-block;
+    min-width: 2em;
+    padding: .35em .65em;
+    line-height: 1;
+    font-family: "Quicksand", sans-serif;
+    font-size: .92rem;
+    text-align: center;
+}
+
+/* Markdown */
+.Box--condensed {
+    line-height: 1.25;
+    margin-top: 50px;
+}
+
+.Box {
+    background-color: #fff;
+    border: 1px solid #d1d5da;
+    border-radius: 3px;
+}
+
+.Box--condensed .Box-header {
+    padding: 8px 16px;
+}
+
+.Box-header {
+    padding: 16px;
+    margin: -1px -1px 0 -1px;
+    background-color: #f6f8fa;
+    border-color: #d1d5da;
+    border-style: solid;
+    border-width: 1px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+}
+
+div#readme p,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    margin: 0;
+    padding: 15px 15px 15px 15px;
+    font-family: "Quicksand", sans-serif;
+}
+
+div#readme h1 {
+    font-size: 20px;
+}
+
+.Box-title {
+    padding: 0px;
+}
+
+.markdown-body h1 {
+    padding-bottom: 0.3em;
+    font-size: 2em;
+    border-bottom: 1px solid #eaecef;
+}
+
+/* Footer */
+#footer {
+    background: #282a2f;
+}
+
+#footer,
+#footer a {
+    color: white;
+}
+
+.l-footer {
+    width: 100%;
+    bottom: 0;
+}
+
+.footer-widget-group {
+    padding-top: 50px;
+    padding-bottom: 50px;
+    display: flex;
+}
+
+
+
+.footer-widget {
+    flex: 1 auto;
+    padding: 1em 0.5em 1em 0.5em;
+}
+
+.footer-content {
+    margin-top: 2rem;
+    font-family: "Quicksand", sans-serif;
+}
+
+#footer,
+#footer a {
+    color: white;
+}
+
+.credit-list {
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+}
+
+
+.credit-item {
+    display: flex;
+    flex-flow: row nowrap;
+}
+
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    margin: -1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.credit-right {
+    margin-left: 1em;
+    opacity: .66;
+}
+
+.icons {
+    width: 20px;
+    height: 20px;
+}
+
+.fi,
+.icons {
+    display: inline-block;
+    vertical-align: middle;
+}
+
+.footer-content {
+    margin-top: 2rem;
+    font-family: "Quicksand", sans-serif;
+}
+
+.unstyled-list {
+    padding: 0;
+    list-style: none;
+}
+
+
+.iconed-text {
+    margin-left: .5em;
+}
+
+.footer-heading {
+    padding-left: 0px;
+    padding-top: 0px;
+    padding-bottom: 0px;
+}
+
+#backToTopButton {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.12);
+    display: block;
+    width: 64px;
+    height: 64px;
+    padding-top: 30px;
+    box-sizing: border-box;
+    transition: background .3s, color .3s;
+}
+
+#backToTop.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 0s, opacity .3s;
+}
+
+#backToTop {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear .3s, opacity .3s;
+}
+
+#backToTop .text {
+    display: block;
+    line-height: 1;
+    font-size: 11px;
+    text-align: center;
+    text-transform: lowercase;
+}
+
+
+#backToTop #go_up {
+    border-width: 1px 0 0 1px;
+    display: block;
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 16px;
+    left: 35%;
+    transition: border-color .3s;
+}
+
+#Delete.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 0s, opacity .3s;
+}
+
+
+#DeleteButton {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.12);
+    display: block;
+    width: 64px;
+    height: 64px;
+    padding-top: 30px;
+    box-sizing: border-box;
+    transition: background .3s, color .3s;
+}
+
+#Delete #go_up {
+    border-width: 1px 0 0 1px;
+    display: block;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 10px;
+    left: 35%;
+    transition: border-color .3s;
+}
+
+#Delete .text {
+    display: block;
+    line-height: 1;
+    font-size: 11px;
+    text-align: center;
+    text-transform: lowercase;
+}
+
+/* Update Button */
+
+#Update.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 0s, opacity .3s;
+}
+
+
+#UpdateButton {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.12);
+    display: block;
+    width: 64px;
+    height: 64px;
+    padding-top: 30px;
+    box-sizing: border-box;
+    transition: background .3s, color .3s;
+}
+
+#Update #go_up {
+    border-width: 1px 0 0 1px;
+    display: block;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 10px;
+    left: 35%;
+    transition: border-color .3s;
+}
+
+#Update .text {
+    display: block;
+    line-height: 1;
+    font-size: 11px;
+    text-align: center;
+    text-transform: lowercase;
+}
+
+/* Home Button */
+
+#Home.is-visible {
+    visibility: visible;
+    opacity: 1;
+    transition: visibility 0s linear 0s, opacity .3s;
+}
+
+#HomeButton {
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 12px 1px rgba(0, 0, 0, 0.12);
+    display: block;
+    width: 64px;
+    height: 64px;
+    padding-top: 30px;
+    box-sizing: border-box;
+    transition: background .3s, color .3s;
+}
+
+#Home #go_up {
+    border-width: 1px 0 0 1px;
+    display: block;
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    top: 10px;
+    left: 35%;
+    transition: border-color .3s;
+}
+
+#Home .text {
+    display: block;
+    line-height: 1;
+    font-size: 11px;
+    text-align: center;
+    text-transform: lowercase;
+}
+
+/* Home Button */
+#Home {
+    position: fixed;
+    right: 260px;
+    bottom: 30px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear .3s, opacity .3s;
+}
+
+#Update {
+    position: fixed;
+    right: 186px;
+    bottom: 30px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear .3s, opacity .3s;
+}
+
+#Delete {
+    position: fixed;
+    right: 112px;
+    bottom: 30px;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s linear .3s, opacity .3s;
+}

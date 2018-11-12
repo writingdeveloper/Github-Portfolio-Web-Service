@@ -1,0 +1,153 @@
+doctype html
+head
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1.0')
+  meta(http-equiv='X-UA-Compatible', content='ie=edge')
+  title Project Detail
+  link(rel='stylesheet', href='/stylesheets/create.css')
+  script(src='/javascripts/setting.js')
+form(method='post', action='/create_process' enctype="multipart/form-data" id="searchForm" onsubmit="return validateForm()")
+  section#works.l-section(role='region')
+    .l-section-holder
+      h2.section-heading
+        span.secondary Create Page
+        span.primary
+            label(for="projectName") Name :
+            input(type="text" id="projectName" name="projectName" class="create_form")
+      #portfolio.section-content.gallery.alternate
+        article#work1.gallery-item(role='article')
+          figure.gallery-figure(role='group')
+            .gallery-image
+              img.gallery-image-thumb(src=`${imgurl}`)
+            figcaption.gallery-caption
+              h3.gallery-title Project Name will be Display here!
+                select#portfolio-type-select(name='portType' class="create_form")
+                  option(value="" selected disabled hidden) Choose Type
+                  option(value='Project') Projects
+                  option(value='Certificate') Certifications
+                  option(value='Education') Education
+              ul.gallery-spec
+                li.gallery-spec-item
+                  strong.gallery-spec-key Programming Language
+                  input(type="text" id="sumLang" name="sumLang" class="create_form")
+                li.gallery-spec-item
+                  strong.gallery-spec-key Term
+                  input(type="month" id="pjdate1" name="pjdate1" class="create_form")
+                  p(id="create_p") ~
+                  input(type="month" id="pjdate2" name="pjdate2" class="create_form")
+              p(id="ProjectSummary") Project Summary
+              #work1Description
+                textarea(cols="30", rows="10" id="projectExplanation" name="projectExplanation" class="create_form")
+                strong.gallery-spec-key Demo Link
+                input(type="text" id="projectUrl" name="projectUrl" class="create_form")
+                br
+                strong.gallery-spec-key Github repository Link
+                input(type="text" id="githuburl" name="githuburl" class="create_form" placeholder="This form will get Github Repos README.md file")
+                strong.gallery-spec-key Image Upload
+                  input(type="file" id="projectImg" name="projectImg" class="create_form" accept="image/*")
+                  input(type="submit")
+        #readme.Box.Box--condensed.instapaper_body.md
+        .Box-header.px-2.clearfix
+          h3.Box-title.pr-3
+            svg.octicon.octicon-book(viewbox='0 0 16 16', version='1.1', width='16', height='16', aria-hidden='true')
+              path(fill-rule='evenodd', d='M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z')
+            |         README.md Information will be display here (Needs github repository Link!)
+  footer#footer.l-footer(role='contentinfo')
+    .l-section-holder.l-footer-holder.footer-widget-group
+      // 크레딧
+      #credits.footer-widget
+        h2.footer-heading Credits
+        .footer-content
+          ul.credit-list
+            li.credit-item
+              .credit-left
+                a(href='https://fonts.google.com/specimen/Open+Sans', target='_blank') Open Sans
+                |  font
+              span.sr-only by
+              .credit-right Steve Matteson
+            li.credit-item
+              .credit-left
+                a(href='https://fonts.google.com/specimen/Quicksand', target='_blank') Quicksand
+                |  font
+              span.sr-only by
+              .credit-right Andrew Paglinawan
+            li.credit-item
+              .credit-left
+                a(href='http://www.flaticon.com/packs/creative-outlines/', target='_blank') Creative Outlines
+                |  iconpack
+              span.sr-only by
+              .credit-right Gregor Cresnar
+            li.credit-item
+              .credit-left
+                a(href='http://sass-lang.com/') Sass
+              span.sr-only by
+              .credit-right Hampton Catlin, Natalie Weizenbaum, Chris Eppstein and MIT
+            li.credit-item
+              .credit-left
+                a(href='http://compass-style.org/', target='_blank') Compass
+              span.sr-only by
+              .credit-right Christopher M.Eppstein
+            li.credit-item
+              .credit-left
+                a(href='https://findawayer.github.io/', target='_blank') Web Design
+              span.sr-only by
+              .credit-right Tae Sung Im
+      // 연락처
+      #contacts.footer-widget
+        h2.footer-heading Contacts
+        .footer-content
+          ul.unstyled-list
+            li
+              //
+              a(href='mailto:super2451894@gmail.com', title='이메일')
+                //
+                img(src="https://png.icons8.com/material-outlined/50/ffffff/new-post.png" class="icons")
+                //
+                                                  
+                span.iconed-text super2451894@gmail.com
+                //
+              //
+            li
+              //
+              span(title='전화')
+                //
+                img(src='https://png.icons8.com/material/50/ffffff/google-mobile.png' class="icons")
+                //
+                                                  
+                span.iconed-text +82 10 3736 9328
+                //
+              //
+            li
+              //
+              span(title='카카오톡')
+                //
+                img(src='https://png.icons8.com/ios/50/ffffff/speech-bubble.png' class="icons")
+                //
+                                                  
+                span.iconed-text leesihung@KakaoTalk
+                //
+              //
+            li
+              //
+              a(href='https://github.com/sangumee', target='_blank', title='깃허브')
+                //
+                img(src='https://png.icons8.com/windows/50/ffffff/github.png' class="icons")
+                //
+                                                  
+                span.iconed-text Github Account
+                //
+              //
+  aside#backToTop.is-visible
+    a#backToTopButton(role='button', href='#')
+      img(src='https://png.icons8.com/ios-glyphs/50/666666/collapse-arrow.png' id="go_up")
+      span.text
+        | page
+        br
+        b top
+  aside#Home.is-visible
+    a#HomeButton(role='button', href='/')
+      img(src="https://png.icons8.com/ios/50/000000/home-page.png" id="go_up")
+      span.text
+        | Go
+        br
+        b home      
