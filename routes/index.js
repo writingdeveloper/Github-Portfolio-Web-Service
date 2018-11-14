@@ -3,23 +3,17 @@ let router = express.Router();
 let bodyParser = require("body-parser");
 let path = require("path");
 
-/* Database Module */
-const mysql = require("mysql");
-var db = mysql.createConnection({
-  host: "",
-  user: "",
-  password: "",
-  database: ""
-});
+let db = require("../lib/db");
+
 // DB Connection Check
-db.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
+// db.connect(function(err) {
+//   if (err) throw err;
+//   console.log("Connected!");
+// });
 
 // Routes to portFolioData.js
-// let portfolioDataRouter = require("./portfolioData");
-// router.use("/", portfolioDataRouter);
+let portfolioDataRouter = require("./portfolioData");
+router.use("/", portfolioDataRouter);
 
 router.use(bodyParser.json()); // to support JSON-encoded bodies
 router.use(
