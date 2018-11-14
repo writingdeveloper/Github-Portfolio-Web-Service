@@ -1,6 +1,7 @@
 let express = require("express");
 let router = express.Router();
 var path = require("path");
+const db = require("../lib/db");
 
 router.use(express.static(path.join(__dirname, "public")));
 
@@ -22,20 +23,6 @@ let upload = multer({
   storage: storage
 });
 
-const mysql = require("mysql");
-
-var db = mysql.createConnection({
-  host: "175.115.237.238",
-  user: "sangumee",
-  password: "sihung84265@",
-  database: "portfolio"
-});
-
-db.connect(function(err) {
-  if (err) throw err;
-  console.log("Connected!");
-});
-
 /* GET home page. */
 router.get(`/:LinkedInUser`, function(req, res, next) {
   let userId = req.params.LinkedInUser;
@@ -44,6 +31,7 @@ router.get(`/:LinkedInUser`, function(req, res, next) {
     "SELECT * FROM Personal_Data WHERE linkedInName='" + userId + "'",
     function(error, data) {
       // Log Data
+      console.log(error);
       console.log(data);
       console.log(data.id);
       res.render("portfolioItems", {
