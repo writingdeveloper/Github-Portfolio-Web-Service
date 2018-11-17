@@ -31,9 +31,9 @@ router.get(`/:LinkedInUser`, function(req, res, next) {
     "SELECT * FROM Personal_Data WHERE linkedInName='" + userId + "'",
     function(error, data) {
       // Log Data
-      console.log(error);
-      console.log(data);
-      console.log(data.id);
+      // console.log(error);
+      // console.log(data);
+      // console.log(data.id);
       res.render("portfolioItems", {
         dataarray: data
         // id: data.id,
