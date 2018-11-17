@@ -29,8 +29,21 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 /* GET home page. */
 router.get("/", function(req, res, next) {
   // Log Data
-  // console.log(data);
-  res.render("main", {});
+  db.query(
+    `SELECT linkedInName FROM Personal_Data group by linkedInName`,
+    function(error, data) {
+      //Log Error
+      if (error) {
+        console.log(error);
+      }
+      console.log(data);
+
+      // console.log(data);
+      res.render("main", {
+        dataarray: data
+      });
+    }
+  );
 });
 
 module.exports = router;
