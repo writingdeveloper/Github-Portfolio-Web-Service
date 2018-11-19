@@ -1,6 +1,7 @@
 let express = require("express");
 let router = express.Router();
-var path = require("path");
+let path = require("path");
+const shortid = require("shortid");
 const db = require("../lib/db");
 
 router.use(express.static(path.join(__dirname, "public")));
@@ -35,7 +36,8 @@ router.get(`/:LinkedInUser`, function(req, res, next) {
       // console.log(data);
       // console.log(data.id);
       res.render("portfolioItems", {
-        dataarray: data
+        dataarray: data,
+        userId: userId
         // id: data.id,
         // userid: data.linkedInName,
         // type: data.type,
@@ -54,6 +56,7 @@ router.get("/:userId/create", function(req, res, next) {
   let userId = req.params.userId;
   res.render("create", {
     // Sample Image
+    userId: userId,
     imgurl:
       "https://via.placeholder.com/730x444?text=Portfolio Image will be display here!"
   });
@@ -65,36 +68,64 @@ router.post("/:userId/create_process", upload.single("projectImg"), function(
   res,
   next
 ) {
+  let body = req.body;
   let sid = shortid.generate();
+  let linkedInName = req.params.userId;
+  let name = req.body.projectName;
+  let type = req.body.portType;
+  let url = req.body.projectUrl;
+  let explanation = req.body.projectExplanation;
   // files information are in req.file object
   console.log(req.file);
-
   // Check Image Process
   let checkImg = req.file;
+  console.log(checkImg);
   // If there is no image use 404.png iamge
   if (checkImg === undefined) {
     checkImg = "app/404.png";
     console.log(checkImg);
   } else {
     // If Image is exist put original name
-    checkImg = req.file.originalname;
+    checkImg = req.file.filename;
   }
+  let imgurl = checkImg;
+  let sumlang = req.body.sumLang;
+  let pjdate1 = req.body.pjdate1;
+  let pjdate2 = req.body.pjdate2;
+  let githuburl = req.body.githuburl;
 
-  // DB Write
-  db.get("project")
-    .push({
-      id: sid,
-      name: req.body.projectName,
-      type: req.body.portType,
-      url: req.body.projectUrl,
-      explanation: req.body.projectExplanation,
-      imgurl: checkImg,
-      sumlang: req.body.sumLang,
-      pjdate1: req.body.pjdate1,
-      pjdate2: req.body.pjdate2,
-      githuburl: req.body.githuburl
-    })
-    .write();
+  db.query(
+    "INSERT INTO Personal_Data (id, linkedInName, name, type, url, explanation, imgurl, sumlang, pjdate1, pjdate2, githuburl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+    [
+      sid,
+      linkedInName,
+      name,
+      type,
+      url,
+      explanation,
+      imgurl,
+      sumlang,
+      pjdate1,
+      pjdate2,
+      githuburl
+    ]
+  );
+
+  // // DB Write
+  // db.get("project")
+  //   .push({
+  //     id: sid,
+  //     name: req.body.projectName,
+  //     type: req.body.portType,
+  //     url: req.body.projectUrl,
+  //     explanation: req.body.projectExplanation,
+  //     imgurl: checkImg,
+  //     sumlang: req.body.sumLang,
+  //     pjdate1: req.body.pjdate1,
+  //     pjdate2: req.body.pjdate2,
+  //     githuburl: req.body.githuburl
+  //   })
+  //   .write();
   res.redirect(`/`);
 });
 
@@ -103,6 +134,7 @@ router.post("/:userId/:pageId/delete_process", function(req, res, next) {
   // GET userId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
+  console.log(userId + " and " + pageId);
   db.query(`DELETE FROM Personal_Data WHERE id=?`, [pageId], function(
     error,
     data
@@ -137,87 +169,107 @@ router.post("/:userId/:pageId/delete_process", function(req, res, next) {
   //     });
   //   }
 
-  res.redirect("/");
+  /* TODO :: ERROR IN userID*/
+  res.redirect(`/:userId`);
 });
 
 /* GET Update Page */
-router.get("/update/:pageId", function(req, res) {
-  let id = req.params.pageId;
-  console.log("ID PARAMETER IS : " + id);
-  let data = db
-    .get("project")
-    .find({
-      id: id
-    })
-    .value();
-  // console.log(data);
-  res.render("update", {
-    id: id,
-    name: data.name,
-    type: data.type,
-    url: data.url,
-    explanation: data.explanation,
-    imgurl: data.imgurl,
-    startDate: data.pjdate1,
-    endDate: data.pjdate2,
-    githuburl: data.githuburl,
-    sumlang: data.sumlang
+router.get("/:userId/:pageId/update", function(req, res) {
+  let userId = req.params.userId;
+  let pageId = req.params.pageId;
+
+  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function(
+    error,
+    data
+  ) {
+    if (error) {
+      throw error;
+    }
+
+    console.log(data);
+    res.render("update", {
+      userId: userId,
+      pageId: pageId,
+      name: data[0].name,
+      type: data[0].type,
+      url: data[0].url,
+      explanation: data[0].explanation,
+      imgurl: data[0].imgurl,
+      startDate: data[0].pjdate1,
+      endDate: data[0].pjdate2,
+      githuburl: data[0].githuburl,
+      sumlang: data[0].sumlang
+    });
   });
 });
 
 /* POST Update Page */
-router.post("/update_process/:pageId", upload.single("projectImg"), function(
-  req,
-  res
-) {
-  let id = req.params.pageId;
-  // console.log(id);
-  // console.log(req.file);
-  let data = db
-    .get("project")
-    .find({
-      id: id
-    })
-    .value();
-  // console.log(data);
+router.post(
+  "/:userId/:pageId/update_process",
+  upload.single("projectImg"),
+  function(req, res) {
+    let userId = req.params.userId;
+    let pageId = req.params.pageId;
+    db.query(`SELECT imgurl FROM Personal_Data WHERE id=?`, [pageId], function(
+      error,
+      data
+    ) {
+      if (error) {
+        throw error;
+      }
+      console.log(data[0]);
+      let checkImage = data[0];
 
-  console.log(req.file);
+      let name = req.body.projectName;
+      let type = req.body.portType;
+      let url = req.body.projectUrl;
+      let explanation = req.body.projectExplanation;
 
-  let checkImg;
-  // If there is no image use 404.png iamge
-  if (
-    data.imgurl === undefined &&
-    data.imgurl === "app/404.png" &&
-    req.file === undefined
-  ) {
-    checkImg = "app/404.png";
-    console.log(data.imgurl);
-  } else if (req.file === undefined) {
-    checkImg = data.imgurl;
-    console.log(checkImg);
-  } else {
-    checkImg = req.file.originalname;
+      let imgurl = req.file ? req.file.filename : undefined;
+      let sumlang = req.body.sumLang;
+      let pjdate1 = req.body.pjdate1;
+      let pjdate2 = req.body.pjdate2;
+      let githuburl = req.body.githuburl;
+
+      // If Imgurl is undefined
+      if (imgurl === undefined) {
+        db.query(
+          `UPDATE Personal_Data SET name=?, type=?, url=?, explanation=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
+          [
+            name,
+            type,
+            url,
+            explanation,
+            sumlang,
+            pjdate1,
+            pjdate2,
+            githuburl,
+            pageId
+          ]
+        );
+        // If Imgurl is exist
+      } else {
+        db.query(
+          `UPDATE Personal_Data SET name=?, type=?, url=?, explanation=?, imgurl=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
+          [
+            name,
+            type,
+            url,
+            explanation,
+            imgurl,
+            sumlang,
+            pjdate1,
+            pjdate2,
+            githuburl,
+            pageId
+          ]
+        );
+      }
+    });
+
+    res.redirect("/" + userId);
   }
-
-  db.get("project")
-    .find({
-      id: id
-    })
-    .assign({
-      id: id,
-      name: req.body.projectName,
-      type: req.body.portType,
-      url: req.body.projectUrl,
-      explanation: req.body.projectExplanation,
-      imgurl: checkImg,
-      sumlang: req.body.sumLang,
-      pjdate1: req.body.pjdate1,
-      pjdate2: req.body.pjdate2,
-      githuburl: req.body.githuburl
-    })
-    .write();
-  res.redirect("/" + id);
-});
+);
 
 router.get("/resumeeng", function(req, res, next) {
   console.log("Hello");
@@ -232,11 +284,10 @@ router.get("/resumekor", function(req, res, next) {
 router.get("/:userId/:pageId", function(req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
-  let sid = req.params.pageId;
-  console.log(userId);
-  console.log(sid);
+  let pageId = req.params.pageId;
+
   // GET data id to use Object
-  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [sid], function(
+  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function(
     error,
     data
   ) {
@@ -290,6 +341,7 @@ router.get("/:userId/:pageId", function(req, res, next) {
       res.render("detail", {
         id: data[0].id,
         userId: userId,
+        pageId: pageId,
         dataarray: data[0],
         type: data[0].type,
         name: data[0].name,
