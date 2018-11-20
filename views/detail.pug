@@ -73,11 +73,6 @@ footer#footer.l-footer(role='contentinfo')
               a(href='http://compass-style.org/', target='_blank') Compass
             span.sr-only by
             .credit-right Christopher M.Eppstein
-          li.credit-item
-            .credit-left
-              a(href='https://findawayer.github.io/', target='_blank') Web Design
-            span.sr-only by
-            .credit-right Tae Sung Im
     // 연락처
     #contacts.footer-widget
       h2.footer-heading Contacts
@@ -131,7 +126,7 @@ aside#backToTop.is-visible
       br
       b top
 aside#Delete.is-visible
-  form(method="post" action=`/${userId}/${id}/delete_process`)
+  form(method="post" action=`/${userId}/${pageId}/delete_process`)
     input(type='image' src='https://png.icons8.com/ios/35/000000/waste-filled.png' id="go_up" onclick="return checkDelete()")
   a#DeleteButton(role='button')
     span.text
@@ -146,7 +141,7 @@ aside#Home.is-visible
       br
       b home
 aside#Update.is-visible
-  a#UpdateButton(role='button', href=`/update/${id}`)
+  a#UpdateButton(role='button', href=`/${userId}/${pageId}/update`)
     img(src="https://png.icons8.com/windows/50/000000/edit-file.png" id="go_up")
     span.text
       | Update
