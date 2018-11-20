@@ -6,7 +6,7 @@ head
   title Project Detail
   link(rel='stylesheet', href='/stylesheets/create.css')
   script(src='/javascripts/setting.js')
-form(method='post', action='/create_process' enctype="multipart/form-data" id="searchForm" onsubmit="return validateForm()")
+form(method='post', action=`/${userId}/create_process` enctype="multipart/form-data" id="searchForm" onsubmit="return validateForm()")
   section#works.l-section(role='region')
     .l-section-holder
       h2.section-heading

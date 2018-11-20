@@ -63,10 +63,10 @@ header.MOD_HEADER2
     div(data-layout='al16 de8')
       img.MOD_HEADER2_Logo(alt='Company name', src='https://unsplash.it/300/100/?random')
     .MOD_HEADER2_SearchContainer(data-layout='al16 de8')
-      p.MOD_HEADER2_Slogan(data-theme='_ts1') Enter your LinkedIn ID or User ID to use then create your own portfolio page
+      p.MOD_HEADER2_Slogan(data-theme='_ts1') Enter your Github ID or User ID to use then create your own portfolio page
       // Search
-      form(name='Header2', action='', method='')
-        input#MOD_HEADER2_Search.MOD_HEADER2_Search(type='search', placeholder='Search')
+      form(name='Header2', action=`/user`, method='post')
+        input#MOD_HEADER2_Search.MOD_HEADER2_Search(type='search', name='id' placeholder='Search')
         label(for='MOD_HEADER2_Search') Search
 //
   END MODULE AREA 1: Blog Article
@@ -76,7 +76,7 @@ section
   div(data-layout='_r')
     div#introduce_text(data-layout='ec-third')
       p
-        | You can re-organize your portfolio with only LinkedIn ID registration. You can also register your own portfolio. This project started because I thought that the resume format provided by various job sites is not suitable for expressing me.
+        | You can re-organize your portfolio with only Github ID registration. You can also register your own portfolio. This project started because I thought that the resume format provided by various job sites is not suitable for expressing me.
     div(data-layout='ch8 ec-third')
       img(src='https://unsplash.it/400/300/?random', alt='')
 //
@@ -85,30 +85,13 @@ section
   START MODULE AREA 3: Staff 1
 section
   div(data-layout='_r')
-    div(data-layout='ch8 ec4')
-      img.MOD_STAFF_Picture(src='https://unsplash.it/400/400/?random', alt='', data-theme='_is1')
-      p.MOD_STAFF_Name(data-theme='_bb1') John Smith
-      p.MOD_STAFF_Positon Position
-      p
-        | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    div(data-layout='ch8 ec4')
-      img.MOD_STAFF_Picture(src='https://unsplash.it/400/400/?random', alt='', data-theme='_is1')
-      p.MOD_STAFF_Name(data-theme='_bb1') Jane Smith
-      p.MOD_STAFF_Positon Position
-      p
-        | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    div(data-layout='ch8 ec4')
-      img.MOD_STAFF_Picture(src='https://unsplash.it/400/400/?random', alt='', data-theme='_is1')
-      p.MOD_STAFF_Name(data-theme='_bb1') John Smith
-      p.MOD_STAFF_Positon Position
-      p
-        | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    div(data-layout='ch8 ec4')
-      img.MOD_STAFF_Picture(src='https://unsplash.it/400/400/?random', alt='', data-theme='_is1')
-      p.MOD_STAFF_Name(data-theme='_bb1') Jane Smith
-      p.MOD_STAFF_Positon Position
-      p
-        | Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+    each profile in dataarray
+      div(data-layout='ch8 ec4')
+        img.MOD_STAFF_Picture(src=`${profile.avatar_url}`, alt='', data-theme='_is1')
+        a.name(href=`/${profile.login}`)
+          p.MOD_STAFF_Name(data-theme='_bb1')= `${profile.name}`
+        p.MOD_STAFF_Positon Position
+        p=`${profile.bio}`
 //
   END MODULE AREA 3: Staff 1
 //
