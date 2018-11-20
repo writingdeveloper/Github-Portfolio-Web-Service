@@ -29,7 +29,7 @@ router.get(`/:LinkedInUser`, function(req, res, next) {
   let userId = req.params.LinkedInUser;
   console.log(userId);
   db.query(
-    "SELECT * FROM Personal_Data WHERE linkedInName='" + userId + "'",
+    "SELECT * FROM Personal_Data WHERE githubid='" + userId + "'",
     function(error, data) {
       // Log Data
       // console.log(error);
@@ -39,7 +39,7 @@ router.get(`/:LinkedInUser`, function(req, res, next) {
         dataarray: data,
         userId: userId
         // id: data.id,
-        // userid: data.linkedInName,
+        // userid: data.githubid,
         // type: data.type,
         // name: data.name,
         // url: data.url,
@@ -70,7 +70,7 @@ router.post("/:userId/create_process", upload.single("projectImg"), function(
 ) {
   let body = req.body;
   let sid = shortid.generate();
-  let linkedInName = req.params.userId;
+  let githubid = req.params.userId;
   let name = req.body.projectName;
   let type = req.body.portType;
   let url = req.body.projectUrl;
@@ -95,10 +95,10 @@ router.post("/:userId/create_process", upload.single("projectImg"), function(
   let githuburl = req.body.githuburl;
 
   db.query(
-    "INSERT INTO Personal_Data (id, linkedInName, name, type, url, explanation, imgurl, sumlang, pjdate1, pjdate2, githuburl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+    "INSERT INTO Personal_Data (id, githubid, name, type, url, explanation, imgurl, sumlang, pjdate1, pjdate2, githuburl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
     [
       sid,
-      linkedInName,
+      githubid,
       name,
       type,
       url,
@@ -126,7 +126,7 @@ router.post("/:userId/create_process", upload.single("projectImg"), function(
   //     githuburl: req.body.githuburl
   //   })
   //   .write();
-  res.redirect(`/`);
+  res.redirect("/" + userId);
 });
 
 /* Delete Process */
@@ -170,7 +170,7 @@ router.post("/:userId/:pageId/delete_process", function(req, res, next) {
   //   }
 
   /* TODO :: ERROR IN userID*/
-  res.redirect(`/:userId`);
+  res.redirect("/" + userId);
 });
 
 /* GET Update Page */
