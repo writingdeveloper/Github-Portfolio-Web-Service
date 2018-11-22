@@ -85,11 +85,17 @@ section
   START MODULE AREA 3: Staff 1
 section
   div(data-layout='_r')
+    div(data-layout='ch8 ec4')
+      img.MOD_STAFF_Picture(src='https://avatars1.githubusercontent.com/u/6832586?s=460&v=4', alt='', data-theme='_is1')
+      p.MOD_STAFF_Name(data-theme='_bb1') Sihyeong Lee
+      p.MOD_STAFF_Positon Web Developer
+      p
+        | Hello! I'm developer of this Web Site
     each profile in dataarray
       div(data-layout='ch8 ec4')
         img.MOD_STAFF_Picture(src=`${profile.avatar_url}`, alt='', data-theme='_is1')
         a.name(href=`/${profile.login}`)
-          p.MOD_STAFF_Name(data-theme='_bb1')= `${profile.name}`
+        p.MOD_STAFF_Name(data-theme='_bb1')= `${profile.name}`
         p.MOD_STAFF_Positon Position
         p=`${profile.bio}`
 //
