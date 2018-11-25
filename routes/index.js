@@ -1,11 +1,12 @@
-let express = require("express");
-let router = express.Router();
-let bodyParser = require("body-parser");
-let path = require("path");
-let request = require("request");
+const express = require("express");
+const router = express.Router();
+const bodyParser = require("body-parser");
+const path = require("path");
+const request = require("request");
+const shortid = require("shortid");
 
 // DB Import
-let db = require("../lib/db");
+const db = require("../lib/db");
 
 // Parse DATA
 const fieldOrder = [
@@ -90,7 +91,7 @@ router.post("/user", function(req, res, next) {
 
   // User Repository API Option Set
   let repositoryOptions = {
-    url: githubAPI + id + "repos",
+    url: githubAPI + id + "/repos",
     headers: {
       "User-Agent": "request"
     }
@@ -109,12 +110,85 @@ router.post("/user", function(req, res, next) {
     )}) VALUES (${fieldOrder.map(e => "?").join(",")})`;
     db.query(sql, values);
   });
+
   // User Repository Information API Process
-  request(repositoryOptions, function(error, responmse, data) {
+  request(repositoryOptions, function(error, response, data) {
     if (error) {
       throw error;
     }
+    // repositoryResult have JSON Repos Data
     let repositoryResult = JSON.parse(data);
+
+    let repositoryAll = [];
+
+    for (i = 0; i < repositoryResult.length; i++) {
+      // Generate Short ID to use in Personal_Data DB
+      let sid = shortid.generate();
+      repositoryAll.push({
+        id: sid,
+        githubid: id,
+        name: repositoryResult[i].name,
+        githuburl: repositoryResult[i].html_url,
+        explanation: repositoryResult[i].description,
+        created_at: repositoryResult[i].created_at,
+        updated_at: repositoryResult[i].updated_at
+      });
+    }
+    // console.log(repositoryAll);
+    // let repositoryNameArray = [];
+    // let repositoryURL = [];
+    // for (i = 0; i < repositoryResult.length; i++) {
+    //   repositoryNameArray.push(repositoryResult[i].name);
+    //   repositoryURL.push(repositoryResult[i].html_url);
+    // }
+    // console.log(repositoryNameArray);
+    // console.log(repositoryURL);
+
+    console.log(repositoryAll.length);
+    let values = "";
+    for (i = 0; i < repositoryAll.length; i++) {
+      values +=
+        "(" +
+        "'" +
+        repositoryAll[i].id +
+        "'" +
+        "," +
+        "'" +
+        repositoryAll[i].githubid +
+        "'" +
+        "," +
+        "'" +
+        repositoryAll[i].name +
+        "'" +
+        "," +
+        "'" +
+        repositoryAll[i].githuburl +
+        "'" +
+        "," +
+        "'" +
+        repositoryAll[i].explanation +
+        "'" +
+        "," +
+        "'" +
+        repositoryAll[i].created_at +
+        "'" +
+        "," +
+        "'" +
+        repositoryAll[i].updated_at +
+        "'" +
+        ")" +
+        ",";
+    }
+
+    // console.log("Final Value :" + values.slice(0, -1));
+    let sqlData = values.slice(0, -1);
+    // console.log(sqlData);
+
+    // let values = [...repositoryAll[0].join(",")];
+    // console.log(values);
+    let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES ${sqlData}`;
+    console.log(sql);
+    db.query(sql);
   });
 
   res.redirect("/");
