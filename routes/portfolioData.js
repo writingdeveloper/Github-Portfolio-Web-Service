@@ -1,6 +1,6 @@
-let express = require("express");
-let router = express.Router();
-let path = require("path");
+const express = require("express");
+const router = express.Router();
+const path = require("path");
 const shortid = require("shortid");
 const db = require("../lib/db");
 
@@ -27,25 +27,33 @@ let upload = multer({
 /* GET home page. */
 router.get(`/:LinkedInUser`, function(req, res, next) {
   let userId = req.params.LinkedInUser;
-  console.log(userId);
+  // console.log(userId);
   db.query(
     "SELECT * FROM Personal_Data WHERE githubid='" + userId + "'",
     function(error, data) {
-      // Log Data
-      // console.log(error);
-      // console.log(data);
-      // console.log(data.id);
-      res.render("portfolioItems", {
-        dataarray: data,
-        userId: userId
-        // id: data.id,
-        // userid: data.githubid,
-        // type: data.type,
-        // name: data.name,
-        // url: data.url,
-        // sumlang: data.sumlang,
-        // explanation: data.explanation
-        // imgurl: checkImg
+      if (error) {
+        throw error;
+      }
+      let option = {
+        url: "https://api.unsplash.com/search/photos?page=1&query=apple",
+        headers: {
+          Authorization:
+            "Client-ID 89511a20975117a2d7d1c3fd1904517bb7326531502dc28a78dd73bb67269e4a"
+        }
+      };
+      request(option, function(error, response, callback) {
+        if (error) {
+          throw error;
+        }
+        let results = JSON.parse(callback);
+        // console.log(results.results[0].urls.raw);
+        let image = results.results[0].urls.raw;
+
+        res.render("portfolioItems", {
+          dataarray: data,
+          userId: userId,
+          callback: image
+        });
       });
     }
   );
@@ -68,6 +76,7 @@ router.post("/:userId/create_process", upload.single("projectImg"), function(
   res,
   next
 ) {
+  let userId = req.params.userId;
   let body = req.body;
   let sid = shortid.generate();
   let githubid = req.params.userId;
@@ -218,7 +227,6 @@ router.post(
         throw error;
       }
       console.log(data[0]);
-      let checkImage = data[0];
 
       let name = req.body.projectName;
       let type = req.body.portType;
@@ -267,18 +275,9 @@ router.post(
       }
     });
 
-    res.redirect("/" + userId);
+    res.redirect("/" + userId + "/" + pageId);
   }
 );
-
-router.get("/resumeeng", function(req, res, next) {
-  console.log("Hello");
-  res.render("resumeeng", {});
-});
-router.get("/resumekor", function(req, res, next) {
-  console.log("Hello");
-  res.render("resumekor", {});
-});
 
 /* GET Detail View Page */
 router.get("/:userId/:pageId", function(req, res, next) {
@@ -294,30 +293,34 @@ router.get("/:userId/:pageId", function(req, res, next) {
     if (error) {
       throw error;
     }
-    console.log(data[0]);
-    // Check Image Process
-    let checkImg = data[0].imgurl;
-    let checkType = data[0].type;
-    // Check Image Validate
-    if (checkImg === "app/404.png" || checkType === "Certificate") {
-      // Type is Certificate but No Image then USE this link
-      checkImg = "app/Certificate.png";
-    }
-    if (checkImg === "app/404.png" && checkType === "Education") {
-      // Type is Certificate but No Image then USE this link
-      checkImg = "app/Education.png";
-    }
-    // If there is no image use 404.png iamge
-    if (checkImg === undefined) {
-      checkImg = "sample.png";
-      console.log(checkImg);
-    } else {
-      checkImg = data[0].imgurl;
-    }
+    let results = data[0];
+    // // Check Image Process
+    // let imgurl = results.imgurl ? req.file.filename : undefined;
+    console.log(results.imgurl);
+
+    // let checkImg = data[0].imgurl;
+    // let checkType = data[0].type;
+    // // Check Image Validate
+    // if (checkImg === "app/404.png" || checkType === "Certificate") {
+    //   // Type is Certificate but No Image then USE this link
+    //   checkImg = "app/Certificate.png";
+    // }
+    // if (checkImg === "app/404.png" && checkType === "Education") {
+    //   // Type is Certificate but No Image then USE this link
+    //   checkImg = "app/Education.png";
+    // }
+    // // If there is no image use 404.png iamge
+    // if (checkImg === undefined) {
+    //   checkImg = "sample.png";
+    //   console.log(checkImg);
+    // } else {
+    //   checkImg = data[0].imgurl;
+    // }
 
     // Get github URL
-    let url = data[0].githuburl;
-    console.log(url);
+    let url = results.githuburl;
+
+    // console.log(url);
     // Use Request Module to parsing Web page
     request(url, function(error, response, html) {
       // If Error with parsing Github README.md
@@ -335,24 +338,21 @@ router.get("/:userId/:pageId", function(req, res, next) {
           readme = $(this).html();
         });
       }
-
       // Rendering
       console.log("No Problem with Detail Pages data");
       res.render("detail", {
-        id: data[0].id,
         userId: userId,
         pageId: pageId,
-        dataarray: data[0],
-        type: data[0].type,
-        name: data[0].name,
-        url: data[0].url,
-        explanation: data[0].explanation,
-        imgurl: checkImg,
-        markdown: readme,
-        startDate: data[0].pjdate1,
-        endDate: data[0].pjdate2,
-        githuburl: data[0].githuburl,
-        sumlang: data[0].sumlang
+        name: results.name,
+        imgurl: results.imgurl,
+        type: results.type,
+        sumlang: results.sumlang,
+        startDate: results.pjdate1,
+        endDate: results.pjdate2,
+        explanation: results.explanation,
+        url: results.url,
+        githuburl: results.githuburl,
+        markdown: readme
       });
     });
   });
