@@ -4,7 +4,7 @@ block content
   header
     nav
       h1
-        a(href='/') Si Hyeong Lee's Portfolio
+        a(href='/')= `${userId}`
   main#maincontent
     section
       .filter-options
@@ -15,16 +15,12 @@ block content
           option(value='Certificate') Certifications
           option(value='Education') Education
         button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
-        button(class='button' type='button' onclick="window.location.href='/resumeeng'") Resume/English
-        button(class='button' type='button' onclick="window.location.href='/resumekor'") Resume/Korean
-        button(class='button' type='button' onclick="window.location.href='https://www.linkedin.com/in/sihyeonglee'") LinkedIn
-        button(class='button' type='button' onclick=`window.location.href=/login`) Login
     ul#restaurants-list
       each projects in dataarray
         li(class=`${projects.type}`)
           .type-box
             p(class=`paragraph-`+`${projects.type}`)=`${projects.type}`
-          img.restaurant-img(src=`/images/${projects.imgurl}` onerror=`this.src='/images/app/${projects.type}.png'`)
+          img.restaurant-img(src=`${callback}` onerror=`this.src='/images/app/${projects.type}.png'`)
           a(href=`/${projects.id}`)
             h1= projects.name
           p(class="element" style="font-weight: bold")= `Keyword : ${projects.sumlang}`
@@ -32,13 +28,13 @@ block content
             br
             br
             br
-          a(href= `/${projects.linkedInName}/` + `${projects.id}` class="viewDetail") View Details
-
+          a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details
   script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
   script(type='application/javascript', charset='utf-8', src='javascripts/sw_register.js')
   
   footer#footer
-    | Copyright (c) 2018 
+    | Copyright (c) 2018
+  p=`${callback}`
     a(href='https://www.linkedin.com/in/sihyeonglee/')
       strong Si Hyeong Lee
     |  All Rights Reserved.
