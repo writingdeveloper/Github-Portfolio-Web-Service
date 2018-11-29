@@ -16,7 +16,7 @@ section#works.l-section(role='region')
   .l-section-holder
     h2.section-heading
       span.secondary Portfolio
-      span.primary= name
+      span.primary= `${name}`
     #portfolio.section-content.gallery.alternate
       article#work1.gallery-item(role='article')
         figure.gallery-figure(role='group')
@@ -37,7 +37,7 @@ section#works.l-section(role='region')
               a.ui-button(role='button', href=`${url}`, target='_blank') Demo
               a.ui-button(role='button', href=`${githuburl}`, target='_blank') Github Repo
         div(id="readme" class="Box Box--condensed instapaper_body md")
-          !=markdown
+          != markdown
 footer#footer.l-footer(role='contentinfo')
   .l-section-holder.l-footer-holder.footer-widget-group
     // 크레딧
