@@ -13,10 +13,10 @@ let request = require("request");
 // Multer Module
 let multer = require("multer"); // multer모듈 적용 (for 파일업로드)
 let storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, "./public/images/"); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     cb(null, file.originalname); // cb 콜백함수를 통해 전송된 파일 이름 설정
   }
 });
@@ -25,23 +25,22 @@ let upload = multer({
 });
 
 /* GET home page. */
-router.get(`/:LinkedInUser`, function(req, res, next) {
-  let userId = req.params.LinkedInUser;
+router.get(`/:githubUser`, function (req, res, next) {
+  let userId = req.params.githubUser;
   // console.log(userId);
   db.query(
     "SELECT * FROM Personal_Data WHERE githubid='" + userId + "'",
-    function(error, data) {
+    function (error, data) {
       if (error) {
         throw error;
       }
       let option = {
         url: "https://api.unsplash.com/search/photos?page=1&query=apple",
         headers: {
-          Authorization:
-            "Client-ID 89511a20975117a2d7d1c3fd1904517bb7326531502dc28a78dd73bb67269e4a"
+          Authorization: "Client-ID 89511a20975117a2d7d1c3fd1904517bb7326531502dc28a78dd73bb67269e4a"
         }
       };
-      request(option, function(error, response, callback) {
+      request(option, function (error, response, callback) {
         if (error) {
           throw error;
         }
@@ -60,18 +59,17 @@ router.get(`/:LinkedInUser`, function(req, res, next) {
 });
 
 /* GET Create Page */
-router.get("/:userId/create", function(req, res, next) {
+router.get("/:userId/create", function (req, res, next) {
   let userId = req.params.userId;
   res.render("create", {
     // Sample Image
     userId: userId,
-    imgurl:
-      "https://via.placeholder.com/730x444?text=Portfolio Image will be display here!"
+    imgurl: "https://via.placeholder.com/730x444?text=Portfolio Image will be display here!"
   });
 });
 
 /* POST Create_Process Page */
-router.post("/:userId/create_process", upload.single("projectImg"), function(
+router.post("/:userId/create_process", upload.single("projectImg"), function (
   req,
   res,
   next
@@ -139,12 +137,12 @@ router.post("/:userId/create_process", upload.single("projectImg"), function(
 });
 
 /* Delete Process */
-router.post("/:userId/:pageId/delete_process", function(req, res, next) {
+router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   // GET userId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   console.log(userId + " and " + pageId);
-  db.query(`DELETE FROM Personal_Data WHERE id=?`, [pageId], function(
+  db.query(`DELETE FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
   ) {
@@ -183,11 +181,11 @@ router.post("/:userId/:pageId/delete_process", function(req, res, next) {
 });
 
 /* GET Update Page */
-router.get("/:userId/:pageId/update", function(req, res) {
+router.get("/:userId/:pageId/update", function (req, res) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
 
-  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function(
+  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
   ) {
@@ -216,10 +214,10 @@ router.get("/:userId/:pageId/update", function(req, res) {
 router.post(
   "/:userId/:pageId/update_process",
   upload.single("projectImg"),
-  function(req, res) {
+  function (req, res) {
     let userId = req.params.userId;
     let pageId = req.params.pageId;
-    db.query(`SELECT imgurl FROM Personal_Data WHERE id=?`, [pageId], function(
+    db.query(`SELECT imgurl FROM Personal_Data WHERE id=?`, [pageId], function (
       error,
       data
     ) {
@@ -280,13 +278,13 @@ router.post(
 );
 
 /* GET Detail View Page */
-router.get("/:userId/:pageId", function(req, res, next) {
+router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
 
   // GET data id to use Object
-  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function(
+  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
   ) {
@@ -322,7 +320,7 @@ router.get("/:userId/:pageId", function(req, res, next) {
 
     // console.log(url);
     // Use Request Module to parsing Web page
-    request(url, function(error, response, html) {
+    request(url, function (error, response, html) {
       // If Error with parsing Github README.md
       if (error) {
         console.log("Have Some problem with Reading Github README.md file!");
@@ -333,9 +331,10 @@ router.get("/:userId/:pageId", function(req, res, next) {
       } else {
         // Parsing readme ID in github page
         let $ = cheerio.load(html);
-        $("#readme").each(function() {
+        $("#readme").each(function () {
           // save to readme Variable
-          readme = $(this).html();
+          readme = $(this).html().replace(/<img src="/gi, '<img src="https://github.com');
+
         });
       }
       // Rendering
