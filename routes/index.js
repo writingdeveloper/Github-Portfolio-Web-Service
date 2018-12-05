@@ -103,12 +103,12 @@ router.post("/user", function (req, res, next) {
       throw error;
     }
     // result have JSON User Data
-    // let result = JSON.parse(data);
-    // let values = fieldOrder.map(k => result[k]);
-    // let sql = `INSERT INTO user (${fieldOrder.join(
-    //   ","
-    // )}) VALUES (${fieldOrder.map(e => "?").join(",")})`;
-    // db.query(sql, values);
+    let result = JSON.parse(data);
+    let values = fieldOrder.map(k => result[k]);
+    let sql = `INSERT INTO user (${fieldOrder.join(
+      ","
+    )}) VALUES (${fieldOrder.map(e => "?").join(",")})`;
+    db.query(sql, values);
   });
 
   // // User Repository Information API Process
@@ -128,13 +128,12 @@ router.post("/user", function (req, res, next) {
       let explanation = result[i].description;
       let created_at = result[i].created_at;
       let updated_at = result[i].updated_at;
+      let sqlData = [sid, githubid, name, githuburl, explanation, created_at, updated_at];
 
+      console.log(sqlData);
 
-      // let sqlData = `(\`${sid}\`, \`${githubid}\`, \`${name}\`, \`${githuburl}\`, \`${explanation}\`, \`${created_at}\`, \`${updated_at}\`)`;
-      // console.log(sqlData);
-
-      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (${sid}, ${githubid}, ${name},${githuburl},${explanation},${created_at},${updated_at})`;
-      db.query(sql);
+      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
+      db.query(sql, sqlData);
     }
   })
 
