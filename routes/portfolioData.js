@@ -117,22 +117,6 @@ router.post("/:userId/create_process", upload.single("projectImg"), function (
       githuburl
     ]
   );
-
-  // // DB Write
-  // db.get("project")
-  //   .push({
-  //     id: sid,
-  //     name: req.body.projectName,
-  //     type: req.body.portType,
-  //     url: req.body.projectUrl,
-  //     explanation: req.body.projectExplanation,
-  //     imgurl: checkImg,
-  //     sumlang: req.body.sumLang,
-  //     pjdate1: req.body.pjdate1,
-  //     pjdate2: req.body.pjdate2,
-  //     githuburl: req.body.githuburl
-  //   })
-  //   .write();
   res.redirect("/" + userId);
 });
 
