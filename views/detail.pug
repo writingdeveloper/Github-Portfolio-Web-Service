@@ -21,7 +21,7 @@ section#works.l-section(role='region')
       article#work1.gallery-item(role='article')
         figure.gallery-figure(role='group')
           .gallery-image
-            img.gallery-image-thumb(src=`/images/${imgurl}` onerror=`this.src='/images/app/${type}.png'`)
+            img.gallery-image-thumb(src=`/images/member/${userId}/${imgurl}` onerror=`this.src='/images/app/${type}.png'`)
           figcaption.gallery-caption
             h3.gallery-title= name
             ul.gallery-spec
