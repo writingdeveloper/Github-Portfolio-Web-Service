@@ -3,6 +3,8 @@ const router = express.Router();
 const path = require("path");
 const shortid = require("shortid");
 const db = require("../lib/db");
+const fs = require('fs');
+
 
 router.use(express.static(path.join(__dirname, "public")));
 
@@ -14,7 +16,14 @@ let request = require("request");
 let multer = require("multer"); // multer모듈 적용 (for 파일업로드)
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, "./public/images/"); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+    let dir = `./public/images/member/${req.params.userId}`;
+
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir);
+      cb(null, dir);
+    } else {
+      cb(null, dir); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
+    }
   },
   filename: function (req, file, cb) {
     cb(null, file.originalname); // cb 콜백함수를 통해 전송된 파일 이름 설정
@@ -95,7 +104,7 @@ router.post("/:userId/create_process", upload.single("projectImg"), function (
     // If Image is exist put original name
     checkImg = req.file.filename;
   }
-  let imgurl = checkImg;
+  let imgurl = `${githubid}/${checkImg}`;
   let sumlang = req.body.sumLang;
   let pjdate1 = req.body.pjdate1;
   let pjdate2 = req.body.pjdate2;
