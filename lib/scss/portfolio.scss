@@ -1,0 +1,294 @@
+//colors
+$color_mine_shaft_approx: #333;
+$color_quill_gray_approx:  lightgrey;
+$white: #ffffff;
+$web_orange: orange;
+$black_24: rgba(0, 0, 0, 0.24);
+$black_19: rgba(0, 0, 0, 0.19);
+$color_apple_approx: #4caf50;
+$color_concrete_approx: #f3f3f3;
+$color_tundora_approx: #444;
+$color_silver_chalice_approx: #aaa;
+$color_shark_approx: #252831;
+$color_gallery_approx: #eee;
+$black: black;
+$color_science_blue_approx: #0275d8;
+$color_congress_blue_approx: #01447e;
+$black_20: rgba(0, 0, 0, 0.2);
+$color_picton_blue_approx: rgb(76, 201, 250);
+$khaki: #f0e68c;
+$color_celeste_approx: #ccc;
+$gold_drop: #f18200;
+
+.viewDetail {
+	background-color: $web_orange;
+	color: $white;
+	display: inline-block;
+	font-size: 10pt;
+	margin: 15px 0 0;
+	padding: 10px 32px;
+	text-align: center;
+	text-decoration: none;
+	//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+	border-radius: 7px;
+	//Instead of the line below you could use @include transition-duration($duration-1, $duration-2, $duration-3, $duration-4, $duration-5, $duration-6, $duration-7, $duration-8, $duration-9, $duration-10)
+	transition-duration: 0.4s;
+	&:hover {
+		//Instead of the line below you could use @include box-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
+		box-shadow: 0 12px 16px 0 $black_24, 0 17px 50px 0 $black_19;
+	}
+}
+.button {
+	background-color: $color_apple_approx;
+	//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+	border-radius: 7px;
+	border: none;
+	color: $white;
+	padding: 6px 15px;
+	text-align: center;
+	text-decoration: none;
+	display: inline-block;
+	font-size: 16px;
+	cursor: pointer;
+	//Instead of the line below you could use @include transition-duration($duration-1, $duration-2, $duration-3, $duration-4, $duration-5, $duration-6, $duration-7, $duration-8, $duration-9, $duration-10)
+	transition-duration: 0.4s;
+	margin-left: 5px;
+	margin-right: 5px;
+	&:hover {
+		//Instead of the line below you could use @include box-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
+		box-shadow: 0 12px 16px 0 $black_24, 0 17px 50px 0 $black_19;
+	}
+}
+#maincontent {
+	background-color: $color_concrete_approx;
+	min-height: 100%;
+}
+#footer {
+	background-color: $color_tundora_approx;
+	color: $color_silver_chalice_approx;
+	font-size: 8pt;
+	letter-spacing: 1px;
+	padding: 25px;
+	text-align: center;
+	text-transform: uppercase;
+}
+nav {
+	width: 100%;
+	height: 80px;
+	background-color: $color_shark_approx;
+	text-align: center;
+	h1 {
+		vertical-align: middle;
+		text-align: center;
+		padding-top: 30px;
+		margin-top: 0;
+		a {
+			color: $white;
+			font-size: 14pt;
+			letter-spacing: 8px;
+			text-transform: uppercase;
+			text-decoration: none;
+		}
+	}
+}
+.filter-options {
+	width: 100%;
+	height: 80px;
+	padding-top: 0;
+	padding-bottom: 0;
+	background-color: $color_mine_shaft_approx;
+	align-items: center;
+	h2 {
+		color: $white;
+		font-size: 1em;
+		line-height: 1;
+		margin: 0 40px;
+		padding-top: 10px;
+		padding-left: 2%;
+	}
+	select {
+		font-size: 11pt;
+		height: 30px;
+		margin: 10px;
+		padding: 0 10px;
+		width: 200px;
+		margin-left: 4%;
+	}
+	nav ul {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		color: $white;
+		text-align: end;
+		li {
+			display: inline-block;
+			a {
+				color: $white;
+				font-size: 1em;
+			}
+		}
+	}
+}
+#breadcrumb {
+	padding: 10px 40px 16px;
+	list-style: none;
+	background-color: $color_gallery_approx;
+	font-size: 17px;
+	margin: 0;
+	width: calc(50% - 80px);
+	li {
+		display: inline;
+		a {
+			color: $color_science_blue_approx;
+			text-decoration: none;
+			&:hover {
+				color: $color_congress_blue_approx;
+				text-decoration: underline;
+			}
+		}
+		+ li:before {
+			padding: 8px;
+			color: $black;
+			content: "/\00a0";
+		}
+	}
+}
+#restaurants-list {
+	background-color: $color_concrete_approx;
+	padding: 10px 0 25px;
+	margin-bottom: 0;
+	text-align: center;
+	li {
+		display: inline-block;
+		background-color: $white;
+		margin: 20px;
+		min-height: 380px;
+		padding: 0 30px 25px;
+		text-align: left;
+		border: 1px solid $color_quill_gray_approx;
+		//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+		border-radius: 0.8em;
+		//Instead of the line below you could use @include box-shadow($shadow-1, $shadow-2, $shadow-3, $shadow-4, $shadow-5, $shadow-6, $shadow-7, $shadow-8, $shadow-9, $shadow-10)
+		box-shadow: 0 4px 8px 0 $black_20, 0 6px 20px 0 $black_19;
+		h1 {
+			color: $gold_drop;
+			font-size: 14pt;
+			text-decoration: none;
+			overflow: hidden;
+			width: 315px;
+		}
+	}
+	.restaurant-img {
+		background-color: $color_celeste_approx;
+		display: block;
+		margin: 0;
+		width: 100%;
+		max-width: 315px;
+		height: 248px;
+		//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+		border-radius: 0 0 7px 7px;
+	}
+}
+.type-box {
+	background-color: $color_mine_shaft_approx;
+	//Instead of the line below you could use @include border-radius($radius, $vertical-radius)
+	border-radius: 0.8em 0.8em 0 0;
+	width: 119%;
+	margin-left: -30px;
+	> {
+		.paragraph-Project {
+			background-color: transparent;
+			height: 44px;
+			width: 270px;
+			margin-left: 30px;
+			padding-left: 30px;
+			margin-top: 0;
+			margin-bottom: 0;
+			font-weight: 200;
+			font-size: 20px;
+			color: $color_picton_blue_approx;
+			display: table-cell;
+			vertical-align: middle;
+		}
+		.paragraph-Certificate {
+			background-color: transparent;
+			height: 44px;
+			width: 270px;
+			margin-left: 30px;
+			padding-left: 30px;
+			margin-top: 0;
+			margin-bottom: 0;
+			font-weight: 200;
+			font-size: 20px;
+			color: $khaki;
+			display: table-cell;
+			vertical-align: middle;
+		}
+		.paragraph-Education {
+			background-color: transparent;
+			height: 44px;
+			width: 270px;
+			margin-left: 30px;
+			padding-left: 30px;
+			margin-top: 0;
+			margin-bottom: 0;
+			font-weight: 200;
+			font-size: 20px;
+			color: $white;
+			display: table-cell;
+			vertical-align: middle;
+		}
+	}
+}
+.element {
+	overflow: hidden;
+	width: 315px;
+}
+#resume {
+	width: 80%;
+	max-width: 63em;
+	margin: 0 auto;
+	margin-top: 2em;
+	border: 1px solid $color_quill_gray_approx;
+	> iframe {
+		width: 100%;
+		height: 80%;
+	}
+}
+@media(max-width: 600px) {
+	.filter-options {
+		width: 100%;
+		height: 125px;
+		padding-top: 0;
+		padding-bottom: 0;
+		background-color: $color_mine_shaft_approx;
+		align-items: center;
+	}
+}
+@media(max-width: 700px) {
+	#resume {
+		width: 100%;
+		max-width: 50em;
+		margin: 0 auto;
+		margin-top: 2em;
+		border: 1px solid $color_quill_gray_approx;
+		> iframe {
+			width: 100%;
+			height: 80%;
+		}
+	}
+	.c18 {
+		background-color: $white;
+		max-width: 525.6pt;
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+a img {
+	border: none 0 $white;
+}
+li > p {
+	overflow: hidden;
+	font-size: 11pt;
+	width: 315px;
+}
