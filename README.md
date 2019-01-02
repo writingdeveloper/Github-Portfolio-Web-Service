@@ -48,4 +48,4 @@ Use the Issue tab if you have any problems and questions with this program. Plea
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
+This project is licensed under the MIT License - see the [LICENSE.md](LICENSE) file for details.
