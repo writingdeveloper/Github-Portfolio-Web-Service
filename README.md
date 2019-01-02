@@ -1,5 +1,5 @@
 # Github Portfolio Web Service
-![](https://img.shields.io/badge/Code%20Statue-Open-brightgreen.svg)
+![](https://img.shields.io/badge/Code%20Statue-Open-brightgreen.svg) [![Build Status](https://travis-ci.org/sangumee/Github-Portfolio-Web-Service.svg?branch=master)](https://travis-ci.org/sangumee/Github-Portfolio-Web-Service)
 
 Developer Portfolio Site Using Github
 
