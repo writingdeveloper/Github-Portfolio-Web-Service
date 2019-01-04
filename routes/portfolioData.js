@@ -5,7 +5,6 @@ const shortid = require("shortid");
 const db = require("../lib/db");
 const fs = require('fs');
 
-
 router.use(express.static(path.join(__dirname, "public")));
 
 // Parsing Dependency
@@ -104,7 +103,7 @@ router.post("/:userId/create_process", upload.single("projectImg"), function (
     // If Image is exist put original name
     checkImg = req.file.filename;
   }
-  let imgurl = `${githubid}/${checkImg}`;
+  let imgurl = checkImg;
   let sumlang = req.body.sumLang;
   let pjdate1 = req.body.pjdate1;
   let pjdate2 = req.body.pjdate2;
@@ -285,29 +284,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
       throw error;
     }
     let results = data[0];
-    // // Check Image Process
-    // let imgurl = results.imgurl ? req.file.filename : undefined;
-    console.log(results.imgurl);
-
-    // let checkImg = data[0].imgurl;
-    // let checkType = data[0].type;
-    // // Check Image Validate
-    // if (checkImg === "app/404.png" || checkType === "Certificate") {
-    //   // Type is Certificate but No Image then USE this link
-    //   checkImg = "app/Certificate.png";
-    // }
-    // if (checkImg === "app/404.png" && checkType === "Education") {
-    //   // Type is Certificate but No Image then USE this link
-    //   checkImg = "app/Education.png";
-    // }
-    // // If there is no image use 404.png iamge
-    // if (checkImg === undefined) {
-    //   checkImg = "sample.png";
-    //   console.log(checkImg);
-    // } else {
-    //   checkImg = data[0].imgurl;
-    // }
-
     // Get github URL
     let url = results.githuburl;
 
@@ -326,10 +302,12 @@ router.get("/:userId/:pageId", function (req, res, next) {
         let $ = cheerio.load(html);
         $("#readme").each(function () {
           // save to readme Variable
-          readme = $(this).html().replace(/<img src="/gi, '<img src="https://github.com');
-
+          readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
         });
       }
+      console.log(readme);
+
+
       // Rendering
       console.log("No Problem with Detail Pages data");
       res.render("detail", {
@@ -348,6 +326,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
       });
     });
   });
+
 });
+
 
 module.exports = router;
