@@ -20,7 +20,7 @@ block content
         li(class=`${projects.type}`)
           .type-box
             p(class=`paragraph-`+`${projects.type}`)=`${projects.type}`
-          img.restaurant-img(src=`${callback}` onerror=`this.src='/images/app/${projects.type}.png'`)
+          img.restaurant-img(src=`/images/member/${userId}/${projects.imgurl}` onerror=`this.src='/images/app/${projects.type}.png'`)
           a(href=`/${projects.id}`)
             h1= projects.name
           p(class="element" style="font-weight: bold")= `Keyword : ${projects.sumlang}`
