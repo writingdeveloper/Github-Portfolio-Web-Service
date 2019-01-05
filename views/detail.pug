@@ -37,7 +37,7 @@ section#works.l-section(role='region')
               a.ui-button(role='button', href=`${url}`, target='_blank') Demo
               a.ui-button(role='button', href=`${githuburl}`, target='_blank') Github Repo
         div(id="readme" class="Box Box--condensed instapaper_body md")
-          != markdown
+          != `${markdown}`
 footer#footer.l-footer(role='contentinfo')
   .l-section-holder.l-footer-holder.footer-widget-group
     // 크레딧
@@ -125,6 +125,7 @@ aside#backToTop.is-visible
       | page
       br
       b top
+- if(ownerCheck === userId){
 aside#Delete.is-visible
   form(method="post" action=`/${userId}/${pageId}/delete_process`)
     input(type='image' src='https://png.icons8.com/ios/35/000000/waste-filled.png' id="go_up" onclick="return checkDelete()")
@@ -133,13 +134,6 @@ aside#Delete.is-visible
       | Delete
       br
       b this
-aside#Home.is-visible
-  a#HomeButton(role='button', href='/')
-    img(src="https://png.icons8.com/ios/50/000000/home-page.png" id="go_up")
-    span.text
-      | Go
-      br
-      b home
 aside#Update.is-visible
   a#UpdateButton(role='button', href=`/${userId}/${pageId}/update`)
     img(src="https://png.icons8.com/windows/50/000000/edit-file.png" id="go_up")
@@ -147,3 +141,11 @@ aside#Update.is-visible
       | Update
       br
       b this
+- }
+aside#Home.is-visible
+  a#HomeButton(role='button', href='/')
+    img(src="https://png.icons8.com/ios/50/000000/home-page.png" id="go_up")
+    span.text
+      | Go
+      br
+      b home

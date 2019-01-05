@@ -4,7 +4,21 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const request = require("request");
 const shortid = require("shortid");
+let session = require('express-session')
+let FileStore = require('session-file-store')(session)
 
+router.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  store: new FileStore()
+}));
+
+// Favicon Server Dependency
+let favicon = require("serve-favicon");
+router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
+
+let passport = require('passport');
 // DB Import
 const db = require("../lib/db");
 
@@ -12,36 +26,151 @@ const db = require("../lib/db");
 const fieldOrder = [
   "login",
   "id",
-  "node_id",
   "avatar_url",
-  "gravatar_id",
-  "url",
-  "html_url",
-  "followers_url",
-  "following_url",
-  "gists_url",
-  "starred_url",
-  "subscriptions_url",
-  "organizations_url",
-  "repos_url",
-  "events_url",
-  "received_events_url",
-  "type",
-  "site_admin",
   "name",
-  "company",
-  "blog",
-  "location",
-  "email",
-  "hireable",
-  "bio",
-  "public_repos",
-  "public_gists",
-  "followers",
-  "following",
-  "created_at",
-  "updated_at"
+  "bio"
 ];
+
+let GitHubStrategy = require('passport-github').Strategy;
+
+passport.use(new GitHubStrategy({
+    clientID: '36eebe46884c9debc1f4',
+    clientSecret: '73085d60a186fc60446bd49276968f1c3f0dc251',
+    callbackURL: "http://118.35.126.220:3000/auth/github/callback"
+  },
+  function (accessToken, refreshToken, profile, cb) {
+    // User.findOrCreate({ githubId: profile.id }, function (err, user) {
+    //   return cb(err, user);
+    // });
+    console.log(accessToken);
+    // console.log(profile);
+    // Check Register
+    db.query(`SELECT 0 FROM user WHERE id=?`, [profile.id], function (error, data) {
+      if (error) {
+        throw error;
+      }
+      // console.log(profile);
+      // console.log(data);
+      if (data.length > 0) {
+        console.log('registered Member!!');
+      } else {
+        // console.log(`query ${profile.username}, ${profile.id}`)
+        db.query(`INSERT INTO user (login, id, avatar_url, name, bio) VALUES (?, ?, ?, ?, ?)`, [profile.username, profile.id, profile._json.avatar_url, profile._json.name, profile._json.bio]);
+
+        // Data
+
+        let githubAPI = "https://api.github.com/users/";
+
+        // User Information API Option Set
+        let userOptions = {
+          url: githubAPI + profile.username,
+          headers: {
+            "User-Agent": "request"
+          }
+        };
+
+        // User Repository API Option Set
+        let repositoryOptions = {
+          url: githubAPI + profile.username + "/repos",
+          headers: {
+            "User-Agent": "request"
+          }
+        };
+
+        //     // User Information API Process
+        //     request(userOptions, function (error, response, data) {
+        //       if (error) {
+        //         throw error;
+        //       }
+        //       // result have JSON User Data
+        //       let result = JSON.parse(data);
+        //       console.log(result);
+        //       if (result.bio === null) {
+        //         result.bio = '';
+        //       }
+        //       let values = fieldOrder.map(k => result[k]);
+        //       let sql = `INSERT INTO user (${fieldOrder.join(
+        //   ","
+        // )}) VALUES (${fieldOrder.map(e => "?").join(",")})`;
+        //       db.query(sql, values);
+        //     });
+
+        // User Repository Information API Process
+        request(repositoryOptions, function (error, response, data) {
+          if (error) {
+            throw error;
+          }
+          let result = JSON.parse(data);
+
+          for (i = 0; i < result.length; i++) {
+            // console.log(result[i]);
+
+            let sid = shortid.generate();
+            let githubid = result[i].owner.login;
+            let name = result[i].name;
+            let githuburl = result[i].html_url;
+            let explanation = result[i].description;
+            let created_at = result[i].created_at;
+            let updated_at = result[i].updated_at;
+            let sqlData = [sid, githubid, name, githuburl, explanation, created_at, updated_at];
+
+            console.log(sqlData);
+
+            let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
+            db.query(sql, sqlData);
+          }
+        })
+
+      }
+
+    })
+    return cb(null, profile);
+  }
+));
+
+router.use(passport.initialize());
+router.use(passport.session());
+
+passport.serializeUser(function (user, cb) {
+  cb(null, user.id);
+  console.log('serializeUser', user.id);
+});
+
+passport.deserializeUser(function (obj, cb) {
+  db.query(`SELECT * FROM user WHERE id=?`, [obj], function (error, data) {
+    if (error) {
+      throw error;
+    }
+    cb(null, data[0]);
+    console.log('DeserializerUser', data[0]);
+  })
+});
+
+
+
+router.get('/auth/github',
+  passport.authenticate('github'));
+
+router.get('/auth/github/callback',
+  passport.authenticate('github', {
+    failureRedirect: '/auth/login'
+  }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect(`/`);
+  });
+
+router.get(`/auth/login`, function (req, res, next) {
+  res.render("login", {});
+});
+
+router.get(`/logout`, function (req, res, next) {
+  req.logout();
+  req.session.save(function (err) {
+    res.redirect('/');
+  });
+});
+
 
 // Routes to portFolioData.js
 let portfolioDataRouter = require("./portfolioData");
@@ -54,26 +183,34 @@ router.use(
     extended: true
   })
 );
-// Favicon Server Dependency
-let favicon = require("serve-favicon");
-router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
+
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
+  console.log('/', req.user);
   // Parse LinkedIn Profile Image
   let id = req.body.id;
-  // Log Data
-  db.query(`SELECT * FROM user group by login`, function (error, data) {
-    //Log Error
+  // Main page Profile Data Process
+  db.query(`SELECT * FROM user ORDER BY register_time DESC LIMIT 5`, function (error, data) { // GET Data sort with register_time and get 6 Profile
+    // Log Error
     if (error) {
       console.log(error);
     }
+    let url = ''
+    if (req.user) {
+      url = req.user.login
+    } else {
+      url = '';
+    }
     // console.log(data);
     res.render("main", {
-      dataarray: data
+      dataarray: data,
+      _user: req.user,
+      url: url
     });
   });
 });
+
 
 /* POST User Save in MySQL DB */
 router.post("/user", function (req, res, next) {
@@ -104,6 +241,10 @@ router.post("/user", function (req, res, next) {
     }
     // result have JSON User Data
     let result = JSON.parse(data);
+    console.log(result);
+    if (result.bio === null) {
+      result.bio = '';
+    }
     let values = fieldOrder.map(k => result[k]);
     let sql = `INSERT INTO user (${fieldOrder.join(
       ","
@@ -111,7 +252,7 @@ router.post("/user", function (req, res, next) {
     db.query(sql, values);
   });
 
-  // // User Repository Information API Process
+  // User Repository Information API Process
   request(repositoryOptions, function (error, response, data) {
     if (error) {
       throw error;

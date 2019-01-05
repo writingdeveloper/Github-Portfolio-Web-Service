@@ -42,28 +42,11 @@ router.get(`/:githubUser`, function (req, res, next) {
       if (error) {
         throw error;
       }
-      let option = {
-        url: "https://api.unsplash.com/search/photos?page=1&query=apple",
-        headers: {
-          Authorization: "Client-ID 89511a20975117a2d7d1c3fd1904517bb7326531502dc28a78dd73bb67269e4a"
-        }
-      };
-      request(option, function (error, response, callback) {
-        if (error) {
-          throw error;
-        }
-        let results = JSON.parse(callback);
-        // console.log(results.results[0].urls.raw);
-        let image = results.results[0].urls.raw;
-
-        res.render("portfolioItems", {
-          dataarray: data,
-          userId: userId,
-          callback: image
-        });
+      res.render("portfolioItems", {
+        dataarray: data,
+        userId: userId
       });
-    }
-  );
+    });
 });
 
 /* GET Create Page */
@@ -274,6 +257,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
+  let ownerCheck = req.user.login;
+  console.log(`Owner Check ${ownerCheck}`);
 
   // GET data id to use Object
   db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
@@ -322,11 +307,11 @@ router.get("/:userId/:pageId", function (req, res, next) {
         explanation: results.explanation,
         url: results.url,
         githuburl: results.githuburl,
-        markdown: readme
+        markdown: readme,
+        ownerCheck: ownerCheck
       });
     });
   });
-
 });
 
 

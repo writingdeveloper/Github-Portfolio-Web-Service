@@ -1,158 +1,314 @@
 doctype html
-// Start Head
 head
   meta(charset='utf-8')
-  meta(http-equiv='X-UA-Compatible', content='IE=edge')
-  meta(name='viewport', content='width=device-width, initial-scale=1')
-  title Portfolio - Main
-  link(rel='stylesheet', href='assets/css/style.min.css')
-  link(rel='stylesheet', href='assets/css/modules.css')
-  // Canonical URL usage
-  // link(rel='canonical', href='https://aperitif.io/')
-  // Facebook Open Graph
-  meta(property='og:url', content='https://aperitif.io/')
-  meta(property='og:title', content='Aperitif | The web template generator')
-  meta(property='og:description', content='Aperitif is a rapid web template generation tool.')
-  meta(property='og:image', content='https://aperitif.io/img/aperitif-facebook.png')
-  meta(property='og:image:width', content='1200')
-  meta(property='og:image:height', content='630')
-  // Twitter Cards
-  meta(name='twitter:card', content='summary_large_image')
-  meta(name='twitter:site', content='@Aperitif')
-  meta(name='twitter:creator', content='@Aperitif')
-  meta(name='twitter:title', content='Aperitif - The web template generator')
-  meta(name='twitter:description', content='Aperitif is a rapid web template generation tool.')
-  meta(name='twitter:image', content='https://aperitif.io/img/aperitif-card.png')
-  // Google Structured Data
-  script(type='application/ld+json').
-    {
-    "@context" : "http://schema.org",
-    "@type" : "SoftwareApplication",
-    "name" : "Aperitif",
-    "image" : "https://aperitif.io/img/aperitif-logo.svg",
-    "url" : "https://aperitif.io/",
-    "author" : {
-    "@type" : "Person",
-    "name" : "Octavector"
-    },
-    "datePublished" : "2017-MM-DD",
-    "applicationCategory" : "HTML"
-    }
-// End Head
-
-body.modern
-header.MOD_HEADER2
-  .MOD_HEADER2_SocialBarContainer
-    .MOD_HEADER2_SocialBar(data-layout='_r')
-      // Facebook SVG
-      a.smIcon(href='#')
-        svg.fb(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
-          path(d='M0 0v24h24v-24h-24zm16 7h-1.923c-.616 0-1.077.252-1.077.889v1.111h3l-.239 3h-2.761v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z')
-      // LinkedIn SVG
-      a.smIcon(href='#')
-        svg.li(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
-          path(d='M0 0v24h24v-24h-24zm8 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.397-2.586 7-2.777 7 2.476v6.759z')
-      // Google Plus SVG
-      a.smIcon(href='#')
-        svg.gp(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
-          path(d='M0 0v24h24v-24h-24zm8.667 16.667c-2.581 0-4.667-2.087-4.667-4.667s2.086-4.667 4.667-4.667c1.26 0 2.313.46 3.127 1.22l-1.267 1.22c-.347-.333-.954-.72-1.86-.72-1.593 0-2.893 1.32-2.893 2.947s1.3 2.947 2.893 2.947c1.847 0 2.54-1.327 2.647-2.013h-2.647v-1.6h4.406c.041.233.074.467.074.773 0 2.666-1.787 4.56-4.48 4.56zm11.333-4h-2v2h-1.333v-2h-2v-1.333h2v-2h1.333v2h2v1.333z')
-      p.MOD_HEADER2_Tel
-        | Phone: 
-        a(href='tel:#') +82-10-3736-9328
-  .MOD_HEADER2_Details(data-layout='_r')
-    div(data-layout='al16 de8')
-      img.MOD_HEADER2_Logo(alt='Company name', src='https://unsplash.it/300/100/?random')
-    .MOD_HEADER2_SearchContainer(data-layout='al16 de8')
-      p.MOD_HEADER2_Slogan(data-theme='_ts1') Enter your Github ID or User ID to use then create your own portfolio page
-      // Search
-      form(name='Header2', action=`/user`, method='post')
-        input#MOD_HEADER2_Search.MOD_HEADER2_Search(type='search', name='id' placeholder='Search')
-        label(for='MOD_HEADER2_Search') Search
-//
-  END MODULE AREA 1: Blog Article
-//
-  START MODULE AREA 2: Text | Text | Image
-section
-  div(data-layout='_r')
-    div#introduce_text(data-layout='ec-third')
-      p
-        | You can re-organize your portfolio with only Github ID registration. You can also register your own portfolio. This project started because I thought that the resume format provided by various job sites is not suitable for expressing me.
-    div(data-layout='ch8 ec-third')
-      img(src='https://unsplash.it/400/300/?random', alt='')
-//
-  END MODULE AREA 2: Text | Text | Image
-//
-  START MODULE AREA 3: Staff 1
-section
-  div(data-layout='_r')
-    div(data-layout='ch8 ec4')
-      img.MOD_STAFF_Picture(src='https://avatars1.githubusercontent.com/u/6832586?s=460&v=4', alt='', data-theme='_is1')
-      p.MOD_STAFF_Name(data-theme='_bb1') Sihyeong Lee
-      p.MOD_STAFF_Positon Web Developer
-      p
-        | Hello! I'm developer of this Web Site
-    each profile in dataarray
-      div(data-layout='ch8 ec4')
-        img.MOD_STAFF_Picture(src=`${profile.avatar_url}`, alt='', data-theme='_is1')
-        a.name(href=`/${profile.login}`)
-          p.MOD_STAFF_Name(data-theme='_bb1')= `${profile.name}`
-        p.MOD_STAFF_Positon Position
-        p=`${profile.bio}`
-//
-  END MODULE AREA 3: Staff 1
-//
-  START MODULE AREA 4: Footer 2
-footer
-  .MOD_FOOTER2(data-theme='_bgd')
-    div(data-layout='_r')
-      div(data-layout='al16 ch8 ch-o1 ec-third ec-o1')
-        h3 Links
-        nav
-          ul
-            li
-              a(href='#') Footer Link 1
-            li
-              a(href='#') Footer Link 2
-            li
-              a(href='#') Footer Link 3
-            li
-              a(href='#') Footer Link 4
-            li
-              a(href='#') Footer Link 5
-      div(data-layout='al16 ch-o3 ec-third ec-o2')
-        h3 Contact
-        // Facebook SVG
-        .MOD_FOOTER2_Icons
-          a.smIcon(href='#')
-            svg.fb(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
-              path(d='M0 0v24h24v-24h-24zm16 7h-1.923c-.616 0-1.077.252-1.077.889v1.111h3l-.239 3h-2.761v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z')
-          // LinkedIn SVG
-          a.smIcon(href='#')
-            svg.li(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
-              path(d='M0 0v24h24v-24h-24zm8 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.397-2.586 7-2.777 7 2.476v6.759z')
-          // Google Plus SVG
-          a.smIcon(href='#')
-            svg.gp(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
-              path(d='M0 0v24h24v-24h-24zm8.667 16.667c-2.581 0-4.667-2.087-4.667-4.667s2.086-4.667 4.667-4.667c1.26 0 2.313.46 3.127 1.22l-1.267 1.22c-.347-.333-.954-.72-1.86-.72-1.593 0-2.893 1.32-2.893 2.947s1.3 2.947 2.893 2.947c1.847 0 2.54-1.327 2.647-2.013h-2.647v-1.6h4.406c.041.233.074.467.074.773 0 2.666-1.787 4.56-4.48 4.56zm11.333-4h-2v2h-1.333v-2h-2v-1.333h2v-2h1.333v2h2v1.333z')
+  meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(name='description' content='')
+  meta(name='author' content='')
+  title Porfolio World
+  // Bootstrap core CSS
+  link(href='stylesheets/core/bootstrap.min.css' rel='stylesheet')
+  // Custom styles for this template
+  link(href='stylesheets/main.css' rel='stylesheet')
+header
+  nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
+    a.navbar-brand(href='/') Porfolio World
+    button.navbar-toggler(type='button' data-toggle='collapse' data-target='#navbarCollapse' aria-controls='navbarCollapse' aria-expanded='false' aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    #navbarCollapse.collapse.navbar-collapse
+      ul.navbar-nav.mr-auto
+        li.nav-item.active
+          a.nav-link(href='#')
+            | Home 
+            span.sr-only (current)
+        li.nav-item
+         - if(_user){
+           a.nav-link(href='/logout') Logout
+         - } else {
+           a.nav-link(href='/auth/github') Login
+         - }
+          
+      form.form-inline.mt-2.mt-md-0(action=`/user`, method='post')
+        input.form-control.mr-sm-2(type='text' name='id' placeholder='Github ID' aria-label='Search')
+        button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Register
+main(role='main')
+  #myCarousel.carousel.slide(data-ride='carousel')
+    ol.carousel-indicators
+      li.active(data-target='#myCarousel' data-slide-to='0')
+      li(data-target='#myCarousel' data-slide-to='1')
+      li(data-target='#myCarousel' data-slide-to='2')
+    .carousel-inner
+      .carousel-item.active
+        //- img.first-slide(src='data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' alt='First slide')
+        .container
+          .carousel-caption.text-left
+            h1 Portfolio site for Software Developers
+            p
+              | We believe that the most important thing for developers is the result of the portfolio. Create a personal portfolio website in a few minutes now via Github login!
+            - if(_user){
+            p
+              a.btn.btn-lg.btn-primary(href=`/${url}` role='button') Access to my Portfolio
+            - } else {
+            p
+              a.btn.btn-lg.btn-primary(href='/auth/github' role='button') Sign up with Github
+            - }
+            
+      //- .carousel-item
+      //-   img.second-slide(src='data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' alt='Second slide')
+      //-   .container
+      //-     .carousel-caption
+      //-       h1 Another example headline.
+      //-       p
+      //-         | Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+      //-       p
+      //-         a.btn.btn-lg.btn-primary(href='#' role='button') Learn more
+      //- .carousel-item
+      //-   img.third-slide(src='data:image/gif;base64,R0lGODlhAQABAIAAAHd3dwAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw==' alt='Third slide')
+      //-   .container
+      //-     .carousel-caption.text-right
+      //-       h1 One more for good measure.
+      //-       p
+      //-         | Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus. Nullam id dolor id nibh ultricies vehicula ut id elit.
+      //-       p
+      //-         a.btn.btn-lg.btn-primary(href='#' role='button') Browse gallery
+    a.carousel-control-prev(href='#myCarousel' role='button' data-slide='prev')
+      span.carousel-control-prev-icon(aria-hidden='true')
+      span.sr-only Previous
+    a.carousel-control-next(href='#myCarousel' role='button' data-slide='next')
+      span.carousel-control-next-icon(aria-hidden='true')
+      span.sr-only Next
+  //
+    Marketing messaging and featurettes
+    ==================================================
+  // Wrap the rest of the page in another container to center all the content.
+  .container.marketing
+    // Three columns of text below the carousel
+    .row
+      .col-lg-4
+        img.rounded-circle(src='https://avatars1.githubusercontent.com/u/6832586?s=460&v=4' alt='Generic placeholder image' width='140' height='140')
+        h2 Sihyeong Lee
         p
-          | Email: 
-          a(href='mailto:#') super2451894@email.com
-          br
-          | Phone: 
-          a(href='tel:#') +82 1037369328
-        p Copyright &copy; 2018 SiHyeong Lee
-      div(data-layout='al16 ch8 ch-o2 ec-third ec-o3')
-        h3 Address
-        address
-          | 123 The High Street
-          br
-          |             The Town
-          br
-          |             The City
-          br
-          |             County / State
-          br
-          |             Postal / Zip Code
+          | Hello! I'm developer of this Web Site
+        p
+          a.btn.btn-secondary(href='/sangumee' role='button') View details &raquo;
+      // /.col-lg-4
+      each profile in dataarray
+        .col-lg-4
+          img.rounded-circle(src=`${profile.avatar_url}` alt='Generic placeholder image' width='140' height='140')
+          h2=`${profile.name}`
+          p=`${profile.bio}`
+          p
+            a.btn.btn-secondary(href=`/${profile.login}` role='button') View details &raquo;
+    // /.row
+    // START THE FEATURETTES
+    hr.featurette-divider
+    .row.featurette
+      .col-md-7(id="intro_1_text")
+        h2.featurette-heading
+          | First featurette heading. 
+          span.text-muted It&apos;ll blow your mind.
+        p.lead
+          | Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.
+      .col-md-5(id="intro_1_img")
+        img.featurette-image.img-fluid.mx-auto(src='./images/app/main/intro_1.png' alt='Generic placeholder image')
+    hr.featurette-divider
+    .row.featurette
+      .col-md-7.order-md-2(id="intro_2_text")
+        h2.featurette-heading
+          | Oh yeah, it&apos;s that good. 
+          span.text-muted See for yourself.
+        p.lead
+          | Donec ullamcorper nulla non metus auctor fringilla. Vestibulum id ligula porta felis euismod semper. Praesent commodo cursus magna, vel scelerisque nisl consectetur. Fusce dapibus, tellus ac cursus commodo.
+      .col-md-5.order-md-1(id="intro_2_img")
+        img.featurette-image.img-fluid.mx-auto(data-src='holder.js/500x500/auto' alt='Generic placeholder image')
+    hr.featurette-divider
+    .row.featurette
+      .col-md-7(id="intro_3_text")
+        h2.featurette-heading
+          | Securely managed personal information
+        p.lead
+          | All connections are sent privately using the Let's Encrypt SSL security certificate. In addition, the stored data is not used for purposes other than the portfolio website development data.
+      .col-md-5(id="intro_3_img")
+        img.featurette-image.img-fluid.mx-auto(src='./images/app/main/intro_3.png' alt='Generic placeholder image')
+    hr.featurette-divider
+    // /END THE FEATURETTES
+  // /.container
+  // FOOTER
+  footer.container
+    p.float-right
+      a(href='#') Back to top
+    p
+      | &copy; 2017-2018 Portfolio World, Inc. &middot; 
+      a(href='#') Privacy
+      |  &middot; 
+      a(href='#') Terms
 //
-  END MODULE AREA 4: Footer 2
-script(src='assets/js/index.js')
+  Bootstrap core JavaScript
+  ==================================================
+// Placed at the end of the document so the pages load faster
+script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
+script.
+  window.jQuery || document.write('<script src="../../assets/js/vendor/jquery-slim.min.js"><\\/script>')
+script(src='javascripts/core/popper.min.js')
+script(src='javascripts/core/bootstrap.min.js')
+// Just to make our placeholder images work. Don't actually copy the next line!
+script(src='javascripts/core/holder.min.js')
+
+
+//- doctype html
+//- // Start Head
+//- head
+//-   meta(charset='utf-8')
+//-   meta(http-equiv='X-UA-Compatible', content='IE=edge')
+//-   meta(name='viewport', content='width=device-width, initial-scale=1')
+//-   title Portfolio - Main
+//-   link(rel='stylesheet', href='assets/css/style.min.css')
+//-   link(rel='stylesheet', href='assets/css/modules.css')
+//-   // Canonical URL usage
+//-   // link(rel='canonical', href='https://aperitif.io/')
+//-   // Facebook Open Graph
+//-   meta(property='og:url', content='https://aperitif.io/')
+//-   meta(property='og:title', content='Aperitif | The web template generator')
+//-   meta(property='og:description', content='Aperitif is a rapid web template generation tool.')
+//-   meta(property='og:image', content='https://aperitif.io/img/aperitif-facebook.png')
+//-   meta(property='og:image:width', content='1200')
+//-   meta(property='og:image:height', content='630')
+//-   // Twitter Cards
+//-   meta(name='twitter:card', content='summary_large_image')
+//-   meta(name='twitter:site', content='@Aperitif')
+//-   meta(name='twitter:creator', content='@Aperitif')
+//-   meta(name='twitter:title', content='Aperitif - The web template generator')
+//-   meta(name='twitter:description', content='Aperitif is a rapid web template generation tool.')
+//-   meta(name='twitter:image', content='https://aperitif.io/img/aperitif-card.png')
+//-   // Google Structured Data
+//-   script(type='application/ld+json').
+//-     {
+//-     "@context" : "http://schema.org",
+//-     "@type" : "SoftwareApplication",
+//-     "name" : "Aperitif",
+//-     "image" : "https://aperitif.io/img/aperitif-logo.svg",
+//-     "url" : "https://aperitif.io/",
+//-     "author" : {
+//-     "@type" : "Person",
+//-     "name" : "Octavector"
+//-     },
+//-     "datePublished" : "2017-MM-DD",
+//-     "applicationCategory" : "HTML"
+//-     }
+//- // End Head
+
+//- body.modern
+//- header.MOD_HEADER2
+//-   .MOD_HEADER2_SocialBarContainer
+//-     .MOD_HEADER2_SocialBar(data-layout='_r')
+//-       // Facebook SVG
+//-       a.smIcon(href='#')
+//-         svg.fb(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+//-           path(d='M0 0v24h24v-24h-24zm16 7h-1.923c-.616 0-1.077.252-1.077.889v1.111h3l-.239 3h-2.761v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z')
+//-       // LinkedIn SVG
+//-       a.smIcon(href='#')
+//-         svg.li(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+//-           path(d='M0 0v24h24v-24h-24zm8 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.397-2.586 7-2.777 7 2.476v6.759z')
+//-       // Google Plus SVG
+//-       a.smIcon(href='#')
+//-         svg.gp(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+//-           path(d='M0 0v24h24v-24h-24zm8.667 16.667c-2.581 0-4.667-2.087-4.667-4.667s2.086-4.667 4.667-4.667c1.26 0 2.313.46 3.127 1.22l-1.267 1.22c-.347-.333-.954-.72-1.86-.72-1.593 0-2.893 1.32-2.893 2.947s1.3 2.947 2.893 2.947c1.847 0 2.54-1.327 2.647-2.013h-2.647v-1.6h4.406c.041.233.074.467.074.773 0 2.666-1.787 4.56-4.48 4.56zm11.333-4h-2v2h-1.333v-2h-2v-1.333h2v-2h1.333v2h2v1.333z')
+//-       p.MOD_HEADER2_Tel
+//-         | Phone: 
+//-         a(href='tel:#') +82-10-3736-9328
+//-   .MOD_HEADER2_Details(data-layout='_r')
+//-     div(data-layout='al16 de8')
+//-       img.MOD_HEADER2_Logo(alt='Company name', src='https://unsplash.it/300/100/?random')
+//-     .MOD_HEADER2_SearchContainer(data-layout='al16 de8')
+//-       p.MOD_HEADER2_Slogan(data-theme='_ts1') Enter your Github ID or User ID to use then create your own portfolio page
+//-       // Search
+//-       form(name='Header2', action=`/user`, method='post')
+//-         input#MOD_HEADER2_Search.MOD_HEADER2_Search(type='search', name='id' placeholder='Search')
+//-         label(for='MOD_HEADER2_Search') Search
+//- //
+//-   END MODULE AREA 1: Blog Article
+//- //
+//-   START MODULE AREA 2: Text | Text | Image
+//- section
+//-   div(data-layout='_r')
+//-     div#introduce_text(data-layout='ec-third')
+//-       p
+//-         | You can re-organize your portfolio with only Github ID registration. You can also register your own portfolio. This project started because I thought that the resume format provided by various job sites is not suitable for expressing me.
+//-     div(data-layout='ch8 ec-third')
+//-       img(src='https://unsplash.it/400/300/?random', alt='')
+//- //
+//-   END MODULE AREA 2: Text | Text | Image
+//- //
+//-   START MODULE AREA 3: Staff 1
+//- section
+//-   div(data-layout='_r')
+//-     div(data-layout='ch8 ec4')
+//-       img.MOD_STAFF_Picture(src='https://avatars1.githubusercontent.com/u/6832586?s=460&v=4', alt='', data-theme='_is1')
+//-       p.MOD_STAFF_Name(data-theme='_bb1') Sihyeong Lee
+//-       p.MOD_STAFF_Positon Web Developer
+//-       p
+//-         | Hello! I'm developer of this Web Site
+//-     each profile in dataarray
+//-       div(data-layout='ch8 ec4')
+//-         img.MOD_STAFF_Picture(src=`${profile.avatar_url}`, alt='', data-theme='_is1')
+//-         a.name(href=`/${profile.login}`)
+//-           p.MOD_STAFF_Name(data-theme='_bb1')= `${profile.name}`
+//-         p.MOD_STAFF_Positon Position
+//-         p=`${profile.bio}`
+//- //
+//-   END MODULE AREA 3: Staff 1
+//- //
+//-   START MODULE AREA 4: Footer 2
+//- footer
+//-   .MOD_FOOTER2(data-theme='_bgd')
+//-     div(data-layout='_r')
+//-       div(data-layout='al16 ch8 ch-o1 ec-third ec-o1')
+//-         h3 Links
+//-         nav
+//-           ul
+//-             li
+//-               a(href='#') Footer Link 1
+//-             li
+//-               a(href='#') Footer Link 2
+//-             li
+//-               a(href='#') Footer Link 3
+//-             li
+//-               a(href='#') Footer Link 4
+//-             li
+//-               a(href='#') Footer Link 5
+//-       div(data-layout='al16 ch-o3 ec-third ec-o2')
+//-         h3 Contact
+//-         // Facebook SVG
+//-         .MOD_FOOTER2_Icons
+//-           a.smIcon(href='#')
+//-             svg.fb(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+//-               path(d='M0 0v24h24v-24h-24zm16 7h-1.923c-.616 0-1.077.252-1.077.889v1.111h3l-.239 3h-2.761v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z')
+//-           // LinkedIn SVG
+//-           a.smIcon(href='#')
+//-             svg.li(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+//-               path(d='M0 0v24h24v-24h-24zm8 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.397-2.586 7-2.777 7 2.476v6.759z')
+//-           // Google Plus SVG
+//-           a.smIcon(href='#')
+//-             svg.gp(xmlns='http://www.w3.org/2000/svg', width='24', height='24', viewbox='0 0 24 24')
+//-               path(d='M0 0v24h24v-24h-24zm8.667 16.667c-2.581 0-4.667-2.087-4.667-4.667s2.086-4.667 4.667-4.667c1.26 0 2.313.46 3.127 1.22l-1.267 1.22c-.347-.333-.954-.72-1.86-.72-1.593 0-2.893 1.32-2.893 2.947s1.3 2.947 2.893 2.947c1.847 0 2.54-1.327 2.647-2.013h-2.647v-1.6h4.406c.041.233.074.467.074.773 0 2.666-1.787 4.56-4.48 4.56zm11.333-4h-2v2h-1.333v-2h-2v-1.333h2v-2h1.333v2h2v1.333z')
+//-         p
+//-           | Email: 
+//-           a(href='mailto:#') super2451894@email.com
+//-           br
+//-           | Phone: 
+//-           a(href='tel:#') +82 1037369328
+//-         p Copyright &copy; 2018 SiHyeong Lee
+//-       div(data-layout='al16 ch8 ch-o2 ec-third ec-o3')
+//-         h3 Address
+//-         address
+//-           | 123 The High Street
+//-           br
+//-           |             The Town
+//-           br
+//-           |             The City
+//-           br
+//-           |             County / State
+//-           br
+//-           |             Postal / Zip Code
+//- //
+//-   END MODULE AREA 4: Footer 2
+//- script(src='assets/js/index.js')
