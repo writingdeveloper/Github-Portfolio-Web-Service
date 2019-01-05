@@ -59,7 +59,7 @@ typings/
 
 # next.js build output
 .next
-# lib/db.js
+lib/db.js
 
 # CUSTOM File
 public/images/*
