@@ -63,3 +63,4 @@ lib/db.js
 
 # CUSTOM File
 public/images/*
+sessions/*
