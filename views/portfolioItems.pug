@@ -15,6 +15,8 @@ block content
           option(value='Certificate') Certifications
           option(value='Education') Education
         button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
+        input#input-url(type='hidden', value='Copied!')
+        button(class='button' id='btn-copy') Copy this URL
     ul#restaurants-list
       each projects in dataarray
         li(class=`${projects.type}`)
@@ -27,6 +29,7 @@ block content
           p(class="explanation")= `${projects.explanation}`
             br
           a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details
+  script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
   script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
   script(type='application/javascript', charset='utf-8', src='javascripts/sw_register.js')
   
