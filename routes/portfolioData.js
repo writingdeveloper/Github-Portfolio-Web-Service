@@ -257,7 +257,15 @@ router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  let ownerCheck = req.user.login;
+
+  let ownerCheck;
+  console.log(req.user);
+  if (req.user === undefined) {
+    ownerCheck = null;
+  } else {
+
+    ownerCheck = req.user.login;
+  }
   console.log(`Owner Check ${ownerCheck}`);
 
   // GET data id to use Object
@@ -271,12 +279,11 @@ router.get("/:userId/:pageId", function (req, res, next) {
     let results = data[0];
     // Get github URL
     let url = results.githuburl;
-
-    // console.log(url);
     // Use Request Module to parsing Web page
     request(url, function (error, response, html) {
+      let readme;
       // If Error with parsing Github README.md
-      if (error) {
+      if (error || !readme) {
         console.log("Have Some problem with Reading Github README.md file!");
         console.log(error);
         readme =
@@ -290,8 +297,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
           readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
         });
       }
-      console.log(readme);
-
 
       // Rendering
       console.log("No Problem with Detail Pages data");
