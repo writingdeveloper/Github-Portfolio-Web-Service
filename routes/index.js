@@ -77,24 +77,6 @@ passport.use(new GitHubStrategy({
           }
         };
 
-        //     // User Information API Process
-        //     request(userOptions, function (error, response, data) {
-        //       if (error) {
-        //         throw error;
-        //       }
-        //       // result have JSON User Data
-        //       let result = JSON.parse(data);
-        //       console.log(result);
-        //       if (result.bio === null) {
-        //         result.bio = '';
-        //       }
-        //       let values = fieldOrder.map(k => result[k]);
-        //       let sql = `INSERT INTO user (${fieldOrder.join(
-        //   ","
-        // )}) VALUES (${fieldOrder.map(e => "?").join(",")})`;
-        //       db.query(sql, values);
-        //     });
-
         // User Repository Information API Process
         request(repositoryOptions, function (error, response, data) {
           if (error) {
