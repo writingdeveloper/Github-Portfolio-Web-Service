@@ -1,0 +1,100 @@
+/*!
+ * Start Bootstrap - 4 Col Portfolio (https://startbootstrap.com/template-overviews/4-col-portfolio)
+ * Copyright 2013-2018 Start Bootstrap
+ * Licensed under MIT (https://github.com/BlackrockDigital/startbootstrap-4-col-portfolio/blob/master/LICENSE)
+ */
+
+body {
+  padding-top: 54px;
+  background-color: #f3f3f3 !important;
+}
+
+@media (min-width: 992px) {
+  body {
+    padding-top: 56px;
+  }
+}
+
+.navbar-brand{
+  letter-spacing: 8px;
+    text-transform: uppercase;
+}
+
+.portfolio-item {
+  margin-bottom: 30px;
+
+}
+
+.card {
+  border-radius: 0.8em !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.card-type {
+  height: 45px;
+  background-color: #333;
+  border-radius: 0.8em 0.8em 0 0;
+}
+
+.card-type>.text {
+  font-weight: 400;
+  font-size: 20px;
+  padding: 5px 0 0 1.1em;
+  color: rgb(76, 201, 250);
+}
+
+.card-img-top {
+  flex: 1 1 auto;
+  padding: 0 1.8rem 0 1.8rem;
+  border-top-left-radius: calc(.25rem - 1px);
+  border-top-right-radius: calc(.25rem - 1px);
+  max-height: 250px;
+}
+
+.card-body{
+  flex: 1 1 auto;
+  padding: 0 1.8rem 15px 1.8rem;
+}
+
+.card-title>a {
+  color: #f18200 !important;
+  font-weight: normal;
+  font-size: 20px;
+}
+
+.viewDetail {
+  background-color: orange;
+  width: 137px;
+  color: #fff;
+  display: inline-block;
+  font-size: 10pt;
+  margin: 0 0 15px 20px;
+  padding: 10px 32px 10px;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 7px;
+  -webkit-transition-duration: 0.4s;
+  transition-duration: 0.4s;
+}
+
+.viewDetail:hover {
+  box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+
+.pagination {
+  margin-bottom: 30px;
+}
+
+
+/* CUSTOM */
+@media (min-width: 1200px) {
+  .navbar {
+    height: 80px;
+    background-color: #252831 !important;
+  }
+
+  .container {
+    max-width: 1600px;
+  }
+}

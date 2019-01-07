@@ -1,40 +1,120 @@
-extends layout
-
-block content
-  header
-    nav
-      h1
-        a(href='/')= `${userId}`
-  main#maincontent
-    section
-      .filter-options
-        h2 Filter Results
-        select#neighborhoods-select(name='neighborhoods', onchange='selectBoxUpdate();')
-          option(value='All') All Achievements
-          option(value='Project') Projects
-          option(value='Certificate') Certifications
-          option(value='Education') Education
-        button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
-        input#input-url(type='hidden', value='Copied!')
-        button(class='button' id='btn-copy') Copy this URL
-    ul#restaurants-list
-      each projects in dataarray
-        li(class=`${projects.type}`)
-          .type-box
-            p(class=`paragraph-`+`${projects.type}`)=`${projects.type}`
-          img.restaurant-img(src=`/images/member/${userId}/${projects.imgurl}` onerror=`this.src='/images/app/${projects.type}.png'`)
-          a(href=`/${projects.id}`)
-            h1= projects.name
-          p(class="element" style="font-weight: bold")= `Keyword : ${projects.sumlang}`
-          p(class="explanation")= `${projects.explanation}`
-            br
+doctype html
+head
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(name='description', content='')
+  meta(name='author', content='')
+  title=`${userId}'s Portfolio`
+  // Bootstrap core CSS
+  link(href='stylesheets/core/bootstrap.min.css', rel='stylesheet')
+  // Custom styles for this template
+  link(href='/stylesheets/portfolio_detail.css', rel='stylesheet')
+// Navigation
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+  .container
+    a.navbar-brand(href='#')=`${userId}'s Portfolio`
+    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    #navbarResponsive.collapse.navbar-collapse
+      ul.navbar-nav.ml-auto
+        li.nav-item.active
+          a.nav-link(href='#')
+            | Home
+            span.sr-only (current)
+        li.nav-item
+          a.nav-link(href='#') About
+        li.nav-item
+          a.nav-link(href='#') Services
+        li.nav-item
+          a.nav-link(href='#') Contact
+// Page Content
+.container
+  // Page Heading
+  h1.my-4
+    | Page Heading
+    small Secondary Text
+  .row
+    each projects in dataarray
+      .col-lg-3.col-md-4.col-sm-6.portfolio-item
+        .card.h-100
+          .card-type
+            p.text
+             =projects.type
+          img.card-img-top(src=`/images/member/${userId}/${projects.imgurl}`, onerror=`this.src='/images/app/${projects.type}.png'`)
+          .card-body
+            h4.card-title
+              a(href=`/${userId}/${projects.id}`)
+                = projects.name
+            p.card-text
+              = projects.explanation
           a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details
-  script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
-  script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
-  script(type='application/javascript', charset='utf-8', src='javascripts/sw_register.js')
+  // /.row
+  // Pagination
+  ul.pagination.justify-content-center
+    li.page-item
+      a.page-link(href='#', aria-label='Previous')
+        span(aria-hidden='true') &laquo;
+        span.sr-only Previous
+    li.page-item
+      a.page-link(href='#') 1
+    li.page-item
+      a.page-link(href='#') 2
+    li.page-item
+      a.page-link(href='#') 3
+    li.page-item
+      a.page-link(href='#', aria-label='Next')
+        span(aria-hidden='true') &raquo;
+        span.sr-only Next
+// /.container
+// Footer
+footer.py-5.bg-dark
+  .container
+    p.m-0.text-center.text-white Copyright &copy; Your Website 2018
+  // /.container
+// Bootstrap core JavaScript
+script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
+script(src='javascripts/core/bootstrap.min.js')
+
+
+
+
+//- extends layout
+
+//- block content
+//-   header
+//-     nav
+//-       h1
+//-         a(href='/')= `${userId}`
+//-   main#maincontent
+//-     section
+//-       .filter-options
+//-         h2 Filter Results
+//-         select#neighborhoods-select(name='neighborhoods', onchange='selectBoxUpdate();')
+//-           option(value='All') All Achievements
+//-           option(value='Project') Projects
+//-           option(value='Certificate') Certifications
+//-           option(value='Education') Education
+//-         button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
+//-         input#input-url(type='hidden', value='Copied!')
+//-         button(class='button' id='btn-copy') Copy this URL
+//-     ul#restaurants-list
+//-       each projects in dataarray
+//-         li(class=`${projects.type}`)
+//-           .type-box
+//-             p(class=`paragraph-`+`${projects.type}`)=`${projects.type}`
+//-           img.restaurant-img(src=`/images/member/${userId}/${projects.imgurl}` onerror=`this.src='/images/app/${projects.type}.png'`)
+//-           a(href=`/${projects.id}`)
+//-             h1= projects.name
+//-           p(class="element" style="font-weight: bold")= `Keyword : ${projects.sumlang}`
+//-           p(class="explanation")= `${projects.explanation}`
+//-             br
+//-           a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details
+//-   script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
+//-   script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
+//-   script(type='application/javascript', charset='utf-8', src='javascripts/sw_register.js')
   
-  footer#footer
-    | Copyright (c) 2018
-    a(href='https://www.linkedin.com/in/sihyeonglee/')
-      strong Si Hyeong Lee
-    |  All Rights Reserved.
+//-   footer#footer
+//-     | Copyright (c) 2018
+//-     a(href='https://www.linkedin.com/in/sihyeonglee/')
+//-       strong Si Hyeong Lee
+//-     |  All Rights Reserved.
