@@ -18,24 +18,35 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
     #navbarResponsive.collapse.navbar-collapse
       ul.navbar-nav.ml-auto
         li.nav-item.active
-          a.nav-link(href='#')
+          a.nav-link(href='/')
             | Home
             span.sr-only (current)
-        li.nav-item
-          a.nav-link(href='#') About
+        - if(loginCheck){
+           a.nav-link(href='/logout') Logout
+        - } else {
+           a.nav-link(href='/auth/github') Login
+        - }
         li.nav-item
           a.nav-link(href='#') Services
         li.nav-item
           a.nav-link(href='#') Contact
+nav.toolbar.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+  select#type-select(onchange='selectBoxUpdate();')
+    option(value='All') All Achievements
+    option(value='Project') Projects
+    option(value='Certificate') Certifications
+    option(value='Education') Education
+  - if(ownerCheck === userId) {
+  button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
+  -}
+  input#input-url(type='hidden', value='Copied!')
+  button(class='button' id='btn-copy') Copy this URL
 // Page Content
 .container
   // Page Heading
-  h1.my-4
-    | Page Heading
-    small Secondary Text
   .row
     each projects in dataarray
-      .col-lg-3.col-md-4.col-sm-6.portfolio-item
+      div(class=`${projects.type} col-lg-3 col-md-4 col-sm-6 portfolio-item`)
         .card.h-100
           .card-type
             p.text
@@ -69,11 +80,15 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
 // Footer
 footer.py-5.bg-dark
   .container
-    p.m-0.text-center.text-white Copyright &copy; Your Website 2018
+    p.m-0.text-center.text-white 
+      =`Copyright © ${userId} 2018`
   // /.container
 // Bootstrap core JavaScript
 script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
 script(src='javascripts/core/bootstrap.min.js')
+script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
+script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
+
 
 
 
