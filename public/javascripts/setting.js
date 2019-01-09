@@ -33,7 +33,7 @@ if (navigator.vendor.indexOf("Apple") == 0 && /\sSafari\//.test(navigator.userAg
 Now It works well, but It needs to change because too many iteration
 */
 function selectBoxUpdate() {
-  let selectedValue = document.getElementById("neighborhoods-select").value;
+  let selectedValue = document.getElementById("type-select").value;
   if (selectedValue === "All") {
     console.log("All Selected");
 
