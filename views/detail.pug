@@ -90,7 +90,7 @@ section#works.l-section(role='region')
     - if(ownerCheck === userId){
     a.toolButton(role='button')
       form(method="post" action=`/${userId}/${pageId}/delete_process`)
-        input(type='image' src='https://png.icons8.com/ios/35/000000/waste-filled.png' class="toollogo" onclick="return checkDelete()")
+        input(type='image' src='https://png.icons8.com/ios/35/000000/waste-filled.png' id="delete_button" class="toollogo" onclick="return checkDelete()")
       span.text
         | Delete
         br
