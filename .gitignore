@@ -62,5 +62,5 @@ typings/
 # lib/db.js
 
 # CUSTOM File
-public/images/*
+public/images/member/*
 sessions/*
