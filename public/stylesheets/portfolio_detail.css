@@ -19,7 +19,7 @@ body {
   z-index: 1030;
 }
 
-.container {
+.container{
   flex: 1;
 }
 
@@ -62,14 +62,6 @@ button {
   cursor: pointer;
   margin-left: 5px;
   margin-right: 5px;
-}
-
-#delete_button {
-  width: 16px;
-  height: 16px;
-  position: absolute;
-  top: 16px;
-  margin-left: 23px;
 }
 
 .card {
