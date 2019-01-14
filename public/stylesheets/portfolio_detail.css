@@ -5,24 +5,63 @@
  */
 
 body {
-  padding-top: 54px;
   background-color: #f3f3f3 !important;
+  height: 100%;
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
 }
 
-@media (min-width: 992px) {
-  body {
-    padding-top: 56px;
-  }
+#first_nav {
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1030;
 }
 
-.navbar-brand{
+.container{
+  flex: 1;
+}
+
+
+.navbar-brand {
   letter-spacing: 8px;
-    text-transform: uppercase;
+  text-transform: uppercase;
+}
+
+.navbar {
+  height: 80px;
+  background-color: #252831 !important;
+  justify-content: start;
+}
+
+.toolbar {
+  height: 80px;
+  background-color: #333 !important;
+}
+
+.row {
+  margin-top: 8.5rem !important;
 }
 
 .portfolio-item {
   margin-bottom: 30px;
 
+}
+
+button {
+  background-color: #4CAF50;
+  border-radius: 7px;
+  border: none;
+  color: white;
+  padding: 6px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: 5px;
+  margin-right: 5px;
 }
 
 .card {
@@ -51,7 +90,7 @@ body {
   max-height: 250px;
 }
 
-.card-body{
+.card-body {
   flex: 1 1 auto;
   padding: 0 1.8rem 15px 1.8rem;
 }
@@ -87,13 +126,58 @@ body {
 }
 
 
+
 /* CUSTOM */
-@media (min-width: 1200px) {
-  .navbar {
-    height: 80px;
-    background-color: #252831 !important;
+@media screen and (max-width:575px) {
+
+  .col-md-4 {
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
   }
 
+  .container {
+    max-width: 1600px;
+  }
+
+  #first_nav {
+    height: auto;
+  }
+
+  #toolButton {
+    display: contents;
+  }
+
+}
+
+@media screen and (min-width:575px) and (max-width:1149px) {
+
+  .col-md-4 {
+    -ms-flex: 0 0 50%;
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .container {
+    max-width: 1600px;
+  }
+}
+
+
+@media screen and (min-width:1150px) and (max-width: 1599px) {
+
+  .col-md-4 {
+    -ms-flex: 0 0 33.333333%;
+    flex: 0 0 33.333333%;
+    max-width: 33.333333%;
+  }
+
+  .container {
+    max-width: 1600px;
+  }
+}
+
+@media (min-width: 1600px) {
   .container {
     max-width: 1600px;
   }

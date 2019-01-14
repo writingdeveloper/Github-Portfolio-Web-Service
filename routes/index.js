@@ -39,9 +39,6 @@ passport.use(new GitHubStrategy({
     callbackURL: "http://118.35.126.220:3000/auth/github/callback"
   },
   function (accessToken, refreshToken, profile, cb) {
-    // User.findOrCreate({ githubId: profile.id }, function (err, user) {
-    //   return cb(err, user);
-    // });
     console.log(accessToken);
     // console.log(profile);
     // Check Register
@@ -54,7 +51,6 @@ passport.use(new GitHubStrategy({
       if (data.length > 0) {
         console.log('registered Member!!');
       } else {
-        // console.log(`query ${profile.username}, ${profile.id}`)
         db.query(`INSERT INTO user (login, id, avatar_url, name, bio) VALUES (?, ?, ?, ?, ?)`, [profile.username, profile.id, profile._json.avatar_url, profile._json.name, profile._json.bio]);
 
         // Data
@@ -135,11 +131,12 @@ router.get('/auth/github',
 
 router.get('/auth/github/callback',
   passport.authenticate('github', {
-    failureRedirect: '/auth/login'
+    failureRedirect: '/login'
   }),
   function (req, res) {
     // Successful authentication, redirect home.
-    res.redirect(`/`);
+    // console.log('SUCESS!!' ,req);
+    res.redirect(`/${req.user.username}`);
   });
 
 router.get(`/auth/login`, function (req, res, next) {
@@ -149,7 +146,7 @@ router.get(`/auth/login`, function (req, res, next) {
 router.get(`/logout`, function (req, res, next) {
   req.logout();
   req.session.save(function (err) {
-    res.redirect('/');
+    res.redirect(`/`);
   });
 });
 

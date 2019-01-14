@@ -10,10 +10,10 @@ head
   // Custom styles for this template
   link(href='/stylesheets/portfolio_detail.css', rel='stylesheet')
 // Navigation
-nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
   .container
-    a.navbar-brand(href='#')=`${userId}'s Portfolio`
-    button.navbar-toggler(type='button', data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
+    a.navbar-brand(href=`/${userId}`)=`${userId}'s Portfolio`
+    button.navbar-toggler(type='button' id="toolButton", data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
       span.navbar-toggler-icon
     #navbarResponsive.collapse.navbar-collapse
       ul.navbar-nav.ml-auto
@@ -30,7 +30,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
           a.nav-link(href='#') Services
         li.nav-item
           a.nav-link(href='#') Contact
-nav.toolbar.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
+.toolbar.navbar(id="second_nav")
   select#type-select(onchange='selectBoxUpdate();')
     option(value='All') All Achievements
     option(value='Project') Projects
@@ -76,13 +76,11 @@ nav.toolbar.navbar.navbar-expand-lg.navbar-dark.bg-dark.fixed-top
       a.page-link(href='#', aria-label='Next')
         span(aria-hidden='true') &raquo;
         span.sr-only Next
-// /.container
 // Footer
-footer.py-5.bg-dark
+footer.bg-dark
   .container
     p.m-0.text-center.text-white 
       =`Copyright © ${userId} 2018`
-  // /.container
 // Bootstrap core JavaScript
 script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
 script(src='javascripts/core/bootstrap.min.js')

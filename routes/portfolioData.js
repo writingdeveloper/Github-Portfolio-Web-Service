@@ -33,8 +33,19 @@ let upload = multer({
 });
 
 /* GET home page. */
-router.get(`/:githubUser`, function (req, res, next) {
-  let userId = req.params.githubUser;
+router.get(`/:userId`, function (req, res, next) {
+  let userId = req.params.userId;
+
+  // Check Owner of this page
+  let ownerCheck;
+  console.log(req.user);
+  if (req.user === undefined) {
+    ownerCheck = null;
+  } else {
+    ownerCheck = req.user.login;
+  }
+  console.log(`Owner Check ${ownerCheck}`);
+
   // console.log(userId);
   db.query(
     "SELECT * FROM Personal_Data WHERE githubid='" + userId + "'",
@@ -44,7 +55,9 @@ router.get(`/:githubUser`, function (req, res, next) {
       }
       res.render("portfolioItems", {
         dataarray: data,
-        userId: userId
+        userId: userId,
+        loginCheck: req.user,
+        ownerCheck: ownerCheck
       });
     });
 });
@@ -259,11 +272,9 @@ router.get("/:userId/:pageId", function (req, res, next) {
   let pageId = req.params.pageId;
 
   let ownerCheck;
-  console.log(req.user);
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
-
     ownerCheck = req.user.login;
   }
   console.log(`Owner Check ${ownerCheck}`);
@@ -279,11 +290,12 @@ router.get("/:userId/:pageId", function (req, res, next) {
     let results = data[0];
     // Get github URL
     let url = results.githuburl;
+    console.log(url);
     // Use Request Module to parsing Web page
     request(url, function (error, response, html) {
       let readme;
       // If Error with parsing Github README.md
-      if (error || !readme) {
+      if (error) {
         console.log("Have Some problem with Reading Github README.md file!");
         console.log(error);
         readme =
@@ -292,9 +304,10 @@ router.get("/:userId/:pageId", function (req, res, next) {
       } else {
         // Parsing readme ID in github page
         let $ = cheerio.load(html);
-        $("#readme").each(function () {
+        $(".Box-body").each(function () {
           // save to readme Variable
           readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
+          console.log(readme);
         });
       }
 
