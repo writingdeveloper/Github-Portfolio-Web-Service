@@ -3,9 +3,27 @@
 
 Developer Portfolio Site Using Github
 
+## DEMO
+
+This project is currently hosted in Heroku and MariaDB is available from my raspberry pi server.  
+You can access it from the link below and there may be a delay of up to 5 seconds during the initial connection.
+
+[Link](https://expressme.herokuapp.com/)
+
+
 ## Introduction
 
 I felt that the existing resume was not suitable for use with the developer's resume, and recently Github's profile was often submitted to check the developer's portfolio, but I also thought that Github's profile would not be able to properly identify the developer's capabilities.
+
+## TODO
+This Web Application contains the following features:
+
+1. Login function using Github API (Passport.js) ✔️
+2. Use Github API to generate personal portfolio page by using information from individual repository after login ✔️
+3. Ability to parse the README.md file for that Github in the details page and display the details.
+4. If you are the owner of the portfolio, you will be able to add, delete and modify projects (personal identification using Session) ✔️
+
+
 
 ### Prerequisites
 
@@ -18,6 +36,7 @@ The tested version is shown below and is developed based on the LTS version of N
 ```
 
 ### Installing
+
 
 The program will also be uploaded to the NPM in the future, and currently it will only write the installation method through the ZIP file.
 

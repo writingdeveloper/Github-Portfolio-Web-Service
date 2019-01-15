@@ -6,12 +6,32 @@ head
   title= `${userId}'s Portfolio`
   link(rel='stylesheet', href='/stylesheets/detail.css')
   // BootStrap CDN
-  script(src='https://code.jquery.com/jquery-3.3.1.min.js')
+  
+  link(href='/stylesheets/core/bootstrap.min.css', rel='stylesheet')
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css')
+  script(src='https://code.jquery.com/jquery-3.3.1.min.js')
   script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
-  // Main Script Load
-  script(src='/javascripts/setting.js')
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
+  .container
+    a.navbar-brand(href=`/${userId}`)=`${userId}'s Portfolio`
+    button.navbar-toggler(type='button' id="toolButton", data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    #navbarResponsive.collapse.navbar-collapse
+      ul.navbar-nav.ml-auto
+        li.nav-item.active
+          a.nav-link(href='/') Home
+        li.nav-item.active
+          - if(ownerCheck === userId){
+            a.nav-link(href='/logout') Logout
+          - } else {
+            a.nav-link(href='/auth/github') Login
+          - }
+        li.nav-item.active
+          input#input-url(type='hidden', value='Copied!')
+          a.nav-link(href='#' id='btn-copy') Copy this URL
+        li.nav-item.active
+          a.nav-link(href='#') Contact
 section#works.l-section(role='region')
   .l-section-holder
     h2.section-heading
@@ -102,3 +122,7 @@ section#works.l-section(role='region')
         br
         b this
     - }
+script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
+script(src='/javascripts/core/bootstrap.min.js')
+script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
+script(type='application/javascript', charset='utf-8', src='/javascripts/setting.js')

@@ -21,7 +21,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
           a.nav-link(href='/')
             | Home
             span.sr-only (current)
-        - if(loginCheck){
+        - if(ownerCheck === userId){
            a.nav-link(href='/logout') Logout
         - } else {
            a.nav-link(href='/auth/github') Login

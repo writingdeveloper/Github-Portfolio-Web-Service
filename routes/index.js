@@ -54,9 +54,7 @@ passport.use(new GitHubStrategy({
         db.query(`INSERT INTO user (login, id, avatar_url, name, bio) VALUES (?, ?, ?, ?, ?)`, [profile.username, profile.id, profile._json.avatar_url, profile._json.name, profile._json.bio]);
 
         // Data
-
         let githubAPI = "https://api.github.com/users/";
-
         // User Information API Option Set
         let userOptions = {
           url: githubAPI + profile.username,
@@ -64,7 +62,6 @@ passport.use(new GitHubStrategy({
             "User-Agent": "request"
           }
         };
-
         // User Repository API Option Set
         let repositoryOptions = {
           url: githubAPI + profile.username + "/repos",
@@ -72,7 +69,6 @@ passport.use(new GitHubStrategy({
             "User-Agent": "request"
           }
         };
-
         // User Repository Information API Process
         request(repositoryOptions, function (error, response, data) {
           if (error) {
@@ -82,7 +78,6 @@ passport.use(new GitHubStrategy({
 
           for (i = 0; i < result.length; i++) {
             // console.log(result[i]);
-
             let sid = shortid.generate();
             let githubid = result[i].owner.login;
             let name = result[i].name;
@@ -91,16 +86,12 @@ passport.use(new GitHubStrategy({
             let created_at = result[i].created_at;
             let updated_at = result[i].updated_at;
             let sqlData = [sid, githubid, name, githuburl, explanation, created_at, updated_at];
-
             console.log(sqlData);
-
             let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
             db.query(sql, sqlData);
           }
         })
-
       }
-
     })
     return cb(null, profile);
   }
@@ -124,8 +115,7 @@ passport.deserializeUser(function (obj, cb) {
   })
 });
 
-
-
+// Auth Router
 router.get('/auth/github',
   passport.authenticate('github'));
 
@@ -255,12 +245,8 @@ router.post("/user", function (req, res, next) {
       let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
-  })
-
+  });
   res.redirect("/");
 });
-
-
-// });
 
 module.exports = router;
