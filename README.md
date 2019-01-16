@@ -18,11 +18,20 @@ I felt that the existing resume was not suitable for use with the developer's re
 ## TODO
 This Web Application contains the following features:
 
+👨‍💻FINISHED👨‍💻
+
 1. Login function using Github API (Passport.js) ✔️
 2. Use Github API to generate personal portfolio page by using information from individual repository after login ✔️
-3. Ability to parse the README.md file for that Github in the details page and display the details.
+3. Ability to parse the README.md file for that Github in the details page and display the details. ✔️
 4. If you are the owner of the portfolio, you will be able to add, delete and modify projects (personal identification using Session) ✔️
 
+🧶NOT YET FINISHED🧶
+
+1. If the member sign - up method was used instead of logging in through Github, a discussion on how to manage member information
+2. Development of member personal information management page
+3. Developing an admin member management page
+4. Developing chat pages for contact items
+5. Development of the method for naming image files when uploading images and the function to delete images when deleting portfolios
 
 
 ### Prerequisites
@@ -64,6 +73,8 @@ From the web browser, you can access the following address:
 ## Issues
 
 Use the Issue tab if you have any problems and questions with this program. Please give some ideas or ask for cooperation! [Issue](https://github.com/sangumee/Github-Portfolio-Web-Service/issues)
+
+Also, since the member personal page has not been developed, there is no membership withdrawal function after signing up. And now Github's personal information is stored on the server. If you request me to delete this, send your Github nickname to super2451894@gmail.com and I will notify you after deleting your personal information.
 
 ## License
 
