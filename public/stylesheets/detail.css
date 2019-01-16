@@ -171,6 +171,8 @@ html [type=button] {
 
 .gallery-image-thumb {
   width: 100%;
+  max-width: 765px;
+  height: 444px;
 }
 
 .gallery-item {
