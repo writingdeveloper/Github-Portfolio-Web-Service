@@ -287,48 +287,56 @@ router.get("/:userId/:pageId", function (req, res, next) {
     if (error) {
       throw error;
     }
-    let results = data[0];
-    // Get github URL
-    let url = results.githuburl;
-    console.log(url);
-    // Use Request Module to parsing Web page
-    request(url, function (error, response, html) {
-      let readme;
-      // If Error with parsing Github README.md
-      if (error) {
-        console.log("Have Some problem with Reading Github README.md file!");
-        console.log(error);
-        readme =
-          "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
-        console.log(readme + "ERROR");
-      } else {
-        // Parsing readme ID in github page
-        let $ = cheerio.load(html);
-        $(".Box-body").each(function () {
-          // save to readme Variable
-          readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
-          console.log(readme);
-        });
-      }
+    // If wrong request from Client (Tried Not Exist Portfolio Page), Redirect user page
+    if (data[0] === undefined) {
+      res.redirect(`/${userId}`);
+    } else {
+      let results = data[0];
+      // Get github URL
+      let url = results.githuburl;
+      console.log(url);
 
-      // Rendering
-      console.log("No Problem with Detail Pages data");
-      res.render("detail", {
-        userId: userId,
-        pageId: pageId,
-        name: results.name,
-        imgurl: results.imgurl,
-        type: results.type,
-        sumlang: results.sumlang,
-        startDate: results.pjdate1,
-        endDate: results.pjdate2,
-        explanation: results.explanation,
-        url: results.url,
-        githuburl: results.githuburl,
-        markdown: readme,
-        ownerCheck: ownerCheck
+      // Use Request Module to parsing Web page
+      request(url, function (error, response, html) {
+        let readme;
+        // If Error with parsing Github README.md
+        if (error) {
+          console.log("Have Some problem with Reading Github README.md file!");
+          console.log(error);
+          readme =
+            "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
+          console.log(readme + "ERROR");
+        } else {
+          // Parsing readme ID in github page
+          let $ = cheerio.load(html);
+          $(".Box-body").each(function () {
+            // save to readme Variable
+            readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
+            console.log(readme);
+          });
+        }
+
+
+        // Rendering
+        console.log("No Problem with Detail Pages data");
+
+        res.render("detail", {
+          userId: userId,
+          pageId: pageId,
+          name: results.name,
+          imgurl: results.imgurl,
+          type: results.type,
+          sumlang: results.sumlang,
+          startDate: results.pjdate1,
+          endDate: results.pjdate2,
+          explanation: results.explanation,
+          url: results.url,
+          githuburl: results.githuburl,
+          markdown: readme,
+          ownerCheck: ownerCheck
+        });
       });
-    });
+    }
   });
 });
 
