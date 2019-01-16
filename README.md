@@ -32,6 +32,7 @@ This Web Application contains the following features:
 3. Developing an admin member management page
 4. Developing chat pages for contact items
 5. Development of the method for naming image files when uploading images and the function to delete images when deleting portfolios
+6. Image files should save in External Storage, not in heroku or Github Server
 
 
 ### Prerequisites
