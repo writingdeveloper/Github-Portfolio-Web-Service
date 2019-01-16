@@ -19,7 +19,7 @@ body {
   z-index: 1030;
 }
 
-.container{
+.container {
   flex: 1;
 }
 
@@ -80,6 +80,14 @@ button {
   font-size: 20px;
   padding: 5px 0 0 1.1em;
   color: rgb(76, 201, 250);
+}
+
+.card-text {
+  overflow: hidden;
+  font-size: 11pt;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
 }
 
 .card-img-top {
