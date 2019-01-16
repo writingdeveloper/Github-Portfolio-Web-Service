@@ -48,7 +48,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
     each projects in dataarray
       div(class=`${projects.type} col-lg-3 col-md-4 col-sm-6 portfolio-item`)
         .card.h-100
-          .card-type
+          .card-type(class=`${projects.type}`)
             p.text
              =projects.type
           img.card-img-top(src=`/images/member/${userId}/${projects.imgurl}`, onerror=`this.src='/images/app/${projects.type}.png'`)
