@@ -4,7 +4,7 @@ const path = require("path");
 const shortid = require("shortid");
 const db = require("../lib/db");
 const fs = require('fs');
-
+const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
 router.use(express.static(path.join(__dirname, "public")));
 
 // Parsing Dependency
@@ -12,7 +12,7 @@ let cheerio = require("cheerio");
 let request = require("request");
 
 // Multer Module
-let multer = require("multer"); // multer모듈 적용 (for 파일업로드)
+
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
     let dir = `./public/images/member/${req.params.userId}`;
@@ -48,7 +48,7 @@ router.get(`/:userId`, function (req, res, next) {
 
   // console.log(userId);
   db.query(
-    "SELECT * FROM Personal_Data WHERE githubid='" + userId + "'",
+    `SELECT * FROM Personal_Data WHERE githubid='${userId}' ORDER BY pjdate2 DESC`,
     function (error, data) {
       if (error) {
         throw error;
@@ -270,8 +270,9 @@ router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-
   let ownerCheck;
+
+  // Owner Check
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
@@ -312,11 +313,9 @@ router.get("/:userId/:pageId", function (req, res, next) {
           $(".Box-body").each(function () {
             // save to readme Variable
             readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
-            console.log(readme);
+            // console.log(readme);
           });
         }
-
-
         // Rendering
         console.log("No Problem with Detail Pages data");
 
