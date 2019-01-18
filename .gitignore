@@ -63,4 +63,5 @@ typings/
 
 # CUSTOM File
 public/images/member/*
+!public/images/member/sangumee
 sessions/*
