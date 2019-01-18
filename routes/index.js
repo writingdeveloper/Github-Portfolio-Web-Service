@@ -11,7 +11,9 @@ router.use(session({
   secret: 'keyboard cat',
   resave: false,
   saveUninitialized: true,
-  store: new FileStore()
+  store: new FileStore(),
+  cookie: { secure: false, maxAge: new Date(Date.now() + 3600000) }, 
+  key:'connect.sid'
 }));
 
 // Favicon Server Dependency
@@ -21,7 +23,7 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 
 // DB Import
 const db = require("../lib/db");
-const passport = require('../lib/passport')(router, db);
+const passport = require('../lib/passport')(router, db, request, shortid);
 
 // Parse DATA
 const fieldOrder = [
@@ -156,13 +158,14 @@ router.post("/user", function (req, res, next) {
       let name = result[i].name;
       let githuburl = result[i].html_url;
       let explanation = result[i].description;
+      let imgurl=result[i].language;
       let created_at = result[i].created_at;
       let updated_at = result[i].updated_at;
-      let sqlData = [sid, githubid, name, githuburl, explanation, created_at, updated_at];
+      let sqlData = [sid, githubid, name, githuburl, explanation, imgurl, created_at, updated_at];
 
       console.log(sqlData);
 
-      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
+      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, imgurl, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
   });
