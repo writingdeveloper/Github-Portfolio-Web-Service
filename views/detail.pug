@@ -22,7 +22,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
         li.nav-item.active
           a.nav-link(href='/') Home
         li.nav-item.active
-          - if(ownerCheck === userId){
+          - if(ownerCheck){
             a.nav-link(href='/logout') Logout
           - } else {
             a.nav-link(href='/auth/github') Login
@@ -58,7 +58,9 @@ section#works.l-section(role='region')
             strong.gallery-spec-key Summary
             span.gallery-spec-value= explanation
             .ui-group
+              - if(url){
               a.ui-button(role='button', href=`${url}`, target='_blank') Demo
+              - }
               a.ui-button(role='button', href=`${githuburl}`, target='_blank') Github Repo
         div(id="readme" class="Box Box--condensed instapaper_body md js-code-block-container")
           .Box-header.px-2.clearfix
