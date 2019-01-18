@@ -68,6 +68,10 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
             h4.card-title
               a(href=`/${userId}/${projects.id}`)
                 = projects.name
+            - if(projects.sumlang) {
+            p.card-keyword
+              = `Keyword : ${projects.sumlang}`
+            - }
             p.card-text
               = projects.explanation
           a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details

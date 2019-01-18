@@ -82,6 +82,10 @@ button {
   color: rgb(76, 201, 250);
 }
 
+.card-keyword {
+  font-weight: bold;
+}
+
 .card-text {
   overflow: hidden;
   font-size: 11pt;
