@@ -26,7 +26,7 @@ form(method='post', action=`/${userId}/${pageId}/update_process` enctype="multip
         article#work1.gallery-item(role='article')
           figure.gallery-figure(role='group')
             .gallery-image
-              img.gallery-image-thumb(src=`/images/member/${userId}/${imgurl}`  onerror=`this.src='/images/app/${type}.png'`)
+              img.gallery-image-thumb(src=`${imgurl}`  onerror=`this.src='/images/app/${type}.png'`)
             figcaption.gallery-caption
               select#portfolio-type-select(name='portType' class="create_form")
                   option(value=`${type}` selected hidden)= `${type}`
