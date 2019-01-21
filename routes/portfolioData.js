@@ -20,8 +20,8 @@ let request = require("request");
 
 router.use(bodyParser.json());
 aws.config.update({
-  secretAccessKey: 'srx+YYC+MdGlfYawnCAL+9Wcr3X1KlrUxyReIB87',
-  accessKeyId: 'AKIAJSBHC6JGL3XS6VUQ',
+  secretAccessKey: AWS_SECRET_ACCESS_KEY,
+  accessKeyId: AWS_ACCESS_KEY_ID,
   region: 'ap-northeast-2'
 });
 
