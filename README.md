@@ -24,6 +24,7 @@ This Web Application contains the following features:
 2. Use Github API to generate personal portfolio page by using information from individual repository after login ✔️
 3. Ability to parse the README.md file for that Github in the details page and display the details. ✔️
 4. If you are the owner of the portfolio, you will be able to add, delete and modify projects (personal identification using Session) ✔️
+5. Use Amazon S3 storage to use External Storage (Fix existing code Create & Update & Delete Process) ✔️
 
 🧶NOT YET FINISHED🧶
 
