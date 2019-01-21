@@ -1,36 +1,46 @@
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 const path = require("path");
 const shortid = require("shortid");
+const bodyParser = require("body-parser");
 const db = require("../lib/db");
-const fs = require('fs');
+
+const aws = require('aws-sdk')
 const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
+const multerS3 = require('multer-s3');
 router.use(express.static(path.join(__dirname, "public")));
+
 
 // Parsing Dependency
 let cheerio = require("cheerio");
 let request = require("request");
 
-// Multer Module
 
-let storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    let dir = `./public/images/member/${req.params.userId}`;
 
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir);
-      cb(null, dir);
-    } else {
-      cb(null, dir); // cb 콜백함수를 통해 전송된 파일 저장 디렉토리 설정
-    }
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname); // cb 콜백함수를 통해 전송된 파일 이름 설정
-  }
+
+router.use(bodyParser.json());
+aws.config.update({
+  secretAccessKey: 'srx+YYC+MdGlfYawnCAL+9Wcr3X1KlrUxyReIB87',
+  accessKeyId: 'AKIAJSBHC6JGL3XS6VUQ',
+  region: 'ap-northeast-2'
 });
+
+let s3 = new aws.S3();
+
+
 let upload = multer({
-  storage: storage
+  storage: multerS3({
+    s3: s3,
+    bucket: 'portfolioworld',
+    key: function (req, file, cb) {
+      let newFileName = Date.now() + "-" + file.originalname;
+      let fullPath = `public/images/member/${req.params.userId}/${newFileName}`;
+      console.log(file);
+      cb(null, fullPath); //use Date.now() for unique file keys
+    }
+  })
 });
+
 
 /* GET home page. */
 router.get(`/:userId`, function (req, res, next) {
@@ -56,7 +66,6 @@ router.get(`/:userId`, function (req, res, next) {
       res.render("portfolioItems", {
         dataarray: data,
         userId: userId,
-        loginCheck: req.user,
         ownerCheck: ownerCheck
       });
     });
@@ -78,8 +87,9 @@ router.post("/:userId/create_process", upload.single("projectImg"), function (
   res,
   next
 ) {
+  console.log('This' + req.file.location);
+
   let userId = req.params.userId;
-  let body = req.body;
   let sid = shortid.generate();
   let githubid = req.params.userId;
   let name = req.body.projectName;
@@ -87,19 +97,8 @@ router.post("/:userId/create_process", upload.single("projectImg"), function (
   let url = req.body.projectUrl;
   let explanation = req.body.projectExplanation;
   // files information are in req.file object
-  console.log(req.file);
   // Check Image Process
-  let checkImg = req.file;
-  console.log(checkImg);
-  // If there is no image use 404.png iamge
-  if (checkImg === undefined) {
-    checkImg = "app/404.png";
-    console.log(checkImg);
-  } else {
-    // If Image is exist put original name
-    checkImg = req.file.filename;
-  }
-  let imgurl = checkImg;
+  let imgurl = req.file.location;
   let sumlang = req.body.sumLang;
   let pjdate1 = req.body.pjdate1;
   let pjdate2 = req.body.pjdate2;
@@ -130,6 +129,28 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   console.log(userId + " and " + pageId);
+
+  db.query(`SELECT imgurl FROM Personal_Data WHERE id='${pageId}'`, function (error, data) {
+    if (error) {
+      console.log(`Error Message From UPDATE: ${error}`);
+    } else {
+      console.log(data);
+      let params = {
+        Bucket: 'portfolioworld',
+        Key: data[0].imgurl.substr(55)
+      };
+      console.log(data[0].imgurl.substr(55));
+      s3.deleteObject(params, function (error, data) {
+        if (error) {
+          console.log(`Error Message From UPDATE : ${error}`);
+        } else {
+          console.log(`Delete Previous Image complete`);
+        }
+      })
+    }
+  });
+
+
   db.query(`DELETE FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
@@ -139,30 +160,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
     }
     console.log(data);
   });
-
-  // TO GET Image File Information
-
-  //   let deleteFileName = data[0].imgurl;
-  //   console.log(deleteFileName);
-
-  //   console.log("ITEM : " + id + "DELETED!");
-
-  //   // Prevent Delete Default Image
-  //   if (
-  //     deleteFileName === "app/404.png" ||
-  //     deleteFileName === "app/Certificate.png" ||
-  //     deleteFileName === "app/Education.png"
-  //   ) {
-  //     console.log("This DB has no Image, Do nothing with files");
-  //   } else {
-  //     // Delete Image File
-  //     fs.unlink("./public/images/" + deleteFileName, function(err) {
-  //       if (err) {
-  //         throw err;
-  //       }
-  //       console.log(deleteFileName + "Deleted!");
-  //     });
-  //   }
 
   /* TODO :: ERROR IN userID*/
   res.redirect("/" + userId);
@@ -219,11 +216,12 @@ router.post(
       let url = req.body.projectUrl;
       let explanation = req.body.projectExplanation;
 
-      let imgurl = req.file ? req.file.filename : undefined;
+      let imgurl = req.file ? req.file.location : undefined;
       let sumlang = req.body.sumLang;
       let pjdate1 = req.body.pjdate1;
       let pjdate2 = req.body.pjdate2;
       let githuburl = req.body.githuburl;
+      console.log(`IMGURL ${imgurl}`)
 
       // If Imgurl is undefined
       if (imgurl === undefined) {
@@ -243,6 +241,28 @@ router.post(
         );
         // If Imgurl is exist
       } else {
+        db.query(`SELECT imgurl FROM Personal_Data WHERE id='${pageId}'`, function (error, data) {
+          if (error) {
+            console.log(`Error Message From UPDATE: ${error}`);
+          } else {
+            console.log(data);
+            if (data[0].imgurl === null) {
+              console.log('NO PREVIOUS IMAGE DATA');
+            } else {
+              let params = {
+                Bucket: 'portfolioworld',
+                Key: data[0].imgurl.substr(55)
+              };
+              s3.deleteObject(params, function (error, data) {
+                if (error) {
+                  console.log(`Error Message From UPDATE : ${error}`);
+                } else {
+                  console.log(`Delete Previous Image complete`);
+                }
+              })
+            }
+          }
+        });
         db.query(
           `UPDATE Personal_Data SET name=?, type=?, url=?, explanation=?, imgurl=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
           [
@@ -260,7 +280,6 @@ router.post(
         );
       }
     });
-
     res.redirect("/" + userId + "/" + pageId);
   }
 );
@@ -318,6 +337,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
         }
         // Rendering
         console.log("No Problem with Detail Pages data");
+
 
         res.render("detail", {
           userId: userId,
