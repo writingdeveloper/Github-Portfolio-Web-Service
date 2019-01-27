@@ -23,11 +23,11 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
             span.sr-only (current)
         - if(ownerCheck){
            a.nav-link(href='/logout') Logout
+           a.nav-link(href=`/${userId}/mypage`) My Page
         - } else {
-           a.nav-link(href='/auth/github') Login
+           a.nav-link(href='/auth/login') Login
         - }
-        li.nav-item
-          a.nav-link(href='#') Services
+        //- li.nav-item
         li.nav-item
           a.nav-link(href='#') Contact
 .toolbar.navbar(id="second_nav")
