@@ -1,35 +1,79 @@
 doctype html
 head
-  meta(charset='utf-8')
-  meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
-  meta(name='description', content='')
-  meta(name='author', content='Mark Otto, Jacob Thornton, and Bootstrap contributors')
-  meta(name='generator', content='Jekyll v3.8.5')
-  title Signin Template &middot; Bootstrap
-  // Bootstrap core CSS
-  link(href='https://getbootstrap.com/docs/4.2/dist/css/bootstrap.min.css', rel='stylesheet', integrity='sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS', crossorigin='anonymous')
-  style.
-    .bd-placeholder-img {
-    font-size: 1.125rem;
-    text-anchor: middle;
-    }
-    @media (min-width: 768px) {
-    .bd-placeholder-img-lg {
-    font-size: 3.5rem;
-    }
-    }
-  // Custom styles for this template
-  link(href='https://getbootstrap.com/docs/4.2/examples/sign-in/signin.css', rel='stylesheet')
-form.form-signin
-  img.mb-4(src='https://getbootstrap.com/docs/4.2/assets/brand/bootstrap-solid.svg', alt='', width='72', height='72')
-  h1.h3.mb-3.font-weight-normal Please sign in
-  label.sr-only(for='inputEmail') Email address
-  input#inputEmail.form-control(type='text', placeholder='ID', required='', autofocus='')
-  label.sr-only(for='inputPassword') Password
-  input#inputPassword.form-control(type='password', placeholder='Password', required='')
-  .checkbox.mb-3
-    label
-      input(type='checkbox', value='remember-me')
-      |  Remember me
-  button.btn.btn-lg.btn-primary.btn-block(type='submit') Sign in
-  p.mt-5.mb-3.text-muted &copy; 2017-2018
+  title Login Page
+  meta(charset='UTF-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1')
+  // ===============================================================================================
+  link(rel='icon', type='image/png', href='/external/Login/images/icons/favicon.ico')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/vendor/bootstrap/css/bootstrap.min.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/fonts/font-awesome-4.7.0/css/font-awesome.min.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/fonts/Linearicons-Free-v1.0.0/icon-font.min.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/vendor/animate/animate.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/vendor/css-hamburgers/hamburgers.min.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/vendor/animsition/css/animsition.min.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/vendor/select2/select2.min.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/vendor/daterangepicker/daterangepicker.css')
+  // ===============================================================================================
+  link(rel='stylesheet', type='text/css', href='/external/Login/css/util.css')
+  link(rel='stylesheet', type='text/css', href='/external/Login/css/main.css')
+  // ===============================================================================================
+.limiter
+  .container-login100(style="background-image: url('/external/Login/images/bg-01.jpg');")
+    .wrap-login100.p-l-110.p-r-110.p-t-62.p-b-33
+      form.login100-form.validate-form.flex-sb.flex-w
+        span.login100-form-title.p-b-53
+          | Sign In With
+        a.btn-google.m-b-20(href='/auth/github')
+          //- i.fa.fa-facebook-official
+          img(src='/external/Login/images/icons/icon-github.png', alt='GITHUB')
+          | &#x9;&#x9;&#x9;&#x9;&#x9;&#x9;Github
+        a.btn-google.m-b-20(href='#')
+          img(src='/external/Login/images/icons/icon-google.png', alt='GOOGLE')
+          | &#x9;&#x9;&#x9;&#x9;&#x9;&#x9;Google
+        //- .p-t-31.p-b-9
+        //-   span.txt1
+        //-     | Username
+        //- .wrap-input100.validate-input(data-validate='Username is required')
+        //-   input.input100(type='text', name='username')
+        //-   span.focus-input100
+        //- .p-t-13.p-b-9
+        //-   span.txt1
+        //-     | Password
+        //-   a.txt2.bo1.m-l-5(href='#')
+        //-     | Forgot?
+        //- .wrap-input100.validate-input(data-validate='Password is required')
+        //-   input.input100(type='password', name='pass')
+        //-   span.focus-input100
+        //- .container-login100-form-btn.m-t-17
+        //-   button.login100-form-btn
+        //-     | Sign In
+        .w-full.text-center.p-t-55
+          span.txt2
+            | Not a member?
+          a.txt2.bo1(href='#')
+            | Sign up now
+#dropDownSelect1
+// ===============================================================================================
+script(src='/external/Login/vendor/jquery/jquery-3.2.1.min.js')
+// ===============================================================================================
+script(src='/external/Login/vendor/animsition/js/animsition.min.js')
+// ===============================================================================================
+script(src='/external/Login/vendor/bootstrap/js/popper.js')
+script(src='/external/Login/vendor/bootstrap/js/bootstrap.min.js')
+// ===============================================================================================
+script(src='/external/Login/vendor/select2/select2.min.js')
+// ===============================================================================================
+script(src='/external/Login/vendor/daterangepicker/moment.min.js')
+script(src='/external/Login/vendor/daterangepicker/daterangepicker.js')
+// ===============================================================================================
+script(src='/external/Login/vendor/countdowntime/countdowntime.js')
+// ===============================================================================================
+script(src='/external/Login/js/main.js')
