@@ -71,6 +71,21 @@ router.get(`/:userId`, function (req, res, next) {
     });
 });
 
+router.get(`/:userId/mypage`, function (req, res, next) {
+  let userId = req.params.userId;
+  db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, data) {
+    if (error) {
+      throw (`Error From Router /:userId/mypage \n ${error}`)
+    }
+
+
+    res.render('mypage/main', {
+      dataArray: data,
+      test: 'wow'
+    })
+  })
+})
+
 /* GET Create Page */
 router.get("/:userId/create", function (req, res, next) {
   let userId = req.params.userId;
@@ -298,6 +313,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
     ownerCheck = req.user.login;
   }
   console.log(`Owner Check ${ownerCheck}`);
+  // Counter SET
+  db.query(`UPDATE Personal_Data SET counter=counter+1 WHERE id=?`, [pageId]);
 
   // GET data id to use Object
   db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
@@ -351,6 +368,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
           explanation: results.explanation,
           url: results.url,
           githuburl: results.githuburl,
+          counter: results.counter,
           markdown: readme,
           ownerCheck: ownerCheck
         });
