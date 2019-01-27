@@ -24,7 +24,7 @@ header
          - if(_user){
            a.nav-link(href='/logout') Logout
          - } else {
-           a.nav-link(href='/auth/github') Login
+           a.nav-link(href='/auth/login') Login
          - }
       form.form-inline.mt-2.mt-md-0(action=`/user`, method='post')
         input.form-control.mr-sm-2(type='text' name='id' placeholder='Github ID' aria-label='Search')
