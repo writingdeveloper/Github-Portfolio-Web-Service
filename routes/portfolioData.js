@@ -75,13 +75,17 @@ router.get(`/:userId/mypage`, function (req, res, next) {
   let userId = req.params.userId;
   db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, data) {
     if (error) {
-      throw (`Error From Router /:userId/mypage \n ${error}`)
+      throw (`Error From Router /:userId/mypage \n ${error}`);
     }
-
-
-    res.render('mypage/main', {
-      dataArray: data,
-      test: 'wow'
+    db.query(`SELECT SUM(counter) FROM Personal_Data WHERE githubid='${userId}'`, function (error, counterSum) {
+      if(error){
+        throw (`Error FROM Router /:userId/mypage \n ${error}`);
+      }
+      // console.log(counterSum[0].SUM(counter));
+      res.render('mypage/main', {
+        dataArray: data,
+        totalViews: counterSum[0]['SUM(counter)']
+      })
     })
   })
 })

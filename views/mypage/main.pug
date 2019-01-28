@@ -97,7 +97,7 @@ html(lang='en')
                 .card-body
                   .card-body-icon
                     i.fas.fa-fw.fa-comments
-                  .mr-5 26 New Messages!
+                  .mr-5=`Total Views on your Portfolio : ${totalViews}`
                 a.card-footer.text-white.clearfix.small.z-1(href='#')
                   span.float-left View Details
                   span.float-right
@@ -127,9 +127,9 @@ html(lang='en')
                 .card-body
                   .card-body-icon
                     i.fas.fa-fw.fa-life-ring
-                  .mr-5 Rem
+                  .mr-5 Remove all of my Portfolio Data
                 a.card-footer.text-white.clearfix.small.z-1(href='' ref='#', data-toggle='modal', data-target='#removedata')
-                  span.float-left View Details
+                  span.float-left Remove Exist Data
                   span.float-right
                     i.fas.fa-angle-right
           // Area Chart Example
@@ -208,7 +208,7 @@ html(lang='en')
             .modal-body Select "Logout" below if you are ready to end your current session.
             .modal-footer
               button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
-              a.btn.btn-primary(href='login.html') Logout
+              a.btn.btn-primary(href='/logout') Logout
       #removedata.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
         .modal-dialog(role='document')
           .modal-content
