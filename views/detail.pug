@@ -10,8 +10,6 @@ head
   link(href='/stylesheets/core/bootstrap.min.css', rel='stylesheet')
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css')
-  script(src='https://code.jquery.com/jquery-3.3.1.min.js')
-  script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
 nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
   .container
     a.navbar-brand(href=`/${userId}`)=`${userId}'s Portfolio`
@@ -41,7 +39,7 @@ section#works.l-section(role='region')
       article#work1.gallery-item(role='article')
         figure.gallery-figure(role='group')
           .gallery-image
-            img.gallery-image-thumb(src=`${imgurl}` onerror=`this.src='/images/app/${type}.png'`)
+            img.gallery-image-thumb(src=`${imgurl}`)
           figcaption.gallery-caption
             //- h3.gallery-title= name
             ul.gallery-spec
@@ -84,7 +82,7 @@ section#works.l-section(role='region')
         .footer-content
           ul.unstyled-list
             li
-              a(href='mailto:super2451894@gmail.com', title='이메일')
+              a(href='mailto:super2451894@gmail.com', title='email')
                 img(src="https://png.icons8.com/material-outlined/50/ffffff/new-post.png" class="icons")
                 span.iconed-text super2451894@gmail.com
             li
@@ -129,5 +127,7 @@ section#works.l-section(role='region')
     - }
 script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
 script(src='/javascripts/core/bootstrap.min.js')
+script(src='https://code.jquery.com/jquery-3.3.1.min.js')
+script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
 script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
 script(type='application/javascript', charset='utf-8', src='/javascripts/setting.js')
