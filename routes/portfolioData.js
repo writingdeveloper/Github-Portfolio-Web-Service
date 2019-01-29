@@ -62,7 +62,7 @@ router.get(`/:userId`, function (req, res, next) {
       if (error) {
         throw error;
       }
-      
+
       for(let i=0; i<data.length; i++){
         if(data[i].imgurl===null){
           data[i].imgurl=`/images/app/${data[i].type}.png`;
@@ -80,7 +80,7 @@ router.get(`/:userId`, function (req, res, next) {
 });
 
 /* GET MyPage Page */
-router.get(`/:userId/user/mypage`, function (req, res, next) {
+router.get(`/:userId/mypage`, function (req, res, next) {
   let userId = req.params.userId; // UserID Variable
   let updatedTime = new Date(); // updated Time Variable
   // Chart Data SQL
