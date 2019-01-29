@@ -59,11 +59,6 @@ router.get(`/logout`, function (req, res, next) {
   });
 });
 
-
-// Routes to portFolioData.js
-let portfolioDataRouter = require("./portfolioData");
-router.use("/", portfolioDataRouter);
-
 router.use(bodyParser.json()); // to support JSON-encoded bodies
 router.use(
   bodyParser.urlencoded({
