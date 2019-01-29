@@ -55,7 +55,6 @@ router.get(`/:userId`, function (req, res, next) {
     ownerCheck = req.user.login;
   }
   console.log(`Owner Check ${ownerCheck}`);
-
   // console.log(userId);
   db.query(
     `SELECT * FROM Personal_Data WHERE githubid='${userId}' ORDER BY pjdate2 DESC`,
@@ -63,6 +62,15 @@ router.get(`/:userId`, function (req, res, next) {
       if (error) {
         throw error;
       }
+      
+      for(let i=0; i<data.length; i++){
+        if(data[i].imgurl===null){
+          data[i].imgurl=`/images/app/${data[i].type}.png`;
+        } else {
+          data[i].imgurl=data[i].imgurl
+        }
+      }
+
       res.render("portfolioItems", {
         dataarray: data,
         userId: userId,
@@ -71,20 +79,24 @@ router.get(`/:userId`, function (req, res, next) {
     });
 });
 
-router.get(`/:userId/mypage`, function (req, res, next) {
-  let userId = req.params.userId;
+/* GET MyPage Page */
+router.get(`/:userId/user/mypage`, function (req, res, next) {
+  let userId = req.params.userId; // UserID Variable
+  let updatedTime = new Date(); // updated Time Variable
+  // Chart Data SQL
   db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, data) {
     if (error) {
       throw (`Error From Router /:userId/mypage \n ${error}`);
     }
+    // Total Counter SQL
     db.query(`SELECT SUM(counter) FROM Personal_Data WHERE githubid='${userId}'`, function (error, counterSum) {
-      if(error){
+      if (error) {
         throw (`Error FROM Router /:userId/mypage \n ${error}`);
       }
-      // console.log(counterSum[0].SUM(counter));
       res.render('mypage/main', {
         dataArray: data,
-        totalViews: counterSum[0]['SUM(counter)']
+        totalViews: counterSum[0]['SUM(counter)'],
+        updatedTime: updatedTime.toLocaleString()
       })
     })
   })
@@ -308,7 +320,10 @@ router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
+  let date = new Date().toISOString().substr(0, 10).replace('T', ' '); // Today Date
+  console.log(date);
   let ownerCheck;
+  let imageNullCheck;
 
   // Owner Check
   if (req.user === undefined) {
@@ -317,8 +332,24 @@ router.get("/:userId/:pageId", function (req, res, next) {
     ownerCheck = req.user.login;
   }
   console.log(`Owner Check ${ownerCheck}`);
-  // Counter SET
+  // Personal_Data Table Counter SET
   db.query(`UPDATE Personal_Data SET counter=counter+1 WHERE id=?`, [pageId]);
+  // User Table Total Counter SET
+  db.query(`UPDATE user SET counter=counter+1 WHERE login=?`, [userId]);
+
+  db.query(`SELECT * from counter WHERE login=? AND date=?`, [userId, date], function (error, dayDateResult) {
+    if (error) {
+      console.log(`Error From Router Detail Page, Counter \n ${error}`);
+    }
+    if (dayDateResult[0] === undefined) {
+      console.log('NULL');
+      db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, date, 0])
+    } else {
+      console.log('Not NULL');
+      // Counter Table Day Counter SET
+      db.query(`UPDATE counter SET counter = counter+1 WHERE login=?`, [userId]);
+    }
+  })
 
   // GET data id to use Object
   db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
@@ -335,7 +366,13 @@ router.get("/:userId/:pageId", function (req, res, next) {
       let results = data[0];
       // Get github URL
       let url = results.githuburl;
-      console.log(url);
+      if (results.imgurl === null) {
+        console.log('NO IMAGE');
+        imageNullCheck = `/images/app/${results.type}.png`
+        console.log(imageNullCheck);
+      } else {
+        imageNullCheck = results.imgurl;
+      }
 
       // Use Request Module to parsing Web page
       request(url, function (error, response, html) {
@@ -360,11 +397,12 @@ router.get("/:userId/:pageId", function (req, res, next) {
         console.log("No Problem with Detail Pages data");
 
 
+
         res.render("detail", {
           userId: userId,
           pageId: pageId,
           name: results.name,
-          imgurl: results.imgurl,
+          imgurl: imageNullCheck,
           type: results.type,
           sumlang: results.sumlang,
           startDate: results.pjdate1,
