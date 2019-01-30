@@ -81,8 +81,8 @@ html(lang='en')
             span Charts
         li.nav-item
           a.nav-link(href='tables.html')
-            i.fas.fa-fw.fa-table
-            span Tables
+            i.fas.fa-fw.fa-user
+            span User Information
       #content-wrapper
         .container-fluid
           // Breadcrumbs
@@ -155,43 +155,47 @@ html(lang='en')
                       th Type
                       th URL
                       //- th explanation
-                      th Image URL
+                      th Image
                       th Keyword
                       th Project Start
                       th Porject End
                       th Github URL
-                  tfoot
-                    tr
-                      th ID
-                      th Name
-                      th Type
-                      th URL
-                      //- th explanation
-                      th Image URL
-                      th Keyword
-                      th Project Start
-                      th Porject End
-                      th Github URL
+                  //- tfoot
+                  //-   tr
+                  //-     th ID
+                  //-     th Name
+                  //-     th Type
+                  //-     th URL
+                  //-     //- th explanation
+                  //-     th Image URL
+                  //-     th Keyword
+                  //-     th Project Start
+                  //-     th Porject End
+                  //-     th Github URL
                   tbody
                     each data in dataArray
                       tr
-                        td= `${data.id}`
+                        td
+                          a(href=`/${userId}/${data.id}`)=`${data.id}`
                         td= `${data.name}`
                         td= `${data.type}`
-                        td= `${data.url}`
+                        td
+                          a(href=`${data.url}`)=`${data.url}`
                         //- td= `${data.explanation}`
-                        td= `${data.imgurl}`
+                        td
+                          img(src=`${data.imgurl}`)
                         td= `${data.sumlang}`
                         td= `${data.pjdate1}`
                         td= `${data.pjdate2}`
-                        td= `${data.githuburl}`
-            .card-footer.small.text-muted Updated yesterday at 11:59 PM
+                        td
+                          a(href=`${data.githuburl}`)=`${data.githuburl}`
+            .card-footer.small.text-muted=`Updated at ${updatedTime}`
         // /.container-fluid
         // Sticky Footer
         footer.sticky-footer
           .container.my-auto
             .copyright.text-center.my-auto
-              span Copyright © Your Website 2018
+              span Copyright © Portfolio World 2019
       // /.content-wrapper
       // /#wrapper
       // Scroll to Top Button
