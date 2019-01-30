@@ -94,6 +94,7 @@ router.get(`/:userId/mypage`, function (req, res, next) {
         throw (`Error FROM Router /:userId/mypage \n ${error}`);
       }
       res.render('mypage/main', {
+        userId: userId,
         dataArray: data,
         totalViews: counterSum[0]['SUM(counter)'],
         updatedTime: updatedTime.toLocaleString()
