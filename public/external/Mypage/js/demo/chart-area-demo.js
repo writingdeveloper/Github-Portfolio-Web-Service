@@ -2,14 +2,38 @@
 Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#292b2c';
 
+// CUSTOM Function
+
+var currentDay = new Date();
+var theYear = currentDay.getFullYear();
+var theMonth = currentDay.getMonth();
+var theDate = currentDay.getDate();
+var theDayOfWeek = currentDay.getDay();
+
+var thisWeek = [];
+
+for (var i = 0; i < 7; i++) {
+  var resultDay = new Date(theYear, theMonth, theDate - i);
+  var yyyy = resultDay.getFullYear();
+  var mm = Number(resultDay.getMonth()) + 1;
+  var dd = resultDay.getDate();
+
+  mm = String(mm).length === 1 ? '0' + mm : mm;
+  dd = String(dd).length === 1 ? '0' + dd : dd;
+
+  thisWeek[i] = yyyy + '-' + mm + '-' + dd;
+}
+
+// console.log(thisWeek);
+
 // Area Chart Example
 var ctx = document.getElementById("myAreaChart");
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: ["Mar 1", "Mar 2", "Mar 3", "Mar 4", "Mar 5", "Mar 6", "Mar 7", "Mar 8", "Mar 9", "Mar 10", "Mar 11", "Mar 12", "Mar 13"],
+    labels: thisWeek.reverse(),
     datasets: [{
-      label: "Sessions",
+      label: "Visitors",
       lineTension: 0.3,
       backgroundColor: "rgba(2,117,216,0.2)",
       borderColor: "rgba(2,117,216,1)",
@@ -20,7 +44,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBackgroundColor: "rgba(2,117,216,1)",
       pointHitRadius: 50,
       pointBorderWidth: 2,
-      data: [10000, 30162, 26263, 18394, 18287, 28682, 31274, 33259, 25849, 24159, 32651, 31984, 38451],
+      data: visitorData,
     }],
   },
   options: {
@@ -39,8 +63,8 @@ var myLineChart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           min: 0,
-          max: 40000,
-          maxTicksLimit: 5
+          max: chartMaxData + 50,
+          maxTicksLimit: 10
         },
         gridLines: {
           color: "rgba(0, 0, 0, .125)",
