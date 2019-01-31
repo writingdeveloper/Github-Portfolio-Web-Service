@@ -96,12 +96,10 @@ html(lang='en')
               .card.text-white.bg-primary.o-hidden.h-100
                 .card-body
                   .card-body-icon
-                    i.fas.fa-fw.fa-comments
+                    i.fas.fa-fw.fa-eye
                   .mr-5=`Total Views on your Portfolio : ${totalViews}`
-                a.card-footer.text-white.clearfix.small.z-1(href='#')
-                  span.float-left View Details
-                  span.float-right
-                    i.fas.fa-angle-right
+                a.card-footer.text-white.clearfix.small.z-1
+                  span.float-left= `Today's Visitor : ${todayVisitor}`
             .col-xl-3.col-sm-6.mb-3
               .card.text-white.bg-warning.o-hidden.h-100
                 .card-body
@@ -116,27 +114,27 @@ html(lang='en')
               .card.text-white.bg-success.o-hidden.h-100
                 .card-body
                   .card-body-icon
-                    i.fas.fa-fw.fa-shopping-cart
-                  .mr-5 123 New Orders!
-                a.card-footer.text-white.clearfix.small.z-1(href='#')
-                  span.float-left View Details
+                    i.fas.fa-fw.fa-database
+                  .mr-5 Get Data from Github Repository
+                a.card-footer.text-white.clearfix.small.z-1(href='' ref='#', data-toggle='modal', data-target='#getData')
+                  span.float-left Get Data
                   span.float-right
                     i.fas.fa-angle-right
             .col-xl-3.col-sm-6.mb-3
               .card.text-white.bg-danger.o-hidden.h-100
                 .card-body
                   .card-body-icon
-                    i.fas.fa-fw.fa-life-ring
+                    i.fas.fa-fw.fa-trash
                   .mr-5 Remove all of my Portfolio Data
                 a.card-footer.text-white.clearfix.small.z-1(href='' ref='#', data-toggle='modal', data-target='#removedata')
                   span.float-left Remove Exist Data
                   span.float-right
                     i.fas.fa-angle-right
-          // Area Chart Example
+          // Chart Area
           .card.mb-3
             .card-header
               i.fas.fa-chart-area
-              |               Area Chart Example
+              | Recent 7 Days Visitors
             .card-body
               script.
                 var visitorData=!{JSON.stringify(visitorData)}
@@ -221,13 +219,24 @@ html(lang='en')
         .modal-dialog(role='document')
           .modal-content
             .modal-header
+              h5#exampleModalLabel.modal-title This action initializes all portfolio data and most recent visitor counters.
+              button.close(type='button', data-dismiss='modal', aria-label='Close')
+                span(aria-hidden='true') ×
+            .modal-body Select "Accept" below if you are ready to end your current session.
+            .modal-footer
+              button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
+              a.btn.btn-primary(href=`/${userId}/admin/removeData`) Accept
+      #getData.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
+        .modal-dialog(role='document')
+          .modal-content
+            .modal-header
               h5#exampleModalLabel.modal-title Do you really want to remove all of your data?
               button.close(type='button', data-dismiss='modal', aria-label='Close')
                 span(aria-hidden='true') ×
-            .modal-body Select "Logout" below if you are ready to end your current session.
+            .modal-body Select "Accept" below if you are ready to end your current session.
             .modal-footer
               button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
-              a.btn.btn-primary(href=`/`) Accept              
+              a.btn.btn-primary(href=`/${userId}/admin/getData`) Accept              
 // Bootstrap core JavaScript
 script(src='/external/Mypage/vendor/jquery/jquery.min.js')
 script(src='/external/Mypage/vendor/bootstrap/js/bootstrap.bundle.min.js')
