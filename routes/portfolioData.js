@@ -4,19 +4,14 @@ const path = require("path");
 const shortid = require("shortid");
 const bodyParser = require("body-parser");
 const db = require("../lib/db");
-
 const aws = require('aws-sdk')
 const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
 const multerS3 = require('multer-s3');
 router.use(express.static(path.join(__dirname, "public")));
 
-
 // Parsing Dependency
 let cheerio = require("cheerio");
 let request = require("request");
-
-
-
 
 router.use(bodyParser.json());
 aws.config.update({
@@ -24,10 +19,7 @@ aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   region: 'ap-northeast-2'
 });
-
 let s3 = new aws.S3();
-
-
 let upload = multer({
   storage: multerS3({
     s3: s3,
@@ -41,11 +33,9 @@ let upload = multer({
   })
 });
 
-
 /* GET home page. */
 router.get(`/:userId`, function (req, res, next) {
   let userId = req.params.userId;
-
   // Check Owner of this page
   let ownerCheck;
   console.log(req.user);
@@ -62,15 +52,13 @@ router.get(`/:userId`, function (req, res, next) {
       if (error) {
         throw error;
       }
-
-      for(let i=0; i<data.length; i++){
-        if(data[i].imgurl===null){
-          data[i].imgurl=`/images/app/${data[i].type}.png`;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].imgurl === null) {
+          data[i].imgurl = `/images/app/${data[i].type}.png`;
         } else {
-          data[i].imgurl=data[i].imgurl
+          data[i].imgurl = data[i].imgurl
         }
       }
-
       res.render("portfolioItems", {
         dataarray: data,
         userId: userId,
@@ -80,24 +68,64 @@ router.get(`/:userId`, function (req, res, next) {
 });
 
 /* GET MyPage Page */
-router.get(`/:userId/mypage`, function (req, res, next) {
+router.get(`/:userId/admin/mypage`, function (req, res, next) {
   let userId = req.params.userId; // UserID Variable
   let updatedTime = new Date(); // updated Time Variable
+  let currentDay = new Date();
+  let theYear = currentDay.getFullYear();
+  let theMonth = currentDay.getMonth();
+  let theDate = currentDay.getDate();
+  let theDayOfWeek = currentDay.getDay();
+  let thisWeek = [];
+  for (let i = 0; i < 7; i++) {
+    let resultDay = new Date(theYear, theMonth, theDate - i);
+    let yyyy = resultDay.getFullYear();
+    let mm = Number(resultDay.getMonth()) + 1;
+    let dd = resultDay.getDate();
+    mm = String(mm).length === 1 ? '0' + mm : mm;
+    dd = String(dd).length === 1 ? '0' + dd : dd;
+    thisWeek[i] = yyyy + '-' + mm + '-' + dd;
+  }
+  console.log(thisWeek.reverse());
   // Chart Data SQL
   db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, data) {
     if (error) {
       throw (`Error From Router /:userId/mypage \n ${error}`);
+    }
+    for(var i=0; i<data.length; i++){
+      if(data[i].imgurl===null){
+        data[i].imgurl='/images/app/404.png'
+      }
     }
     // Total Counter SQL
     db.query(`SELECT SUM(counter) FROM Personal_Data WHERE githubid='${userId}'`, function (error, counterSum) {
       if (error) {
         throw (`Error FROM Router /:userId/mypage \n ${error}`);
       }
-      res.render('mypage/main', {
-        userId: userId,
-        dataArray: data,
-        totalViews: counterSum[0]['SUM(counter)'],
-        updatedTime: updatedTime.toLocaleString()
+      db.query(`SELECT counter FROM counter WHERE login='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
+        if (error) {
+          throw (`Error From Router /:userId/mypage \n ${error}`);
+        }
+        console.log(visitorData);
+        let chartData = [];
+        if (visitorData.length < 7) {
+          for (let i = 0; i < 7 - visitorData.length; i++) {
+            chartData.push(0);
+          }
+        }
+        for (let i = 0; i < visitorData.length; i++) {
+          chartData.push(visitorData[i].counter)
+          console.log(chartData);
+        }
+        console.log(Math.max.apply(null, chartData));
+        res.render('mypage/main', {
+          userId: userId,
+          dataArray: data,
+          visitorData: chartData,
+          chartMaxData: Math.max.apply(null, chartData),
+          totalViews: counterSum[0]['SUM(counter)'],
+          updatedTime: updatedTime.toLocaleString()
+        })
       })
     })
   })
@@ -161,7 +189,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   console.log(userId + " and " + pageId);
-
   db.query(`SELECT imgurl FROM Personal_Data WHERE id='${pageId}'`, function (error, data) {
     if (error) {
       console.log(`Error Message From UPDATE: ${error}`);
@@ -181,8 +208,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
       })
     }
   });
-
-
   db.query(`DELETE FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
@@ -192,7 +217,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
     }
     console.log(data);
   });
-
   /* TODO :: ERROR IN userID*/
   res.redirect("/" + userId);
 });
@@ -209,7 +233,6 @@ router.get("/:userId/:pageId/update", function (req, res) {
     if (error) {
       throw error;
     }
-
     console.log(data);
     res.render("update", {
       userId: userId,
@@ -242,19 +265,16 @@ router.post(
         throw error;
       }
       console.log(data[0]);
-
       let name = req.body.projectName;
       let type = req.body.portType;
       let url = req.body.projectUrl;
       let explanation = req.body.projectExplanation;
-
       let imgurl = req.file ? req.file.location : undefined;
       let sumlang = req.body.sumLang;
       let pjdate1 = req.body.pjdate1;
       let pjdate2 = req.body.pjdate2;
       let githuburl = req.body.githuburl;
       console.log(`IMGURL ${imgurl}`)
-
       // If Imgurl is undefined
       if (imgurl === undefined) {
         db.query(
@@ -321,11 +341,21 @@ router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  let date = new Date().toISOString().substr(0, 10).replace('T', ' '); // Today Date
+  // let date = new Date().toISOString().substr(0, 10).replace('T', ' '); // Today Date
+  let date = new Date();
+  let dd = date.getDate();
+  let mm = date.getMonth() + 1; //January is 0!
+  let yyyy = date.getFullYear();
+  if (dd < 10) {
+    dd = '0' + dd
+  }
+  if (mm < 10) {
+    mm = '0' + mm
+  }
+  date = `${yyyy}-${mm}-${dd}`;
   console.log(date);
   let ownerCheck;
   let imageNullCheck;
-
   // Owner Check
   if (req.user === undefined) {
     ownerCheck = null;
@@ -344,7 +374,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
     }
     if (dayDateResult[0] === undefined) {
       console.log('NULL');
-      db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, date, 0])
+      db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, date, 1])
     } else {
       console.log('Not NULL');
       // Counter Table Day Counter SET
@@ -374,7 +404,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
       } else {
         imageNullCheck = results.imgurl;
       }
-
       // Use Request Module to parsing Web page
       request(url, function (error, response, html) {
         let readme;
@@ -396,9 +425,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
         }
         // Rendering
         console.log("No Problem with Detail Pages data");
-
-
-
         res.render("detail", {
           userId: userId,
           pageId: pageId,
