@@ -23,7 +23,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
             span.sr-only (current)
         - if(ownerCheck){
            a.nav-link(href='/logout') Logout
-           a.nav-link(href=`/${userId}/mypage`) My Page
+           a.nav-link(href=`/${userId}/admin/mypage`) My Page
         - } else {
            a.nav-link(href='/auth/login') Login
         - }
