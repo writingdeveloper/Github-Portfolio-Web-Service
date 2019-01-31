@@ -138,6 +138,10 @@ html(lang='en')
               i.fas.fa-chart-area
               |               Area Chart Example
             .card-body
+              script.
+                var visitorData=!{JSON.stringify(visitorData)}
+                var chartMaxData=!{JSON.stringify(chartMaxData)}
+                console.log(visitorData);
               canvas#myAreaChart(width='100%', height='30')
             .card-footer.small.text-muted=`Updated at ${updatedTime}`
           // DataTables Example
