@@ -290,7 +290,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
 router.get("/:userId/:pageId/update", function (req, res) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-
   db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
@@ -299,14 +298,12 @@ router.get("/:userId/:pageId/update", function (req, res) {
       throw error;
     }
     let results=data[0];
+    // Image NULL Check
     if (results.imgurl === null) {
-      console.log('NO IMAGE');
-      imageNullCheck = `/images/app/${results.type}.png`
-      console.log(imageNullCheck);
+      imageNullCheck = `/images/app/${results.type}.png`  // If image data not exists, return default tpye image
     } else {
-      imageNullCheck = results.imgurl;
+      imageNullCheck = results.imgurl;  // Image file Exists
     }
-    console.log(data);
     res.render("update", {
       userId: userId,
       pageId: pageId,
@@ -315,8 +312,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       url: results.url,
       explanation: results.explanation,
       imgurl: imageNullCheck,
-      startDate: results.pjdate1,
-      endDate: results.pjdate2,
+      startDate: results.pjdate1.substring(0,7),
+      endDate: results.pjdate2.substring(0,7),
       githuburl: results.githuburl,
       sumlang: results.sumlang
     });
