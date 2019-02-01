@@ -75,7 +75,6 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
   let theYear = currentDay.getFullYear();
   let theMonth = currentDay.getMonth();
   let theDate = currentDay.getDate();
-  let theDayOfWeek = currentDay.getDay();
   let thisWeek = [];
   for (let i = 0; i < 7; i++) {
     let resultDay = new Date(theYear, theMonth, theDate - i);
@@ -86,49 +85,115 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
     dd = String(dd).length === 1 ? '0' + dd : dd;
     thisWeek[i] = yyyy + '-' + mm + '-' + dd;
   }
-  console.log(thisWeek.reverse());
   // Chart Data SQL
   db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, data) {
     if (error) {
       throw (`Error From Router /:userId/mypage \n ${error}`);
     }
-    for(var i=0; i<data.length; i++){
-      if(data[i].imgurl===null){
-        data[i].imgurl='/images/app/404.png'
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].imgurl === null) {
+        data[i].imgurl = '/images/app/404.png'
       }
     }
     // Total Counter SQL
-    db.query(`SELECT SUM(counter) FROM Personal_Data WHERE githubid='${userId}'`, function (error, counterSum) {
+    db.query(`SELECT SUM(counter) FROM counter WHERE login='${userId}'`, function (error, counterSum) {
       if (error) {
         throw (`Error FROM Router /:userId/mypage \n ${error}`);
       }
+      //  This Week visitor Data SQL
       db.query(`SELECT counter FROM counter WHERE login='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
         if (error) {
           throw (`Error From Router /:userId/mypage \n ${error}`);
         }
-        console.log(visitorData);
-        let chartData = [];
-        if (visitorData.length < 7) {
-          for (let i = 0; i < 7 - visitorData.length; i++) {
-            chartData.push(0);
+        db.query(`SELECT counter FROM counter WHERE login='${userId}' AND date=?`, [currentDay.toISOString().split('T')[0]], function (error, todayVisitorData) {
+          if (error) {
+            throw (`Error From Router /:userId/mypage \n ${error}`);
           }
-        }
-        for (let i = 0; i < visitorData.length; i++) {
-          chartData.push(visitorData[i].counter)
-          console.log(chartData);
-        }
-        console.log(Math.max.apply(null, chartData));
-        res.render('mypage/main', {
-          userId: userId,
-          dataArray: data,
-          visitorData: chartData,
-          chartMaxData: Math.max.apply(null, chartData),
-          totalViews: counterSum[0]['SUM(counter)'],
-          updatedTime: updatedTime.toLocaleString()
+          if (todayVisitorData[0] === undefined) {
+            console.log('NULL');
+            todayVisitorData[0] = 0;
+            db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
+          }
+          console.log(todayVisitorData);
+          let chartData = [];
+          if (visitorData.length < 7) { // If visitor data's length is lower than 7, Push Data 0 to create Array
+            for (let i = 0; i < 7 - visitorData.length; i++) {
+              chartData.push(0);
+            }
+          }
+          for (let i = 0; i < visitorData.length; i++) { // Create Counter Array for chart data
+            chartData.push(visitorData[i].counter)
+            console.log(chartData);
+          }
+          res.render('mypage/main', {
+            userId: userId,
+            dataArray: data,
+            todayVisitor: todayVisitorData[0].counter,
+            visitorData: chartData,
+            chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+            totalViews: counterSum[0]['SUM(counter)'],
+            updatedTime: updatedTime.toLocaleString()
+          })
         })
       })
     })
   })
+})
+
+/* GET Mypage Remove Portfolio Data */
+// TODO :: Needs to check the owner of the mypage and if not, avoid this job
+router.get(`/:userId/admin/removeData`, function (req, res, next) {
+  let userId = req.params.userId;
+  let currentDay = new Date();
+  db.query(`DELETE FROM Personal_Data WHERE githubid='${userId}'`); // Delete Personal_Data Table
+  db.query(`DELETE FROM counter WHERE login='${userId}'`); // Delete counter Table
+  db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
+  res.redirect(`/${userId}/admin/mypage`); // Redirect to main page
+});
+
+/* GET Mypage Get Github Portfolio Data */
+// TODO :: Needs to check the owner of the mypage and if not, avoid this job
+router.get(`/:userId/admin/getData`, function (req, res, next) {
+  let userId = req.params.userId;
+
+  // User Repository API Option Set
+  let repositoryOptions = {
+    url: `https://api.github.com/users/${userId}/repos`,
+    headers: {
+      "User-Agent": "request"
+    }
+  }
+  // User Repository Information API Process
+  request(repositoryOptions, function (error, response, data) {
+    if (error) {
+      throw error;
+    }
+    let result = JSON.parse(data);
+
+    for (i = 0; i < result.length; i++) {
+      // console.log(result[i]);
+      let sid = shortid.generate();
+      let githubid = result[i].owner.login;
+      let name = result[i].name;
+      let githuburl = result[i].html_url;
+      let explanation = result[i].description;
+      let created_at = result[i].created_at;
+      let updated_at = result[i].updated_at;
+      let sqlData = [sid, githubid, name, githuburl, explanation, created_at.split('T')[0], updated_at.split('T')[0]];
+      console.log(sqlData);
+      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
+      db.query(sql, sqlData);
+    }
+  })
+  res.redirect(`/${userId}/admin/mypage`);
+})
+
+/* GET Mypage User Setting Page */
+router.get(`/:userId/admin/user`, function(req,res,next){
+  let userId=req.params.userId;
+  res.render('mypage/user'),{
+
+  }
 })
 
 /* GET Create Page */
@@ -208,7 +273,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
       })
     }
   });
-  db.query(`DELETE FROM Personal_Data WHERE id=?`, [pageId], function (
+  db.query(`DELETE FROM Personal_Data WHERE id=${pageId}`, function (
     error,
     data
   ) {
@@ -233,19 +298,27 @@ router.get("/:userId/:pageId/update", function (req, res) {
     if (error) {
       throw error;
     }
+    let results=data[0];
+    if (results.imgurl === null) {
+      console.log('NO IMAGE');
+      imageNullCheck = `/images/app/${results.type}.png`
+      console.log(imageNullCheck);
+    } else {
+      imageNullCheck = results.imgurl;
+    }
     console.log(data);
     res.render("update", {
       userId: userId,
       pageId: pageId,
-      name: data[0].name,
-      type: data[0].type,
-      url: data[0].url,
-      explanation: data[0].explanation,
-      imgurl: data[0].imgurl,
-      startDate: data[0].pjdate1,
-      endDate: data[0].pjdate2,
-      githuburl: data[0].githuburl,
-      sumlang: data[0].sumlang
+      name: results.name,
+      type: results.type,
+      url: results.url,
+      explanation: results.explanation,
+      imgurl: imageNullCheck,
+      startDate: results.pjdate1,
+      endDate: results.pjdate2,
+      githuburl: results.githuburl,
+      sumlang: results.sumlang
     });
   });
 });
@@ -381,7 +454,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
       db.query(`UPDATE counter SET counter = counter+1 WHERE login=?`, [userId]);
     }
   })
-
   // GET data id to use Object
   db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
