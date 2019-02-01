@@ -175,13 +175,14 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
       let sid = shortid.generate();
       let githubid = result[i].owner.login;
       let name = result[i].name;
+      let demoUrl = result[i].homepage;
       let githuburl = result[i].html_url;
       let explanation = result[i].description;
       let created_at = result[i].created_at;
       let updated_at = result[i].updated_at;
-      let sqlData = [sid, githubid, name, githuburl, explanation, created_at.split('T')[0], updated_at.split('T')[0]];
+      let sqlData = [sid, githubid, name, demoUrl, githuburl, explanation, created_at.split('T')[0], updated_at.split('T')[0]];
       console.log(sqlData);
-      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
+      let sql = `INSERT INTO Personal_Data (id, githubid, name, url, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
   })
@@ -189,9 +190,9 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
 })
 
 /* GET Mypage User Setting Page */
-router.get(`/:userId/admin/user`, function(req,res,next){
-  let userId=req.params.userId;
-  res.render('mypage/user'),{
+router.get(`/:userId/admin/user`, function (req, res, next) {
+  let userId = req.params.userId;
+  res.render('mypage/user'), {
 
   }
 })
@@ -297,12 +298,12 @@ router.get("/:userId/:pageId/update", function (req, res) {
     if (error) {
       throw error;
     }
-    let results=data[0];
+    let results = data[0];
     // Image NULL Check
     if (results.imgurl === null) {
-      imageNullCheck = `/images/app/${results.type}.png`  // If image data not exists, return default tpye image
+      imageNullCheck = `/images/app/${results.type}.png` // If image data not exists, return default tpye image
     } else {
-      imageNullCheck = results.imgurl;  // Image file Exists
+      imageNullCheck = results.imgurl; // Image file Exists
     }
     res.render("update", {
       userId: userId,
@@ -312,8 +313,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       url: results.url,
       explanation: results.explanation,
       imgurl: imageNullCheck,
-      startDate: results.pjdate1.substring(0,7),
-      endDate: results.pjdate2.substring(0,7),
+      startDate: results.pjdate1.substring(0, 7),
+      endDate: results.pjdate2.substring(0, 7),
       githuburl: results.githuburl,
       sumlang: results.sumlang
     });
