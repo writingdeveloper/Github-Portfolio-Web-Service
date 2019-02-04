@@ -3,6 +3,7 @@ const router = express.Router();
 const path = require("path");
 const shortid = require("shortid");
 const bodyParser = require("body-parser");
+router.use(bodyParser.json());
 const db = require("../lib/db");
 const aws = require('aws-sdk')
 const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
@@ -13,7 +14,7 @@ router.use(express.static(path.join(__dirname, "public")));
 let cheerio = require("cheerio");
 let request = require("request");
 
-router.use(bodyParser.json());
+
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -155,7 +156,6 @@ router.get(`/:userId/admin/removeData`, function (req, res, next) {
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
 router.get(`/:userId/admin/getData`, function (req, res, next) {
   let userId = req.params.userId;
-
   // User Repository API Option Set
   let repositoryOptions = {
     url: `https://api.github.com/users/${userId}/repos`,
@@ -169,7 +169,6 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
       throw error;
     }
     let result = JSON.parse(data);
-
     for (i = 0; i < result.length; i++) {
       // console.log(result[i]);
       let sid = shortid.generate();
@@ -192,13 +191,37 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
 /* GET Mypage User Setting Page */
 router.get(`/:userId/admin/user`, function (req, res, next) {
   let userId = req.params.userId;
-  res.render('mypage/user'), {
+  db.query(`SELECT * FROM user WHERE login='${userId}'`, function (error, data) {
+    if (error) {
+      throw (`Error From ${userId}/admin/user Router`);
+    }
+    let results = data[0];
+    let githubUnique = `${results.id}-Github`;
+    res.render('mypage/user', {
+      userId: userId,
+      uniqueId: githubUnique,
+      avatarUrl: results.avatar_url,
+      name: results.name,
+      bio: results.bio,
+      email: results.email,
+      phoneNumber: results.phoneNumber,
+      registerTime: results.register_time
+    })
+  })
+})
 
-  }
+router.post(`/:userId/admin/user`, function (req, res, next) {
+  let userId = req.params.userId;
+  let email = req.body.email;
+  let phoneNumber = req.body.phoneNumber;
+  let bio = req.body.bio;
+  console.log(`${email} / ${phoneNumber} / ${bio}`)
+  db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE login='${userId}'`, [email, phoneNumber, bio]);
+  res.redirect(`/${userId}/admin/user`);
 })
 
 /* GET Create Page */
-router.get("/:userId/create", function (req, res, next) {
+router.get(`/:userId/create`, function (req, res, next) {
   let userId = req.params.userId;
   res.render("create", {
     // Sample Image
