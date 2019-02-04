@@ -393,3 +393,44 @@ body.sidebar-toggled footer.sticky-footer {
 td>img {
   width: 100px;
 }
+
+#cardBody {
+  margin-right: 0px;
+  margin-left: 0px;
+}
+
+#profileImageContainer{
+  width: 20rem;
+  margin-right: 30px;
+}
+
+#profile{
+  min-width: 40%;
+}
+
+
+.input-group {
+  padding-top: 5px;
+}
+
+.tooltip-inner {
+  background-color: #00acd6 !important;
+  /*!important is not necessary if you place custom.css at the end of your css calls. For the purpose of this demo, it seems to be required in SO snippet*/
+  color: #fff;
+}
+
+.tooltip.top .tooltip-arrow {
+  border-top-color: #00acd6;
+}
+
+.tooltip.right .tooltip-arrow {
+  border-right-color: #00acd6;
+}
+
+.tooltip.bottom .tooltip-arrow {
+  border-bottom-color: #00acd6;
+}
+
+.tooltip.left .tooltip-arrow {
+  border-left-color: #00acd6;
+}
