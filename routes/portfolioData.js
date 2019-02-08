@@ -149,7 +149,7 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
 
 /* GET Mypage Remove Portfolio Data */
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.get(`/:userId/admin/removeData`, function (req, res, next) {
+router.post(`/:userId/admin/removeData`, function (req, res, next) {
   let userId = req.params.userId;
   let currentDay = new Date();
   db.query(`DELETE FROM Personal_Data WHERE githubid='${userId}'`); // Delete Personal_Data Table

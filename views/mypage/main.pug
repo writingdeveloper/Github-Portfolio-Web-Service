@@ -126,7 +126,7 @@ html(lang='en')
                   .card-body-icon
                     i.fas.fa-fw.fa-trash
                   .mr-5 Remove all of my Portfolio Data
-                a.card-footer.text-white.clearfix.small.z-1(href='' ref='#', data-toggle='modal', data-target='#removedata')
+                a.card-footer.text-white.clearfix.small.z-1(href='#' id='removeData')
                   span.float-left Remove Exist Data
                   span.float-right
                     i.fas.fa-angle-right
@@ -237,6 +237,7 @@ script(src='/external/Mypage/vendor/datatables/dataTables.bootstrap4.js')
 // Custom scripts for all pages
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
 script(src='/external/Mypage/js/sb-admin.min.js')
+script(src='/public/javascripts/mypage.js')
 // Demo scripts for this page
 script(src='/external/Mypage/js/demo/datatables-demo.js')
 script(src='/external/Mypage/js/demo/chart-area-demo.js')
