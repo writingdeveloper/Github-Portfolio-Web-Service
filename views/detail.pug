@@ -81,20 +81,24 @@ section#works.l-section(role='region')
         h2.footer-heading Contacts
         .footer-content
           ul.unstyled-list
+            - if(email){
             li
               a(href='mailto:super2451894@gmail.com', title='email')
                 img(src="https://png.icons8.com/material-outlined/50/ffffff/new-post.png" class="icons")
-                span.iconed-text super2451894@gmail.com
+                span.iconed-text=`${email}`
             li
+            -}
+            - if(phoneNumber) {
               span(title='전화')
                 img(src='https://png.icons8.com/material/50/ffffff/google-mobile.png' class="icons")
-                span.iconed-text +82 10 3736 9328
+                span.iconed-text=`${phoneNumber}`
+            -}
+            //- li
+            //-   span(title='카카오톡')
+            //-     img(src='https://png.icons8.com/ios/50/ffffff/speech-bubble.png' class="icons")
+            //-     span.iconed-text leesihung@KakaoTalk
             li
-              span(title='카카오톡')
-                img(src='https://png.icons8.com/ios/50/ffffff/speech-bubble.png' class="icons")
-                span.iconed-text leesihung@KakaoTalk
-            li
-              a(href='https://github.com/sangumee', target='_blank', title='깃허브')
+              a(href=`${githuburl}`, target='_blank', title='githubURL')
                 img(src='https://png.icons8.com/windows/50/ffffff/github.png' class="icons")
                 span.iconed-text Github Account
   #tools
