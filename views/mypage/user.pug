@@ -110,21 +110,22 @@ html(lang='en')
                       .input-group-prepend
                         span#basic-addon1.input-group-text Registered Time
                       input.form-control.is-valid(type='text' value=`${registerTime}` disabled)
-                  form(method='post', action=`/${userId}/admin/user`)
+                  //- form(method='post', action=`/${userId}/admin/user`)
+                  form(id='userForm')
                     .input-group.col
                       .input-group-prepend
                         span#basic-addon1.input-group-text Email
-                      input.form-control(type='text' placeholder='Email' name='email' id='email' value=`${email}` data-toggle="tooltip" data-placement="top" title="Recommended Data")         
+                      input.form-control(type='text' placeholder='Email' id='email' value=`${email}` data-toggle="tooltip" data-placement="top" title="Recommended Data")         
                     .input-group.col
                       .input-group-prepend
                         span#basic-addon1.input-group-text Phone Number
-                      input.form-control(type='tel' value=`${phoneNumber}` name='phoneNumber' data-toggle="tooltip" data-placement="top" title="Recommended Data")
+                      input.form-control(type='tel' value=`${phoneNumber}` id='phoneNumber' data-toggle="tooltip" data-placement="top" title="Recommended Data")
                     .input-group.col
                       .input-group-prepend
                         span#basic-addon1.input-group-text Bio
-                      textarea#exampleFormControlTextarea1.form-control(rows='3' name='bio' data-toggle="tooltip" data-placement="top" title="Recommended Data")=`${bio}`
+                      textarea.form-control(rows='3' id='bio' data-toggle="tooltip" data-placement="top" title="Recommended Data")=`${bio}`
                     .input-group.col
-                      button.btn.btn-primary.col(type='submit') Submit
+                      button.btn.btn-primary.col(type='submit' id='submit') Submit
         // /.container-fluid
         // Sticky Footer
         footer.sticky-footer
@@ -171,8 +172,12 @@ html(lang='en')
               button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
               a.btn.btn-primary(href=`/${userId}/admin/getData`) Accept              
 // Bootstrap core JavaScript
-script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js', integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo', crossorigin='anonymous')
+script(src='https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js')
 script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js', integrity='sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut', crossorigin='anonymous')
 script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js', integrity='sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k', crossorigin='anonymous')
 // Custom scripts for all pages
+script.
+  let userId=!{JSON.stringify(userId)}
+  console.log(userId);
+script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
 script(src='/external/Mypage/js/sb-admin.min.js')
