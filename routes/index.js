@@ -8,36 +8,29 @@ let session = require('express-session')
 let FileStore = require('session-file-store')(session)
 
 router.use(session({
-  secret: 'keyboard cat',
+  secret: 'Hello World',
   resave: false,
   saveUninitialized: true,
   store: new FileStore(),
-  cookie: { secure: false, maxAge: new Date(Date.now() + 3600000) }, 
-  key:'connect.sid'
+  cookie: {
+    secure: false,
+    maxAge: new Date(Date.now() + 3600000)
+  },
+  key: 'connect.sid'
 }));
 
 // Favicon Server Dependency
 let favicon = require("serve-favicon");
 router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 
-
 // DB Import
 const db = require("../lib/db");
 const passport = require('../lib/passport')(router, db, request, shortid);
 
-// Parse DATA
-const fieldOrder = [
-  "login",
-  "id",
-  "avatar_url",
-  "name",
-  "bio"
-];
-
-// Auth Router
+/* Github Auth Router */
 router.get('/auth/github',
   passport.authenticate('github'));
-
+/* Github Auth Callback Router */
 router.get('/auth/github/callback',
   passport.authenticate('github', {
     failureRedirect: '/login'
@@ -48,10 +41,12 @@ router.get('/auth/github/callback',
     res.redirect(`/${req.user.username}`);
   });
 
+/* Login Page Router */
 router.get(`/auth/login`, function (req, res, next) {
   res.render("login", {});
 });
 
+/* Logout Router */
 router.get(`/logout`, function (req, res, next) {
   req.logout();
   req.session.save(function (err) {
@@ -59,6 +54,7 @@ router.get(`/logout`, function (req, res, next) {
   });
 });
 
+/* BodyParser Setting */
 router.use(bodyParser.json()); // to support JSON-encoded bodies
 router.use(
   bodyParser.urlencoded({
@@ -66,7 +62,6 @@ router.use(
     extended: true
   })
 );
-
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
@@ -85,7 +80,13 @@ router.get("/", function (req, res, next) {
     } else {
       url = '';
     }
-    // console.log(data);
+    // Main Page BIO NULL Check
+    data.forEach(results => {
+      console.log(results.bio);
+      if (results.bio === null) {
+        results.bio = 'NO BIO';
+      }
+    })
     res.render("main", {
       dataarray: data,
       _user: req.user,
@@ -94,13 +95,11 @@ router.get("/", function (req, res, next) {
   });
 });
 
-
 /* POST User Save in MySQL DB */
 router.post("/user", function (req, res, next) {
   // id value is from PUG form
   let id = req.body.id;
   let githubAPI = "https://api.github.com/users/";
-
   // User Information API Option Set
   let userOptions = {
     url: githubAPI + id,
@@ -108,7 +107,6 @@ router.post("/user", function (req, res, next) {
       "User-Agent": "request"
     }
   };
-
   // User Repository API Option Set
   let repositoryOptions = {
     url: githubAPI + id + "/repos",
@@ -116,35 +114,26 @@ router.post("/user", function (req, res, next) {
       "User-Agent": "request"
     }
   };
-
   // User Information API Process
   request(userOptions, function (error, response, data) {
     if (error) {
-      throw error;
+      throw (`Error from index.js User Information API Process ${error}`);
     }
     // result have JSON User Data
     let result = JSON.parse(data);
     console.log(result);
-    if (result.bio === null) {
-      result.bio = '';
-    }
     if (result.name === null) {
       result.name = result.login;
     }
-    let values = fieldOrder.map(k => result[k]);
-    let sql = `INSERT INTO user (${fieldOrder.join(
-      ","
-    )}) VALUES (${fieldOrder.map(e => "?").join(",")})`;
-    db.query(sql, values);
+    db.query(`INSERT INTO user (login, id, avatar_url, name, bio) VALUES (?,?,?,?,?)`, [result.login, result.id, result.avatar_url, result.name, result.bio]); // User Information INSERT SQL
   });
 
   // User Repository Information API Process
   request(repositoryOptions, function (error, response, data) {
     if (error) {
-      throw error;
+      throw (`Error from index.js User Repository Information API Process ${error}`);
     }
     let result = JSON.parse(data);
-
     for (i = 0; i < result.length; i++) {
       let sid = shortid.generate();
       let githubid = result[i].owner.login;
@@ -154,10 +143,8 @@ router.post("/user", function (req, res, next) {
       let created_at = result[i].created_at;
       let updated_at = result[i].updated_at;
       let sqlData = [sid, githubid, name, githuburl, explanation, created_at, updated_at];
-
       console.log(sqlData);
-
-      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
+      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
   });
