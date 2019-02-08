@@ -96,6 +96,12 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
         data[i].imgurl = '/images/app/404.png'
       }
     }
+    data.forEach(results => {
+      let date1 = results.pjdate1.toISOString().split('T')[0];
+      let date2 = results.pjdate2.toISOString().split('T')[0];
+      results.pjdate1 = date1;
+      results.pjdate2 = date2;
+    })
     // Total Counter SQL
     db.query(`SELECT SUM(counter) FROM counter WHERE login='${userId}'`, function (error, counterSum) {
       if (error) {
@@ -193,7 +199,7 @@ router.get(`/:userId/admin/user`, function (req, res, next) {
   let userId = req.params.userId;
   db.query(`SELECT * FROM user WHERE login='${userId}'`, function (error, data) {
     if (error) {
-      throw (`Error From ${userId}/admin/user Router`);
+      throw (`Error From ${userId}/admin/user Router ${error}`);
     }
     let results = data[0];
     let githubUnique = `${results.id}-Github`;
@@ -210,14 +216,23 @@ router.get(`/:userId/admin/user`, function (req, res, next) {
   })
 })
 
-router.post(`/:userId/admin/user`, function (req, res, next) {
+/* POST Mypage User Setting Page */
+router.post(`/:userId/admin/submit`, function (req, res, next) {
   let userId = req.params.userId;
   let email = req.body.email;
   let phoneNumber = req.body.phoneNumber;
   let bio = req.body.bio;
-  console.log(`${email} / ${phoneNumber} / ${bio}`)
-  db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE login='${userId}'`, [email, phoneNumber, bio]);
-  res.redirect(`/${userId}/admin/user`);
+  console.log(JSON.stringify(req.body));
+  db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE login=?`, [email, phoneNumber, bio, userId]);
+  db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, AjaxData) {
+    if (error) {
+      throw (`Error FROM /:userId/admin/user POST ROUTER : ${error}`);
+    }
+    console.log(AjaxData)
+    // return res.send(JSON.stringify(AjaxData));
+
+  })
+  res.send(req.body);
 })
 
 /* GET Create Page */
@@ -475,7 +490,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
       db.query(`UPDATE counter SET counter = counter+1 WHERE login=?`, [userId]);
     }
   })
-  // GET data id to use Object
+  // GET Data from Personal Data
   db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
     error,
     data
@@ -516,25 +531,36 @@ router.get("/:userId/:pageId", function (req, res, next) {
             // console.log(readme);
           });
         }
-        // Rendering
-        console.log("No Problem with Detail Pages data");
-        res.render("detail", {
-          userId: userId,
-          pageId: pageId,
-          name: results.name,
-          imgurl: imageNullCheck,
-          type: results.type,
-          sumlang: results.sumlang,
-          startDate: results.pjdate1,
-          endDate: results.pjdate2,
-          explanation: results.explanation,
-          url: results.url,
-          githuburl: results.githuburl,
-          counter: results.counter,
-          markdown: readme,
-          ownerCheck: ownerCheck
+        if (readme === undefined) { // If readme is undefined
+          readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
+        }
+        db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, data) {
+          if (error) {
+            throw (`Error from Detail Router GET USER DATA SQL ${error}`)
+          }
+          let userResults = data[0];
+          let email = userResults.email;
+          let phoneNumber = userResults.phoneNumber;
+          res.render("detail", {
+            userId: userId,
+            pageId: pageId,
+            name: results.name,
+            imgurl: imageNullCheck,
+            type: results.type,
+            sumlang: results.sumlang,
+            startDate: results.pjdate1.toISOString().split('T')[0],
+            endDate: results.pjdate2.toISOString().split('T')[0],
+            explanation: results.explanation,
+            url: results.url,
+            githuburl: results.githuburl,
+            counter: results.counter,
+            markdown: readme,
+            email: email,
+            phoneNumber: phoneNumber,
+            ownerCheck: ownerCheck
+          });
         });
-      });
+      })
     }
   });
 });
