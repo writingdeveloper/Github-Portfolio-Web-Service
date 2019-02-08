@@ -13,7 +13,11 @@ var clipboard = new Clipboard('#btn-copy', {
   }
 });
 clipboard.on('success', function (e) {
-  alert("Copied!");
+  Swal.fire(
+    'Copied!',
+    '',
+    'success'
+  )
   e.clearSelection();
 });
 $("#input-url").val(location.href);
