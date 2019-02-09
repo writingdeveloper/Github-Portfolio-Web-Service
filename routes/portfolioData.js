@@ -155,7 +155,8 @@ router.post(`/:userId/admin/removeData`, function (req, res, next) {
   db.query(`DELETE FROM Personal_Data WHERE githubid='${userId}'`); // Delete Personal_Data Table
   db.query(`DELETE FROM counter WHERE login='${userId}'`); // Delete counter Table
   db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
-  res.redirect(`/${userId}/admin/mypage`); // Redirect to main page
+  // res.redirect(`/${userId}/admin/mypage`); // Redirect to main page
+  res.send(req.body);
 });
 
 /* GET Mypage Get Github Portfolio Data */
