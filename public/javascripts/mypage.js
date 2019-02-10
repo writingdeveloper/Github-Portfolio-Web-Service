@@ -42,10 +42,7 @@ $(document).ready(function () {
                 )
             },
             beforeSend: function () {
-                Swal.fire(
-                    Swal.isLoading()
-                )
-
+                Swal.showLoading()
             },
             error: function (e) {
                 Swal.fire(
