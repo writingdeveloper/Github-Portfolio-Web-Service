@@ -41,6 +41,69 @@ $(document).ready(function () {
                     'success'
                 )
             },
+            beforeSend: function () {
+                Swal.fire(
+                    Swal.isLoading()
+                )
+
+            },
+            error: function (e) {
+                Swal.fire(
+                    'Failed to save',
+                    'If this message is output continuously, please contact to administrator.',
+                    'error'
+                )
+            }
+        });
+    }
+})
+
+/* Mypage */
+
+$(document).ready(function () {
+    // GET REQUEST
+    $("#getData").click(function (event) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, Get DATA!'
+        }).then((result) => {
+            if (result.value) {
+                getDataAjax();
+            }
+        })
+    });
+
+    function getDataAjax() {
+        // PREPARE FORM DATA
+        // let data = {
+        //     email: $("#email").val(),
+        //     phoneNumber: $("#phoneNumber").val(),
+        //     bio: $("#bio").val()
+        // }
+        // DO POST
+        $.ajax({
+            type: "POST",
+            // contentType: "application/json",
+            url: `/${userId}/admin/getData`,
+            // data: JSON.stringify(data),
+            // dataType: 'json',
+            beforeSend: function () {
+                Swal.showLoading()
+            },
+            success: function (data) {
+                // console.log(JSON.stringify(data));
+                Swal.fire(
+                    'Get!',
+                    'Your file has been deleted.',
+                    'success'
+                )
+            },
             error: function (e) {
                 Swal.fire(
                     'Failed to save',
