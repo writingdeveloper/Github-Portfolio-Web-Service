@@ -191,9 +191,27 @@ router.post(`/:userId/admin/getData`, function (req, res, next) {
       let sql = `INSERT INTO Personal_Data (id, githubid, name, url, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
+    db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, redrawData) {
+      if (error) {
+        throw (`Error From Router /:userId/mypage \n ${error}`);
+      }
+      for (var i = 0; i < redrawData.length; i++) {
+        if (redrawData[i].imgurl === null) {
+          redrawData[i].imgurl = '/images/app/404.png'
+        }
+      }
+      redrawData.forEach(results => {
+        let date1 = results.pjdate1.toISOString().split('T')[0];
+        let date2 = results.pjdate2.toISOString().split('T')[0];
+        results.pjdate1 = date1;
+        results.pjdate2 = date2;
+      })
+      console.log(JSON.stringify(redrawData));
+      res.json(redrawData);
+    })
+    // res.redirect(`/${userId}/admin/mypage`);
+    // res.send(req.body);
   })
-  // res.redirect(`/${userId}/admin/mypage`);
-  res.send(req.body);
 })
 
 /* GET Mypage User Setting Page */
