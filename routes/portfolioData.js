@@ -161,7 +161,7 @@ router.post(`/:userId/admin/removeData`, function (req, res, next) {
 
 /* GET Mypage Get Github Portfolio Data */
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.post(`/:userId/admin/getData`, function (req, res, next) {
+router.get(`/:userId/admin/getData`, function (req, res, next) {
   let userId = req.params.userId;
   // User Repository API Option Set
   let repositoryOptions = {
@@ -206,7 +206,7 @@ router.post(`/:userId/admin/getData`, function (req, res, next) {
         results.pjdate1 = date1;
         results.pjdate2 = date2;
       })
-      console.log(JSON.stringify(redrawData));
+      // console.log(JSON.stringify(redrawData));
       res.json(redrawData);
     })
     // res.redirect(`/${userId}/admin/mypage`);

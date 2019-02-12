@@ -47,30 +47,26 @@ function removeData() {
 /* Mypage */
 function getData() {
     Swal.fire({
-        title: 'Are you sure?',
+        title: 'Do you want to get data from Github?',
         text: "You won't be able to revert this!",
         type: 'warning',
         showCancelButton: true,
+        allowOutsideClick: false,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, Get DATA!'
-    }).then((result) => {
-        if (result.value) {
-            $.ajax({
-                type: "POST",
-                // contentType: "application/json",
-                url: `/${userId}/admin/getData`,
-                dataType: "json",
-                // dataType: 'json',
-                beforeSend: function () {
-                    Swal.showLoading()
-                },
-                success: function (redrawData) {
-                    console.log(JSON.stringify(redrawData));
+        confirmButtonText: 'Yes, Get DATA!',
+        showLoaderOnConfirm: true,
+
+        preConfirm: () => {
+            return fetch(`/${userId}/admin/getData`)
+                .then(res => res.json()).then(data => {
                     let existTable = $('#dataTable').DataTable();
+                    // let data = response.json();
+                    console.log(data);
                     existTable.destroy();
+
                     $('#dataTable').DataTable({
-                        aaData: redrawData, // Returned Data from Server
+                        aaData: data, // Returned Data from Server
                         aoColumns: [{
                                 mData: 'id',
                                 "render": function (value, type, row) {
@@ -79,7 +75,7 @@ function getData() {
                             },
                             {
                                 mData: 'name'
-                            }, 
+                            },
                             {
                                 mData: 'type'
                             },
@@ -87,10 +83,13 @@ function getData() {
                                 mData: 'url'
                             },
                             {
-                                mData: 'image'
+                                mData: 'imgurl',
+                                "render": function (value, type, row) {
+                                    return `<img src="${row.imgurl}">`;
+                                }
                             },
                             {
-                                mData: 'keyword'
+                                mData: 'sumlang'
                             },
                             {
                                 mData: 'pjdate1'
@@ -101,35 +100,23 @@ function getData() {
                             {
                                 mData: 'githuburl'
                             }
-                            // {
-                            //     mData: 'name'
-                            // },
-                            // {
-                            //     mData: 'type',
-                            //     render: function (value, type, row) {
-                            //         var val = [];
-                            //         $.each(value, function (i, v) {
-                            //             val.push(v['name']);
-                            //         })
-                            //         return val;
-                            //     }
-                            // }
                         ]
                     })
+                }).catch(error => {
                     Swal.fire(
-                        'Get!',
-                        'Your file has been deleted.',
-                        'success'
+                        'ERROR?',
+                        'SOMETHING IS NOTWOKRING',
+                        'warning'
                     )
-                },
-                error: function (e) {
-                    Swal.fire(
-                        'Failed to save',
-                        'If this message is output continuously, please contact to administrator.',
-                        'error'
-                    )
-                }
-            });
-        }
+                    console.log(error);
+                })
+        },
+        allowOutsideClick: () => !Swal.isLoading()
+    }).then(() => {
+        Swal.fire(
+            'Get Data Success',
+            'There is no problem from server',
+            'success'
+        )
     })
 }
