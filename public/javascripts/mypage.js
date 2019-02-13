@@ -1,3 +1,33 @@
+/* Global */
+
+/* Logout in Mypage, User page*/
+function logout() {
+    Swal.fire({
+        title: 'Ready to Leave?',
+        text: `Select "Logout" below if you are ready to end your current session.`,
+        type: 'info',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Logout',
+        preConfirm: () => {
+            return fetch(`/logout`) // Fetch Data from server
+                .catch(error => {
+                    Swal.fire(
+                        'ERROR?',
+                        `Error Message : ${error}`,
+                        'error'
+                    )
+                    console.log(error);
+                })
+        },
+    }).then((result) => {
+        if (result.value) {
+            window.location.href = '/'; // After Login Redirect to Main page
+        }
+    })
+}
+
 /* Mypage Remove All my Data From Server Function */
 function removeData() {
     Swal.fire({
