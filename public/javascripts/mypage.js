@@ -1,5 +1,4 @@
-/* Mypage */
-
+/* Mypage Remove All my Data From Server Function */
 function removeData() {
     Swal.fire({
         title: 'Are you sure?',
@@ -8,43 +7,49 @@ function removeData() {
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!'
+        confirmButtonText: 'Yes, delete it!',
+        preConfirm: () => {
+            return fetch(`/${userId}/admin/removeData`) // Fetch Data from server
+                .then(res => res.json()).then(data => {
+                    let existTable = $('#dataTable').DataTable();
+                    console.log(data);
+                    if (data === 'removed') {
+                        existTable
+                            .clear()
+                            .draw(); // Remove Exist Table to redraw table
+                    }
+                    return data;
+                }).catch(error => {
+                    Swal.fire(
+                        'ERROR?',
+                        `Error Message : ${error}`,
+                        'warning'
+                    )
+                    console.log(error);
+                })
+        },
+        allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
-        if (result.value) {
-            $.ajax({
-                type: "POST",
-                // contentType: "application/json",
-                url: `/${userId}/admin/removeData`,
-                // data: JSON.stringify(data),
-                // dataType: 'json',
-                success: function (data) {
-                    // console.log(JSON.stringify(data));
-                    let table = $('#dataTable').DataTable();
-                    table
-                        .clear()
-                        .draw();
-                    Swal.fire(
-                        'Deleted!',
-                        'Your file has been deleted.',
-                        'success'
-                    )
-                },
-                beforeSend: function () {
-                    Swal.showLoading()
-                },
-                error: function (e) {
-                    Swal.fire(
-                        'Failed to save',
-                        'If this message is output continuously, please contact to administrator.',
-                        'error'
-                    )
-                }
-            });
+        console.log(result);
+        if (result.value === 'removed') {
+            Swal.fire(
+                'Remove Data Success',
+                'There is no problem from server',
+                'success'
+            )
+        } else if (result.dismiss === 'cancel') {
+            console.log('Canceled : DO NOTHING');
+        } else {
+            Swal.fire(
+                'ERROR?',
+                'SOMETHING IS NOT WOKRING',
+                'warning'
+            )
         }
     })
 }
 
-/* Mypage */
+/* Mypage GET Github Data Function */
 function getData() {
     Swal.fire({
         title: 'Do you want to get data from Github?',
@@ -56,15 +61,12 @@ function getData() {
         cancelButtonColor: '#d33',
         confirmButtonText: 'Yes, Get DATA!',
         showLoaderOnConfirm: true,
-
         preConfirm: () => {
-            return fetch(`/${userId}/admin/getData`)
+            return fetch(`/${userId}/admin/getData`) // Fetch Data from server
                 .then(res => res.json()).then(data => {
                     let existTable = $('#dataTable').DataTable();
-                    // let data = response.json();
                     console.log(data);
-                    existTable.destroy();
-
+                    existTable.destroy(); // Remove Exist Table to redraw table
                     $('#dataTable').DataTable({
                         aaData: data, // Returned Data from Server
                         aoColumns: [{
@@ -102,21 +104,33 @@ function getData() {
                             }
                         ]
                     })
+                    return data;
                 }).catch(error => {
                     Swal.fire(
                         'ERROR?',
-                        'SOMETHING IS NOTWOKRING',
+                        'SOMETHING IS NOT WOKRING',
                         'warning'
                     )
                     console.log(error);
                 })
         },
         allowOutsideClick: () => !Swal.isLoading()
-    }).then(() => {
-        Swal.fire(
-            'Get Data Success',
-            'There is no problem from server',
-            'success'
-        )
+    }).then((result) => {
+        console.log(result);
+        if (result.value) {
+            Swal.fire(
+                'Get Data Success',
+                'There is no problem from server',
+                'success'
+            )
+        } else if (result.dismiss === 'cancel') {
+            console.log('Canceled : DO NOTHING');
+        } else {
+            Swal.fire(
+                'ERROR?',
+                'SOMETHING IS NOT WOKRING',
+                'warning'
+            )
+        }
     })
 }
