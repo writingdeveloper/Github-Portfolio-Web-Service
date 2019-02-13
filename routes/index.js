@@ -33,7 +33,7 @@ router.get('/auth/github',
 /* Github Auth Callback Router */
 router.get('/auth/github/callback',
   passport.authenticate('github', {
-    failureRedirect: '/login'
+    failureRedirect: '/auth/login'
   }),
   function (req, res) {
     // Successful authentication, redirect home.
