@@ -149,14 +149,13 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
 
 /* GET Mypage Remove Portfolio Data */
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.post(`/:userId/admin/removeData`, function (req, res, next) {
+router.get(`/:userId/admin/removeData`, function (req, res, next) {
   let userId = req.params.userId;
   let currentDay = new Date();
   db.query(`DELETE FROM Personal_Data WHERE githubid='${userId}'`); // Delete Personal_Data Table
   db.query(`DELETE FROM counter WHERE login='${userId}'`); // Delete counter Table
   db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
-  // res.redirect(`/${userId}/admin/mypage`); // Redirect to main page
-  res.send(req.body);
+  res.json('removed');
 });
 
 /* GET Mypage Get Github Portfolio Data */
@@ -206,11 +205,8 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
         results.pjdate1 = date1;
         results.pjdate2 = date2;
       })
-      // console.log(JSON.stringify(redrawData));
       res.json(redrawData);
     })
-    // res.redirect(`/${userId}/admin/mypage`);
-    // res.send(req.body);
   })
 })
 
