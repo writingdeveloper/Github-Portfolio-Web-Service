@@ -23,7 +23,7 @@ function removeData() {
                     Swal.fire(
                         'ERROR?',
                         `Error Message : ${error}`,
-                        'warning'
+                        'error'
                     )
                     console.log(error);
                 })
@@ -43,7 +43,7 @@ function removeData() {
             Swal.fire(
                 'ERROR?',
                 'SOMETHING IS NOT WOKRING',
-                'warning'
+                'error'
             )
         }
     })
@@ -54,7 +54,7 @@ function getData() {
     Swal.fire({
         title: 'Do you want to get data from Github?',
         text: "You won't be able to revert this!",
-        type: 'warning',
+        type: 'info',
         showCancelButton: true,
         allowOutsideClick: false,
         confirmButtonColor: '#3085d6',
@@ -109,7 +109,7 @@ function getData() {
                     Swal.fire(
                         'ERROR?',
                         'SOMETHING IS NOT WOKRING',
-                        'warning'
+                        'error'
                     )
                     console.log(error);
                 })
@@ -129,7 +129,7 @@ function getData() {
             Swal.fire(
                 'ERROR?',
                 'SOMETHING IS NOT WOKRING',
-                'warning'
+                'error'
             )
         }
     })
