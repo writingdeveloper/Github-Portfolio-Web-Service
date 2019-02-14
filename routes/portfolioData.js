@@ -251,6 +251,14 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
   res.send(req.body);
 })
 
+/* MyPage User Chat Room */
+router.get(`/:userId/admin/contact'`, function (req, res, next) {
+  let userId = req.params.userId;
+  res.render('mypage/contact', {
+    userId: userId
+  })
+});
+
 /* GET Create Page */
 router.get(`/:userId/create`, function (req, res, next) {
   let userId = req.params.userId;
