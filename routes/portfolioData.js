@@ -252,7 +252,7 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
 })
 
 /* MyPage User Chat Room */
-router.get(`/:userId/admin/contact'`, function (req, res, next) {
+router.get(`/:userId/admin/contact`, function (req, res, next) {
   let userId = req.params.userId;
   res.render('mypage/contact', {
     userId: userId
