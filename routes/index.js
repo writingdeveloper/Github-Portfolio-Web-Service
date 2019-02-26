@@ -8,13 +8,14 @@ let session = require('express-session')
 let FileStore = require('session-file-store')(session)
 
 router.use(session({
-  secret: 'Hello World',
+  secret: 'HelloWorld',
   resave: false,
   saveUninitialized: true,
   store: new FileStore(),
   cookie: {
     secure: false,
-    maxAge: new Date(Date.now() + 3600000)
+    // maxAge: new Date(Date.now() + 3600000)
+    maxAge: 24000 * 60 * 60
   },
   key: 'connect.sid'
 }));
