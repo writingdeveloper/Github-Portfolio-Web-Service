@@ -1,18 +1,28 @@
 const express = require('express');
-const router = express.Router();
+// const router = express.Router();
 const path = require("path");
 const shortid = require("shortid");
 const bodyParser = require("body-parser");
-router.use(bodyParser.json());
+
 const db = require("../lib/db");
 const aws = require('aws-sdk')
 const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
 const multerS3 = require('multer-s3');
+const router = express.Router();
+
+router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
 // Parsing Dependency
 let cheerio = require("cheerio");
 let request = require("request");
+
+var server = require('http').Server(express)
+var io = require('socket.io')(server);
+
+//setup stuff
+
+server.listen(3001)
 
 
 aws.config.update({
@@ -246,7 +256,6 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
     }
     console.log(AjaxData)
     // return res.send(JSON.stringify(AjaxData));
-
   })
   res.send(req.body);
 })
@@ -254,9 +263,126 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
 /* MyPage User Chat Room */
 router.get(`/:userId/admin/contact`, function (req, res, next) {
   let userId = req.params.userId;
-  res.render('mypage/contact', {
-    userId: userId
+  let loginedId = req.user.login;
+  let chatListImageArray = [];
+  let profileImageArray = [];
+  db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
+    if (error) {
+      throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
+    }
+    db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, data) {
+      if (error) {
+        throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
+      }
+
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].chatSender === userId) {
+          chatListImageArray.push(data[i].chatReceiver)
+        } else {
+          chatListImageArray.push(data[i].chatSender)
+        }
+      }
+      console.log(chatListImageArray);
+      for (let i = 0; i < chatListImageArray.length; i++) {
+        db.query(`SELECT avatar_url FROM user WHERE login=?`, [chatListImageArray[i]], function (error, profileImage) {
+          if (error) {
+            throw error;
+          }
+          // console.log(profileImage)
+          profileImageArray.push(profileImage)
+        })
+      }
+      console.log(profileImageArray)
+      res.render('mypage/contact', {
+        userId: userId,
+        loginedId: loginedId,
+        room: room
+      })
+    })
+  });
+});
+
+/* GET Privious Chat Data Router */
+router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res, next) {
+  let userId = req.params.userId;
+  let joinedRoomName=req.params.joinedRoomName;
+  console.log(`PREVIOUS CHAT DATA ROOM : ${joinedRoomName}`);
+  db.query(`SELECT * FROM chatData WHERE roomName=?`, [joinedRoomName], function (error, data) {
+    if (error) {
+      throw error;
+    }
+    console.log(data);
+    // io.sockets.to(`${prevChat.joinedRoomName}`).emit('getPrevChat', data);
+    res.send(data);
+  });
+});
+
+// Socket IO 
+io.on('connection', function (socket) {
+  // Join Room
+  socket.on('JoinRoom', function (data) {
+    socket.leave(`${data.leave}`)
+    console.log(`Leave ROOM : ${data.leave}`)
+    socket.join(`${data.joinedRoomName}`);
+    console.log(`NEW JOIN IN ${data.joinedRoomName}`)
   })
+
+  // Send Message
+  socket.on('say', function (data) {
+    console.log(`${data.userId} : ${data.msg}`);
+    //chat message to the others
+    io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
+    console.log(`Message Send to : ${data.joinedRoomName}`)
+    // console.log(`Message Content : ${data.userId} : ${data.message}`);
+    db.query(`INSERT INTO chatData (roomName, chatSender, chatMessage) VALUES (?,?,?)`, [data.joinedRoomName, data.userId, data.msg])
+  });
+
+  // Typing... Socket Function
+  socket.on('typing', function (others) {
+    let whoIsTyping = [];
+    if (!whoIsTyping.includes(others)) {
+      whoIsTyping.push(others);
+      // console.log('who is typing now');
+      // console.log(whoIsTyping);
+      io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
+    }
+  });
+
+  socket.on('quitTyping', function (others) {
+    let whoIsTyping = [];
+    if (whoIsTyping.length == 0) {
+      //if it's empty
+      // console.log('emit endTyping');
+      io.emit('endTyping');
+    } else {
+      //if someone else is typing
+      var index = whoIsTyping.indexOf(others);
+      // console.log(index);
+      if (index != -1) {
+        whoIsTyping.splice(index, 1);
+        if (whoIsTyping.length == 0) {
+          console.log('emit endTyping');
+          io.emit('endTyping');
+        } else {
+          io.emit('typing', whoIsTyping);
+          // console.log('emit quitTyping');
+          // console.log('whoIsTyping after quit');
+          // console.log(whoIsTyping);
+        }
+      }
+    }
+  });
+});
+
+
+/* MyPage User Chat Room */
+router.get(`/:userId/contact`, function (req, res, next) {
+  let userId = req.params.userId;
+  let loginedId = req.user.login;
+  let roomName = `${loginedId}-${userId}`;
+  db.query(`INSERT INTO chatRoom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginedId])
+  console.log(`Create ROOM : ${roomName}`);
+  res.redirect(`/${loginedId}/admin/contact`)
 });
 
 /* GET Create Page */
@@ -588,6 +714,5 @@ router.get("/:userId/:pageId", function (req, res, next) {
     }
   });
 });
-
 
 module.exports = router;
