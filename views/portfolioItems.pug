@@ -21,15 +21,17 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
           a.nav-link(href='/')
             | Home
             span.sr-only (current)
-        - if(ownerCheck){
+        - if(ownerCheck === userId){
            a.nav-link(href='/logout') Logout
            a.nav-link(href=`/${userId}/admin/mypage`) My Page
+        - } else if (ownerCheck && (ownerCheck !== userId)){
+           
         - } else {
            a.nav-link(href='/auth/login') Login
         - }
         //- li.nav-item
         li.nav-item
-          a.nav-link(href='#') Contact
+          a.nav-link(href=`/${userId}/contact`) Contact
 .toolbar.navbar(id="second_nav")
   select#type-select(onchange='selectBoxUpdate();')
     option(value='All') All Achievements
