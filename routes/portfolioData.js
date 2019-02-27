@@ -16,12 +16,12 @@ const cheerio = require("cheerio");
 const request = require("request");
 
 /* Socket IO Settings */
-const server = require('http').Server(express);
-const io = require('socket.io')(server);
-let port = process.env.PORT || 3001;
-server.listen(port, function () {
-  console.log(`SocketIO Listening on port : ${port}`)
-});
+// const server = require('http').Server(express);
+// const io = require('socket.io')(server);
+// let port = process.env.PORT || 3000;
+// server.listen(port, function () {
+//   console.log(`SocketIO Listening on port : ${port}`)
+// });
 
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
@@ -317,61 +317,61 @@ router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res,
 });
 
 // Socket IO 
-io.on('connection', function (socket) {
-  // Join Room
-  socket.on('JoinRoom', function (data) {
-    socket.leave(`${data.leave}`)
-    console.log(`Leave ROOM : ${data.leave}`)
-    socket.join(`${data.joinedRoomName}`);
-    console.log(`NEW JOIN IN ${data.joinedRoomName}`)
-  })
+// io.on('connection', function (socket) {
+//   // Join Room
+//   socket.on('JoinRoom', function (data) {
+//     socket.leave(`${data.leave}`)
+//     console.log(`Leave ROOM : ${data.leave}`)
+//     socket.join(`${data.joinedRoomName}`);
+//     console.log(`NEW JOIN IN ${data.joinedRoomName}`)
+//   })
 
-  // Send Message
-  socket.on('say', function (data) {
-    console.log(`${data.userId} : ${data.msg}`);
-    //chat message to the others
-    io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
-    console.log(`Message Send to : ${data.joinedRoomName}`)
-    // console.log(`Message Content : ${data.userId} : ${data.message}`);
-    db.query(`INSERT INTO chatData (roomName, chatSender, chatMessage) VALUES (?,?,?)`, [data.joinedRoomName, data.userId, data.msg])
-  });
+//   // Send Message
+//   socket.on('say', function (data) {
+//     console.log(`${data.userId} : ${data.msg}`);
+//     //chat message to the others
+//     io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
+//     console.log(`Message Send to : ${data.joinedRoomName}`)
+//     // console.log(`Message Content : ${data.userId} : ${data.message}`);
+//     db.query(`INSERT INTO chatData (roomName, chatSender, chatMessage) VALUES (?,?,?)`, [data.joinedRoomName, data.userId, data.msg])
+//   });
 
-  // Typing... Socket Function
-  socket.on('typing', function (others) {
-    let whoIsTyping = [];
-    if (!whoIsTyping.includes(others)) {
-      whoIsTyping.push(others);
-      // console.log('who is typing now');
-      // console.log(whoIsTyping);
-      io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
-    }
-  });
+//   // Typing... Socket Function
+//   socket.on('typing', function (others) {
+//     let whoIsTyping = [];
+//     if (!whoIsTyping.includes(others)) {
+//       whoIsTyping.push(others);
+//       // console.log('who is typing now');
+//       // console.log(whoIsTyping);
+//       io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
+//     }
+//   });
 
-  socket.on('quitTyping', function (others) {
-    let whoIsTyping = [];
-    if (whoIsTyping.length == 0) {
-      //if it's empty
-      // console.log('emit endTyping');
-      io.emit('endTyping');
-    } else {
-      //if someone else is typing
-      var index = whoIsTyping.indexOf(others);
-      // console.log(index);
-      if (index != -1) {
-        whoIsTyping.splice(index, 1);
-        if (whoIsTyping.length == 0) {
-          console.log('emit endTyping');
-          io.emit('endTyping');
-        } else {
-          io.emit('typing', whoIsTyping);
-          // console.log('emit quitTyping');
-          // console.log('whoIsTyping after quit');
-          // console.log(whoIsTyping);
-        }
-      }
-    }
-  });
-});
+//   socket.on('quitTyping', function (others) {
+//     let whoIsTyping = [];
+//     if (whoIsTyping.length == 0) {
+//       //if it's empty
+//       // console.log('emit endTyping');
+//       io.emit('endTyping');
+//     } else {
+//       //if someone else is typing
+//       var index = whoIsTyping.indexOf(others);
+//       // console.log(index);
+//       if (index != -1) {
+//         whoIsTyping.splice(index, 1);
+//         if (whoIsTyping.length == 0) {
+//           console.log('emit endTyping');
+//           io.emit('endTyping');
+//         } else {
+//           io.emit('typing', whoIsTyping);
+//           // console.log('emit quitTyping');
+//           // console.log('whoIsTyping after quit');
+//           // console.log(whoIsTyping);
+//         }
+//       }
+//     }
+//   });
+// });
 
 
 /* MyPage User Chat Room */
