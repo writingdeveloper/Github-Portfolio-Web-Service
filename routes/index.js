@@ -8,7 +8,7 @@ let session = require('express-session')
 let FileStore = require('session-file-store')(session)
 
 router.use(session({
-  secret: 'HelloWorld',
+  secret: process.env.session_secret,
   resave: false,
   saveUninitialized: true,
   store: new FileStore(),
