@@ -1,9 +1,7 @@
 const express = require('express');
-// const router = express.Router();
 const path = require("path");
 const shortid = require("shortid");
 const bodyParser = require("body-parser");
-
 const db = require("../lib/db");
 const aws = require('aws-sdk')
 const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
@@ -17,14 +15,12 @@ router.use(express.static(path.join(__dirname, "public")));
 let cheerio = require("cheerio");
 let request = require("request");
 
-var server = require('http').Server(express)
+/* Socket IO Settings */
+var server = require('http').Server(express);
 var io = require('socket.io')(server);
+server.listen(3001);
 
-//setup stuff
-
-server.listen(3001)
-
-
+/* Amazon Webservice S3 Storage Settings */
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -34,7 +30,7 @@ let s3 = new aws.S3();
 let upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: 'portfolioworld',
+    bucket: process.env.AWS_S3_BUCKET,
     key: function (req, file, cb) {
       let newFileName = Date.now() + "-" + file.originalname;
       let fullPath = `public/images/member/${req.params.userId}/${newFileName}`;
@@ -305,7 +301,7 @@ router.get(`/:userId/admin/contact`, function (req, res, next) {
 /* GET Privious Chat Data Router */
 router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res, next) {
   let userId = req.params.userId;
-  let joinedRoomName=req.params.joinedRoomName;
+  let joinedRoomName = req.params.joinedRoomName;
   console.log(`PREVIOUS CHAT DATA ROOM : ${joinedRoomName}`);
   db.query(`SELECT * FROM chatData WHERE roomName=?`, [joinedRoomName], function (error, data) {
     if (error) {
