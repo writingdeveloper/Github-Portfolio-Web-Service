@@ -12,13 +12,16 @@ router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
 // Parsing Dependency
-let cheerio = require("cheerio");
-let request = require("request");
+const cheerio = require("cheerio");
+const request = require("request");
 
 /* Socket IO Settings */
-var server = require('http').Server(express);
-var io = require('socket.io')(server);
-server.listen(3001);
+const server = require('http').Server(express);
+const io = require('socket.io')(server);
+let port = process.env.PORT || 3001;
+server.listen(port, function () {
+  console.log(`SocketIO Listening on port : ${port}`)
+});
 
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
@@ -30,7 +33,7 @@ let s3 = new aws.S3();
 let upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.AWS_S3_BUCKET,
+    bucket: process.env.AWS_S3_BUCKET || 'portfolioworld',
     key: function (req, file, cb) {
       let newFileName = Date.now() + "-" + file.originalname;
       let fullPath = `public/images/member/${req.params.userId}/${newFileName}`;
