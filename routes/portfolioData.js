@@ -310,8 +310,7 @@ router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res,
     if (error) {
       throw error;
     }
-    console.log(data[0].chatDate.toLocaleString());
-
+    // Recreate Date Type
     for(let i=0; i<data.length; i++){
       data[i].chatDate=data[i].chatDate.toLocaleString()
     }
