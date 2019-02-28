@@ -25,16 +25,19 @@ This Web Application contains the following features:
 3. Ability to parse the README.md file for that Github in the details page and display the details. ✔️
 4. If you are the owner of the portfolio, you will be able to add, delete and modify projects (personal identification using Session) ✔️
 5. Use Amazon S3 storage to use External Storage (Fix existing code Create & Update & Delete Process) ✔️
+6. Development of member personal information management page ✔️
+7. Developing an admin member management page ✔️
+8. Developing chat pages for contact items ✔️
+9. Development of the method for naming image files when uploading images and the function to delete images when deleting portfolios ✔️
+10. Image files should save in External Storage, not in heroku or Github Server ✔️
 
 🧶NOT YET FINISHED🧶
-
 1. If the member sign - up method was used instead of logging in through Github, a discussion on how to manage member information
-2. Development of member personal information management page
-3. Developing an admin member management page
-4. Developing chat pages for contact items
-5. Development of the method for naming image files when uploading images and the function to delete images when deleting portfolios
-6. Image files should save in External Storage, not in heroku or Github Server
-
+2. In Mypage check the owner in Server-Side
+3. Layout Problems in Mypage
+4. Responsive Design in Chat pages
+5. Chat simliar part should be fixed
+6. Register with Google Method Add
 
 ### Prerequisites
 
