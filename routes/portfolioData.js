@@ -594,7 +594,7 @@ router.post(
         );
       }
     });
-    res.redirect(`${userId}/${pageId}`);
+    res.redirect(`/${userId}/${pageId}`);
   }
 );
 
