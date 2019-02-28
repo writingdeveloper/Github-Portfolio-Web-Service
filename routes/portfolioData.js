@@ -106,8 +106,8 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
       }
     }
     data.forEach(results => {
-      let date1 = results.pjdate1.toISOString().split('T')[0];
-      let date2 = results.pjdate2.toISOString().split('T')[0];
+      let date1 = results.pjdate1;
+      let date2 = results.pjdate2;
       results.pjdate1 = date1;
       results.pjdate2 = date2;
     })
@@ -495,7 +495,6 @@ router.get("/:userId/:pageId/update", function (req, res) {
     } else {
       imageNullCheck = results.imgurl; // Image file Exists
     }
-    console.log(results.pjdate1.toISOString().substr(0,7));
     res.render("update", {
       userId: userId,
       pageId: pageId,
@@ -504,8 +503,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       url: results.url,
       explanation: results.explanation,
       imgurl: imageNullCheck,
-      startDate: results.pjdate1.toISOString().substr(0,7),
-      endDate: results.pjdate2.toISOString().substr(0,7),
+      startDate: results.pjdate1.substr(0,7),
+      endDate: results.pjdate2.substr(0,7),
       githuburl: results.githuburl,
       sumlang: results.sumlang
     });
@@ -536,7 +535,8 @@ router.post(
       let pjdate1 = req.body.pjdate1;
       let pjdate2 = req.body.pjdate2;
       let githuburl = req.body.githuburl;
-      console.log(`IMGURL ${imgurl}`)
+
+      console.log(pjdate1)
       // If Imgurl is undefined
       if (imgurl === undefined) {
         db.query(
@@ -594,7 +594,7 @@ router.post(
         );
       }
     });
-    res.redirect("/" + userId + "/" + pageId);
+    res.redirect(`${userId}/${pageId}`);
   }
 );
 
@@ -694,6 +694,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
           let userResults = data[0];
           let email = userResults.email;
           let phoneNumber = userResults.phoneNumber;
+          console.log(results.pjdate1);
+          // console.log(results.pjdate1.toISOString().substr(0,7));
           res.render("detail", {
             userId: userId,
             pageId: pageId,
@@ -701,8 +703,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
             imgurl: imageNullCheck,
             type: results.type,
             sumlang: results.sumlang,
-            startDate: results.pjdate1.toISOString().substr(0,7),
-            endDate: results.pjdate2.toISOString().substr(0,7),
+            startDate: results.pjdate1,
+            endDate: results.pjdate2,
             explanation: results.explanation,
             url: results.url,
             githuburl: results.githuburl,
