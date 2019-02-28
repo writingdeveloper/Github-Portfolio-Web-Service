@@ -495,6 +495,7 @@ router.get("/:userId/:pageId/update", function (req, res) {
     } else {
       imageNullCheck = results.imgurl; // Image file Exists
     }
+    console.log(results.pjdate1.toISOString().substr(0,7));
     res.render("update", {
       userId: userId,
       pageId: pageId,
@@ -503,8 +504,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       url: results.url,
       explanation: results.explanation,
       imgurl: imageNullCheck,
-      startDate: results.pjdate1.substring(0, 7),
-      endDate: results.pjdate2.substring(0, 7),
+      startDate: results.pjdate1.toISOString().substr(0,7),
+      endDate: results.pjdate2.toISOString().substr(0,7),
       githuburl: results.githuburl,
       sumlang: results.sumlang
     });
