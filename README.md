@@ -38,6 +38,7 @@ This Web Application contains the following features:
 4. Responsive Design in Chat pages
 5. Chat simliar part should be fixed
 6. Register with Google Method Add
+7. Update Page Profile Setting
 
 ### Prerequisites
 
