@@ -42,6 +42,21 @@ router.get('/auth/github/callback',
     res.redirect(`/${req.user.username}`);
   });
 
+/* Google Auth Router */
+rotuer.get('/auth/google',
+  passport.authenticate('google', {
+    scope: ['profile']
+  }));
+
+rotuer.get('/auth/google/callback',
+  passport.authenticate('google', {
+    failureRedirect: '/login'
+  }),
+  function (req, res) {
+    // Successful authentication, redirect home.
+    res.redirect('/');
+  });
+
 /* Login Page Router */
 router.get(`/auth/login`, function (req, res, next) {
   res.render("login", {});
