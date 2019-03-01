@@ -3,10 +3,5 @@
         "clientID": "4759e5875ec96b1011ee",
         "clientSecret": "fca441b57aaa2774ec1cc353721f8ee51a9094b8",
         "callbackURL": "http://118.35.126.220:3000/auth/github/callback/"
-    },
-    "production": {
-        "clientID": "36eebe46884c9debc1f4",
-        "clientSecret": "73085d60a186fc60446bd49276968f1c3f0dc251",
-        "callbackURL": "https://expressme.herokuapp.com/auth/github/callback/"
     }
 }
