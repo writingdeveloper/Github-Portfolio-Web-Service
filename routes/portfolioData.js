@@ -227,10 +227,10 @@ router.get(`/:userId/admin/user`, function (req, res, next) {
       throw (`Error From ${userId}/admin/user Router ${error}`);
     }
     let results = data[0];
-    let githubUnique = `${results.id}-Github`;
+    let uniqueId = `${results.id}-${results.register_type}`;
     res.render('mypage/user', {
       userId: userId,
-      uniqueId: githubUnique,
+      uniqueId: uniqueId,
       avatarUrl: results.avatar_url,
       name: results.name,
       bio: results.bio,
@@ -311,10 +311,10 @@ router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res,
       throw error;
     }
     // Recreate Date Type
-    for(let i=0; i<data.length; i++){
-      data[i].chatDate=data[i].chatDate.toLocaleString()
+    for (let i = 0; i < data.length; i++) {
+      data[i].chatDate = data[i].chatDate.toLocaleString()
     }
-    
+
     res.send(data);
   });
 });
@@ -503,8 +503,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       url: results.url,
       explanation: results.explanation,
       imgurl: imageNullCheck,
-      startDate: results.pjdate1.substr(0,7),
-      endDate: results.pjdate2.substr(0,7),
+      startDate: results.pjdate1.substr(0, 7),
+      endDate: results.pjdate2.substr(0, 7),
       githuburl: results.githuburl,
       sumlang: results.sumlang
     });
