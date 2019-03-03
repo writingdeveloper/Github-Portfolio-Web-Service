@@ -209,8 +209,8 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
         }
       }
       redrawData.forEach(results => {
-        let date1 = results.pjdate1.toISOString().split('T')[0];
-        let date2 = results.pjdate2.toISOString().split('T')[0];
+        let date1 = results.pjdate1.split('T')[0];
+        let date2 = results.pjdate2.split('T')[0];
         results.pjdate1 = date1;
         results.pjdate2 = date2;
       })
