@@ -80,6 +80,8 @@ function removeData() {
 }
 
 /* Mypage GET Github Data Function */
+let registerType;
+
 function getData() {
     Swal.fire({
         title: 'Do you want to get data from Github?',
@@ -94,47 +96,51 @@ function getData() {
         preConfirm: () => {
             return fetch(`/${userId}/admin/getData`) // Fetch Data from server
                 .then(res => res.json()).then(data => {
-                    let existTable = $('#dataTable').DataTable();
-                    console.log(data);
-                    existTable.destroy(); // Remove Exist Table to redraw table
-                    $('#dataTable').DataTable({
-                        aaData: data, // Returned Data from Server
-                        aoColumns: [{
-                                mData: 'id',
-                                "render": function (value, type, row) {
-                                    return `<a href="/${userId}/${row.id}">${row.id}</a>`;
+                    if (data === 'Type:Google') {
+                        registerType = 'Google';
+                    } else {
+                        let existTable = $('#dataTable').DataTable();
+                        // console.log(data);
+                        existTable.destroy(); // Remove Exist Table to redraw table
+                        $('#dataTable').DataTable({
+                            aaData: data, // Returned Data from Server
+                            aoColumns: [{
+                                    mData: 'id',
+                                    "render": function (value, type, row) {
+                                        return `<a href="/${userId}/${row.id}">${row.id}</a>`;
+                                    }
+                                },
+                                {
+                                    mData: 'name'
+                                },
+                                {
+                                    mData: 'type'
+                                },
+                                {
+                                    mData: 'url'
+                                },
+                                {
+                                    mData: 'imgurl',
+                                    "render": function (value, type, row) {
+                                        return `<img src="${row.imgurl}">`;
+                                    }
+                                },
+                                {
+                                    mData: 'sumlang'
+                                },
+                                {
+                                    mData: 'pjdate1'
+                                },
+                                {
+                                    mData: 'pjdate2'
+                                },
+                                {
+                                    mData: 'githuburl'
                                 }
-                            },
-                            {
-                                mData: 'name'
-                            },
-                            {
-                                mData: 'type'
-                            },
-                            {
-                                mData: 'url'
-                            },
-                            {
-                                mData: 'imgurl',
-                                "render": function (value, type, row) {
-                                    return `<img src="${row.imgurl}">`;
-                                }
-                            },
-                            {
-                                mData: 'sumlang'
-                            },
-                            {
-                                mData: 'pjdate1'
-                            },
-                            {
-                                mData: 'pjdate2'
-                            },
-                            {
-                                mData: 'githuburl'
-                            }
-                        ]
-                    })
-                    return data;
+                            ]
+                        })
+                        return data;
+                    }
                 }).catch(error => {
                     Swal.fire(
                         'ERROR?',
@@ -143,19 +149,25 @@ function getData() {
                     )
                     console.log(error);
                 })
+
         },
         allowOutsideClick: () => !Swal.isLoading()
     }).then((result) => {
-        console.log(result);
-        if (result.value) {
+        if (result.value && registerType != 'Google') { // Register Type : Github
             Swal.fire(
                 'Get Data Success',
                 'There is no problem from server',
                 'success'
             )
-        } else if (result.dismiss === 'cancel') {
+        } else if (result.value && registerType === 'Google') { // Register Type : Google
+            Swal.fire(
+                'Google Account!',
+                'Your Account is connected with Google NO DATA!!',
+                'success'
+            )
+        } else if (result.dismiss === 'cancel') {   // Clicks Cancel
             console.log('Canceled : DO NOTHING');
-        } else {
+        } else {    // Error Handling
             Swal.fire(
                 'ERROR?',
                 'SOMETHING IS NOT WOKRING',

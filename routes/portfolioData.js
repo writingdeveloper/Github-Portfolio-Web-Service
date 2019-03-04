@@ -171,51 +171,63 @@ router.get(`/:userId/admin/removeData`, function (req, res, next) {
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
 router.get(`/:userId/admin/getData`, function (req, res, next) {
   let userId = req.params.userId;
-  // User Repository API Option Set
-  let repositoryOptions = {
-    url: `https://api.github.com/users/${userId}/repos`,
-    headers: {
-      "User-Agent": "request"
-    }
-  }
-  // User Repository Information API Process
-  request(repositoryOptions, function (error, response, data) {
+
+  db.query(`SELECT register_type FROM user WHERE login=?`, [userId], function (error, data) {
     if (error) {
-      throw error;
+      throw (`Error from Router /:userId/admin/getData Router \n ${error}`)
     }
-    let result = JSON.parse(data);
-    for (i = 0; i < result.length; i++) {
-      // console.log(result[i]);
-      let sid = shortid.generate();
-      let githubid = result[i].owner.login;
-      let name = result[i].name;
-      let demoUrl = result[i].homepage;
-      let githuburl = result[i].html_url;
-      let explanation = result[i].description;
-      let created_at = result[i].created_at;
-      let updated_at = result[i].updated_at;
-      let sqlData = [sid, githubid, name, demoUrl, githuburl, explanation, created_at.split('T')[0], updated_at.split('T')[0]];
-      console.log(sqlData);
-      let sql = `INSERT INTO Personal_Data (id, githubid, name, url, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
-      db.query(sql, sqlData);
-    }
-    db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, redrawData) {
-      if (error) {
-        throw (`Error From Router /:userId/mypage \n ${error}`);
-      }
-      for (var i = 0; i < redrawData.length; i++) {
-        if (redrawData[i].imgurl === null) {
-          redrawData[i].imgurl = '/images/app/404.png'
+    console.log(data[0].register_type);
+    if (data[0].register_type === 'Google') {
+      res.json('Type:Google')
+    } else {
+      // User Repository API Option Set
+      console.log('GITHUB PROCESS');
+      let repositoryOptions = {
+        url: `https://api.github.com/users/${userId}/repos`,
+        headers: {
+          "User-Agent": "request"
         }
       }
-      redrawData.forEach(results => {
-        let date1 = results.pjdate1.split('T')[0];
-        let date2 = results.pjdate2.split('T')[0];
-        results.pjdate1 = date1;
-        results.pjdate2 = date2;
+      // User Repository Information API Process
+      request(repositoryOptions, function (error, response, data) {
+        if (error) {
+          throw error;
+        }
+        let result = JSON.parse(data);
+        for (i = 0; i < result.length; i++) {
+          // console.log(result[i]);
+          let sid = shortid.generate();
+          let githubid = result[i].owner.login;
+          let name = result[i].name;
+          let demoUrl = result[i].homepage;
+          let githuburl = result[i].html_url;
+          let explanation = result[i].description;
+          let created_at = result[i].created_at;
+          let updated_at = result[i].updated_at;
+          let sqlData = [sid, githubid, name, demoUrl, githuburl, explanation, created_at.split('T')[0], updated_at.split('T')[0]];
+          console.log(sqlData);
+          let sql = `INSERT INTO Personal_Data (id, githubid, name, url, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
+          db.query(sql, sqlData);
+        }
+        db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, redrawData) {
+          if (error) {
+            throw (`Error From Router /:userId/mypage \n ${error}`);
+          }
+          for (var i = 0; i < redrawData.length; i++) {
+            if (redrawData[i].imgurl === null) {
+              redrawData[i].imgurl = '/images/app/404.png'
+            }
+          }
+          redrawData.forEach(results => {
+            let date1 = results.pjdate1.split('T')[0];
+            let date2 = results.pjdate2.split('T')[0];
+            results.pjdate1 = date1;
+            results.pjdate2 = date2;
+          })
+          res.json(redrawData);
+        })
       })
-      res.json(redrawData);
-    })
+    }
   })
 })
 
