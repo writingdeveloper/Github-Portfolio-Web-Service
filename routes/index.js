@@ -55,7 +55,7 @@ router.get('/auth/google/callback',
   function (req, res) {
     // Successful authentication, redirect home.
     console.log(req.user)
-    // res.redirect(`/${req.user.login}`);
+    res.redirect(`/${req.login}`);
   });
 
 /* Login Page Router */
