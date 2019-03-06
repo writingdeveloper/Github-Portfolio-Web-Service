@@ -1,234 +1,117 @@
-doctype html
-html(lang='en')
-  head
-    meta(charset='utf-8')
-    meta(http-equiv='X-UA-Compatible', content='IE=edge')
-    meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
-    meta(name='description', content='')
-    meta(name='author', content='')
-    title Dashboard - MyPage
-    // Bootstrap core CSS
-    link(href='/external/Mypage/vendor/bootstrap/css/bootstrap.min.css', rel='stylesheet')
-    // Custom fonts for this template
-    link(href='/external/Mypage/vendor/fontawesome-free/css/all.min.css', rel='stylesheet', type='text/css')
-    // Page level plugin CSS
-    link(href='/external/Mypage/vendor/datatables/dataTables.bootstrap4.css', rel='stylesheet')
-    // Custom styles for this template
-    link(href='/external/Mypage/css/sb-admin.css', rel='stylesheet')
-  body#page-top
-    nav.navbar.navbar-expand.navbar-dark.bg-dark.static-top
-      a.navbar-brand.mr-1(href='/') Portfolio World
-      button#sidebarToggle.btn.btn-link.btn-sm.text-white.order-1.order-sm-0(href='#')
-        i.fas.fa-bars
-      // Navbar Search
-      form.d-none.d-md-inline-block.form-inline.ml-auto.mr-0.mr-md-3.my-2.my-md-0
-        .input-group
-          input.form-control(type='text', placeholder='Search for...', aria-label='Search', aria-describedby='basic-addon2')
-          .input-group-append
-            button.btn.btn-primary(type='button')
-              i.fas.fa-search
-      // Navbar
-      ul.navbar-nav.ml-auto.ml-md-0
-        li.nav-item.dropdown.no-arrow.mx-1
-          a#alertsDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-            i.fas.fa-bell.fa-fw
-            span.badge.badge-danger 9+
-          .dropdown-menu.dropdown-menu-right(aria-labelledby='alertsDropdown')
-            a.dropdown-item(href='#') Action
-            a.dropdown-item(href='#') Another action
-            .dropdown-divider
-            a.dropdown-item(href='#') Something else here
-        li.nav-item.dropdown.no-arrow.mx-1
-          a#messagesDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-            i.fas.fa-envelope.fa-fw
-            span.badge.badge-danger 7
-          .dropdown-menu.dropdown-menu-right(aria-labelledby='messagesDropdown')
-            a.dropdown-item(href='#') Action
-            a.dropdown-item(href='#') Another action
-            .dropdown-divider
-            a.dropdown-item(href='#') Something else here
-        li.nav-item.dropdown.no-arrow
-          a#userDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-            i.fas.fa-user-circle.fa-fw
-          .dropdown-menu.dropdown-menu-right(aria-labelledby='userDropdown')
-            a.dropdown-item(href='#') Settings
-            a.dropdown-item(href='#') Activity Log
-            .dropdown-divider
-            a.dropdown-item(href='#', onclick='logout()') Logout
-    #wrapper
-      // Sidebar
-      ul.sidebar.navbar-nav.toggled
-        li.nav-item.active
-          a.nav-link(href='index.html')
-            i.fas.fa-fw.fa-tachometer-alt
-            span Dashboard
-        li.nav-item.dropdown
-          a#pagesDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
-            i.fas.fa-fw.fa-folder
-            span Pages
-          .dropdown-menu(aria-labelledby='pagesDropdown')
-            h6.dropdown-header Login Screens:
-            a.dropdown-item(href='login.html') Login
-            a.dropdown-item(href='register.html') Register
-            a.dropdown-item(href='forgot-password.html') Forgot Password
-            .dropdown-divider
-            h6.dropdown-header Other Pages:
-            a.dropdown-item(href='404.html') 404 Page
-            a.dropdown-item(href='blank.html') Blank Page
-        li.nav-item
-          a.nav-link(href=`/${userId}/admin/contact`)
-            i.fas.fa-fw.fa-chart-area
-            span Charts
-        li.nav-item
-          a.nav-link(href=`/${userId}/admin/user`)
-            i.fas.fa-fw.fa-user
-            span User Information
-      #content-wrapper
-        .container-fluid
-          // Breadcrumbs
-          ol.breadcrumb
-            li.breadcrumb-item
-              a(href='#') Dashboard
-            li.breadcrumb-item.active Overview
-          // Icon Cards
-          .row
-            .col-xl-3.col-sm-6.mb-3
-              .card.text-white.bg-primary.o-hidden.h-100
-                .card-body
-                  .card-body-icon
-                    i.fas.fa-fw.fa-eye
-                  .mr-5=`Total Views on your Portfolio : ${totalViews}`
-                a.card-footer.text-white.clearfix.small.z-1
-                  span.float-left= `Today's Visitor : ${todayVisitor}`
-            .col-xl-3.col-sm-6.mb-3
-              .card.text-white.bg-warning.o-hidden.h-100
-                .card-body
-                  .card-body-icon
-                    i.fas.fa-fw.fa-list
-                  .mr-5 11 New Tasks!
-                a.card-footer.text-white.clearfix.small.z-1(href='#')
-                  span.float-left View Details
-                  span.float-right
-                    i.fas.fa-angle-right
-            .col-xl-3.col-sm-6.mb-3
-              .card.text-white.bg-success.o-hidden.h-100
-                .card-body
-                  .card-body-icon
-                    i.fas.fa-fw.fa-database
-                  .mr-5 Get Data from Github Repository
-                a.card-footer.text-white.clearfix.small.z-1(href='#' onclick="getData()" id='getData')
-                  span.float-left Get Data
-                  span.float-right
-                    i.fas.fa-angle-right
-            .col-xl-3.col-sm-6.mb-3
-              .card.text-white.bg-danger.o-hidden.h-100
-                .card-body
-                  .card-body-icon
-                    i.fas.fa-fw.fa-trash
-                  .mr-5 Remove all of my Portfolio Data
-                a.card-footer.text-white.clearfix.small.z-1(href='#' onclick="removeData()" id='removeData')
-                  span.float-left Remove Exist Data
-                  span.float-right
-                    i.fas.fa-angle-right
-          // Chart Area
-          .card.mb-3
-            .card-header
-              i.fas.fa-chart-area
-              | Recent 7 Days Visitors
-            .card-body
-              script.
-                var visitorData=!{JSON.stringify(visitorData)}
-                var chartMaxData=!{JSON.stringify(chartMaxData)}
-                console.log(visitorData);
-              canvas#myAreaChart(width='100%', height='30')
-            .card-footer.small.text-muted=`Updated at ${updatedTime}`
-          // DataTables Example
-          .card.mb-3
-            .card-header
-              i.fas.fa-table
-              | My Portfolio Data
-            .card-body
-              .table-responsive
-                table#dataTable.table.table-bordered(width='100%', cellspacing='0')
-                  thead
-                    tr
-                      th ID
-                      th Name
-                      th Type
-                      th URL
-                      //- th explanation
-                      th Image
-                      th Keyword
-                      th Project Start
-                      th Porject End
-                      th Github URL
-                  tbody
-                    each data in dataArray
-                      tr
-                        td
-                          a(href=`/${userId}/${data.id}`)=`${data.id}`
-                        td= `${data.name}`
-                        td= `${data.type}`
-                        td
-                          a(href=`${data.url}`)=`${data.url}`
-                        //- td= `${data.explanation}`
-                        td
-                          img(src=`${data.imgurl}`)
-                        td= `${data.sumlang}`
-                        td= `${data.pjdate1}`
-                        td= `${data.pjdate2}`
-                        td
-                          a(href=`${data.githuburl}`)=`${data.githuburl}`
-            .card-footer.small.text-muted=`Updated at ${updatedTime}`
-        // /.container-fluid
-        // Sticky Footer
-        footer.sticky-footer
-          .container.my-auto
-            .copyright.text-center.my-auto
-              span Copyright © Portfolio World 2019
-      // /.content-wrapper
-      // /#wrapper
-      // Scroll to Top Button
-      a.scroll-to-top.rounded(href='#page-top')
-        i.fas.fa-angle-up
-      #removedata.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
-        .modal-dialog(role='document')
-          .modal-content
-            .modal-header
-              h5#exampleModalLabel.modal-title This action initializes all portfolio data and most recent visitor counters.
-              button.close(type='button', data-dismiss='modal', aria-label='Close')
-                span(aria-hidden='true') ×
-            .modal-body Select "Accept" below if you are ready to end your current session.
-            .modal-footer
-              button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
-              a.btn.btn-primary(href=`/${userId}/admin/removeData`) Accept
-      #getData.modal.fade(tabindex='-1', role='dialog', aria-labelledby='exampleModalLabel', aria-hidden='true')
-        .modal-dialog(role='document')
-          .modal-content
-            .modal-header
-              h5#exampleModalLabel.modal-title Do you really want to remove all of your data?
-              button.close(type='button', data-dismiss='modal', aria-label='Close')
-                span(aria-hidden='true') ×
-            .modal-body Select "Accept" below if you are ready to end your current session.
-            .modal-footer
-              button.btn.btn-secondary(type='button', data-dismiss='modal') Cancel
-              a.btn.btn-primary(href=`/${userId}/admin/getData`) Accept              
-// Bootstrap core JavaScript
-script(src='/external/Mypage/vendor/jquery/jquery.min.js')
-script(src='/external/Mypage/vendor/bootstrap/js/bootstrap.bundle.min.js')
-// Core plugin JavaScript
-script(src='/external/Mypage/vendor/jquery-easing/jquery.easing.min.js')
-// Page level plugin JavaScript
-script(src='/external/Mypage/vendor/chart.js/Chart.min.js')
-script(src='/external/Mypage/vendor/datatables/jquery.dataTables.js')
-script(src='/external/Mypage/vendor/datatables/dataTables.bootstrap4.js')
-// Custom scripts for all pages
-script.
-  let userId=!{JSON.stringify(userId)}
-  console.log(userId);
-script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
-script(src='/external/Mypage/js/sb-admin.min.js')
-script(src='/javascripts/mypage.js')
-// Demo scripts for this page
-script(src='/external/Mypage/js/demo/datatables-demo.js')
-script(src='/external/Mypage/js/demo/chart-area-demo.js')
+extends layout.pug
+
+block customCSS
+	// Datatable CSS CDN
+	link(href='https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css', rel='stylesheet')
+		
+block content
+	#content-wrapper
+		.container-fluid
+			// Breadcrumbs
+			ol.breadcrumb
+				li.breadcrumb-item
+					a(href='#') Dashboard
+				li.breadcrumb-item.active Overview
+			// Icon Cards
+			.row
+				.col-xl-3.col-sm-6.mb-3
+					.card.text-white.bg-primary.o-hidden.h-100
+						.card-body
+							.card-body-icon
+								i.fas.fa-fw.fa-eye
+							.mr-5=`Total Views on your Portfolio : ${totalViews}`
+						a.card-footer.text-white.clearfix.small.z-1
+							span.float-left= `Today's Visitor : ${todayVisitor}`
+				.col-xl-3.col-sm-6.mb-3
+					.card.text-white.bg-warning.o-hidden.h-100
+						.card-body
+							.card-body-icon
+								i.fas.fa-fw.fa-list
+							.mr-5 11 New Tasks!
+						a.card-footer.text-white.clearfix.small.z-1(href='#')
+							span.float-left View Details
+							span.float-right
+								i.fas.fa-angle-right
+				.col-xl-3.col-sm-6.mb-3
+					.card.text-white.bg-success.o-hidden.h-100
+						.card-body
+							.card-body-icon
+								i.fas.fa-fw.fa-database
+							.mr-5 Get Data from Github Repository
+						a.card-footer.text-white.clearfix.small.z-1(href='#' onclick="getData()" id='getData')
+							span.float-left Get Data
+							span.float-right
+								i.fas.fa-angle-right
+				.col-xl-3.col-sm-6.mb-3
+					.card.text-white.bg-danger.o-hidden.h-100
+						.card-body
+							.card-body-icon
+								i.fas.fa-fw.fa-trash
+							.mr-5 Remove all of my Portfolio Data
+						a.card-footer.text-white.clearfix.small.z-1(href='#' onclick="removeData()" id='removeData')
+							span.float-left Remove Exist Data
+							span.float-right
+								i.fas.fa-angle-right
+			// Chart Area
+			.card.mb-3
+				.card-header
+					i.fas.fa-chart-area
+					| Recent 7 Days Visitors
+				.card-body
+					script.
+						var visitorData=!{JSON.stringify(visitorData)}
+						var chartMaxData=!{JSON.stringify(chartMaxData)}
+						console.log(visitorData);
+					canvas#myAreaChart(width='100%', height='30')
+				.card-footer.small.text-muted=`Updated at ${updatedTime}`
+			// DataTables
+			.card.mb-3
+				.card-header
+					i.fas.fa-table
+					| My Portfolio Data
+				.card-body
+					.table-responsive
+						table#dataTable.table.table-bordered(width='100%', cellspacing='0')
+							thead
+								tr
+									th ID
+									th Name
+									th Type
+									th URL
+									//- th explanation
+									th Image
+									th Keyword
+									th Project Start
+									th Porject End
+									th Github URL
+							tbody
+								each data in dataArray
+									tr
+										td
+											a(href=`/${userId}/${data.id}`)=`${data.id}`
+										td= `${data.name}`
+										td= `${data.type}`
+										td
+											a(href=`${data.url}`)=`${data.url}`
+										//- td= `${data.explanation}`
+										td
+											img(src=`${data.imgurl}`)
+										td= `${data.sumlang}`
+										td= `${data.pjdate1}`
+										td= `${data.pjdate2}`
+										td
+											a(href=`${data.githuburl}`)=`${data.githuburl}`
+				.card-footer.small.text-muted=`Updated at ${updatedTime}`
+			footer.sticky-footer
+				.container.my-auto
+					.copyright.text-center.my-auto
+						span Copyright © Portfolio World 2019
+
+block customJS
+	// ChartJS CDN
+	script(src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js')
+	// Datatable JS CDN
+	script(src='https://cdn.datatables.net/1.10.18/js/jquery.dataTables.min.js')
+	script(src='https://cdn.datatables.net/1.10.18/js/dataTables.bootstrap4.min.js')
+	// Chart Setting
+	script(src='/javascripts/mypage/chart.js')

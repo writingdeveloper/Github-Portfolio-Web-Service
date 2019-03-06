@@ -92,10 +92,6 @@ html(lang='en')
                   img.card-img-top(src=`${avatarUrl}`, alt='Card image cap')
                   .card-body
                     h5.card-title=`${name}`
-                    .form-group
-                      .custom-file
-                        input.custom-file-input(type='file')
-                        label.custom-file-label Choose file
                 .card.row#profile
                   form
                     .input-group.col
@@ -110,7 +106,6 @@ html(lang='en')
                       .input-group-prepend
                         span#basic-addon1.input-group-text Registered Time
                       input.form-control.is-valid(type='text' value=`${registerTime}` disabled)
-                  //- form(method='post', action=`/${userId}/admin/user`)
                   form(id='userForm')
                     .input-group.col
                       .input-group-prepend
