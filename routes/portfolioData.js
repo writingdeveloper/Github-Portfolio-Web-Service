@@ -259,16 +259,15 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
   let email = req.body.email;
   let phoneNumber = req.body.phoneNumber;
   let bio = req.body.bio;
-  console.log(JSON.stringify(req.body));
+  // Update User Data SQL
   db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE login=?`, [email, phoneNumber, bio, userId]);
+  // Check Data From DB SQL
   db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, AjaxData) {
     if (error) {
       throw (`Error FROM /:userId/admin/user POST ROUTER : ${error}`);
     }
-    console.log(AjaxData)
-    // return res.send(JSON.stringify(AjaxData));
+    res.json(AjaxData); // Return Data
   })
-  res.send(req.body);
 })
 
 /* MyPage User Chat Room */
