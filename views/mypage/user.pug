@@ -46,8 +46,13 @@ block content
 										span#basic-addon1.input-group-text Bio
 									textarea.form-control(rows='3' id='bio' data-toggle="tooltip" data-placement="top" title="Recommended Data")=`${bio}`
 								.input-group.col
-									button.btn.btn-primary.col(type='submit' id='submit') Submit
+									button.btn.btn-primary.col(type='button' onclick='userInformationSend()' id='submit') Submit
 		footer.sticky-footer
 			.container.my-auto
 				.copyright.text-center.my-auto
 					span Copyright © Portfolio World 2019
+
+block customJS
+	script.
+		let userId=!{JSON.stringify(userId)}
+	script(src='/javascripts/mypage/user.js')
