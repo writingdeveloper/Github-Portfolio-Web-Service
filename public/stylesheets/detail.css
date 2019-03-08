@@ -189,7 +189,6 @@ html [type=button] {
 .gallery-spec-key {
   min-width: 130px;
   padding-right: .5em;
-  font-family: "Quicksand", sans-serif;
 }
 
 .gallery-spec-key,
@@ -227,7 +226,6 @@ html [type=button] {
   min-width: 2em;
   padding: .35em .65em;
   line-height: 1;
-  font-family: "Quicksand", sans-serif;
   font-size: .92rem;
   text-align: center;
 }
@@ -317,7 +315,6 @@ div#readme h1 {
 
 .footer-content {
   margin-top: 2rem;
-  font-family: "Quicksand", sans-serif;
 }
 
 .unstyled-list {
@@ -379,6 +376,19 @@ div#readme h1 {
 
 .octicon-pencil {
   float: right;
+}
+
+.markdown-body .highlight pre, .markdown-body pre {
+  background-color: #f6f8fa;
+  border-radius: 3px;
+  font-size: 85%;
+  line-height: 1.45;
+  overflow: auto;
+  padding: 16px;
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
 }
 
 
