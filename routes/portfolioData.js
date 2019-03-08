@@ -77,9 +77,12 @@ router.get(`/:userId`, function (req, res, next) {
     });
 });
 
+
+
 /* GET MyPage Page */
 router.get(`/:userId/admin/mypage`, function (req, res, next) {
   let userId = req.params.userId; // UserID Variable
+
   let updatedTime = new Date(); // updated Time Variable
   let currentDay = new Date();
   let theYear = currentDay.getFullYear();
@@ -325,77 +328,28 @@ router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res,
     for (let i = 0; i < data.length; i++) {
       data[i].chatDate = data[i].chatDate.toLocaleString()
     }
-
     res.send(data);
   });
 });
-
-// Socket IO 
-// io.on('connection', function (socket) {
-//   // Join Room
-//   socket.on('JoinRoom', function (data) {
-//     socket.leave(`${data.leave}`)
-//     console.log(`Leave ROOM : ${data.leave}`)
-//     socket.join(`${data.joinedRoomName}`);
-//     console.log(`NEW JOIN IN ${data.joinedRoomName}`)
-//   })
-
-//   // Send Message
-//   socket.on('say', function (data) {
-//     console.log(`${data.userId} : ${data.msg}`);
-//     //chat message to the others
-//     io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
-//     console.log(`Message Send to : ${data.joinedRoomName}`)
-//     // console.log(`Message Content : ${data.userId} : ${data.message}`);
-//     db.query(`INSERT INTO chatData (roomName, chatSender, chatMessage) VALUES (?,?,?)`, [data.joinedRoomName, data.userId, data.msg])
-//   });
-
-//   // Typing... Socket Function
-//   socket.on('typing', function (others) {
-//     let whoIsTyping = [];
-//     if (!whoIsTyping.includes(others)) {
-//       whoIsTyping.push(others);
-//       // console.log('who is typing now');
-//       // console.log(whoIsTyping);
-//       io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
-//     }
-//   });
-
-//   socket.on('quitTyping', function (others) {
-//     let whoIsTyping = [];
-//     if (whoIsTyping.length == 0) {
-//       //if it's empty
-//       // console.log('emit endTyping');
-//       io.emit('endTyping');
-//     } else {
-//       //if someone else is typing
-//       var index = whoIsTyping.indexOf(others);
-//       // console.log(index);
-//       if (index != -1) {
-//         whoIsTyping.splice(index, 1);
-//         if (whoIsTyping.length == 0) {
-//           console.log('emit endTyping');
-//           io.emit('endTyping');
-//         } else {
-//           io.emit('typing', whoIsTyping);
-//           // console.log('emit quitTyping');
-//           // console.log('whoIsTyping after quit');
-//           // console.log(whoIsTyping);
-//         }
-//       }
-//     }
-//   });
-// });
-
 
 /* MyPage User Chat Room */
 router.get(`/:userId/contact`, function (req, res, next) {
   let userId = req.params.userId;
   let loginedId = req.user.login;
   let roomName = `${loginedId}-${userId}`;
-  db.query(`INSERT INTO chatRoom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginedId])
-  console.log(`Create ROOM : ${roomName}`);
-  res.redirect(`/${loginedId}/admin/contact`)
+  db.query(`SELECT * FROM chatRoom WHERE roomName=?`, [roomName], function (err, roomCheck) {
+    if (err) {
+      throw `Error from /:userId/contact Router \n${err}`
+    }
+    // Checks Room Exist
+    if (roomCheck[0] === undefined) {
+      // Create Room
+      db.query(`INSERT INTO chatRoom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginedId])
+      res.redirect(`/${loginedId}/admin/contact`)
+    } else {
+      res.redirect(`/${loginedId}/admin/contact`)
+    }
+  })
 });
 
 /* GET Create Page */
