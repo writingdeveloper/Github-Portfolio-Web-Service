@@ -43,23 +43,29 @@ app.use(function (err, req, res, next) {
   res.render('error');
 });
 
+/* Socket IO Functions */
+
 app.io.on('connection', function (socket) {
-  // Join Room
+  // Join Room Scoket
   socket.on('JoinRoom', function (data) {
     socket.leave(`${data.leave}`)
-    console.log(`Leave ROOM : ${data.leave}`)
+    // console.log(`Leave ROOM : ${data.leave}`)
     socket.join(`${data.joinedRoomName}`);
-    console.log(`NEW JOIN IN ${data.joinedRoomName}`)
+    // console.log(`NEW JOIN IN ${data.joinedRoomName}`)
+    // console.log(`RECEIVER : ${data.receiver}`)
+    // When Reads the message SET notice to '1'
+    db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
   })
 
-  // Send Message
+  // Send Message Socket
   socket.on('say', function (data) {
     console.log(`${data.userId} : ${data.msg}`);
     //chat message to the others
     app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
     console.log(`Message Send to : ${data.joinedRoomName}`)
     // console.log(`Message Content : ${data.userId} : ${data.message}`);
-    db.query(`INSERT INTO chatData (roomName, chatSender, chatMessage) VALUES (?,?,?)`, [data.joinedRoomName, data.userId, data.msg])
+    // Chat Message Save to DB SQL
+    db.query(`INSERT INTO chatData (roomName, chatSender, chatReceiver, chatMessage) VALUES (?,?,?,?)`, [data.joinedRoomName, data.userId, data.receiver, data.msg])
   });
 
   // Typing... Socket Function
@@ -73,6 +79,25 @@ app.io.on('connection', function (socket) {
     }
   });
 
+  // Notice Counter Socket
+  socket.on('counter', function (data) {
+    let counterTo = data.userId;
+    socket.join(`${data.userId}`)
+    // console.log(`COUNTER ${data.userId} ON!`)
+    db.query(`SELECT COUNT(notice) FROM chatData WHERE chatReceiver=? AND notice='0'`, [data.userId], function (error, data) {
+      if (error) {
+        throw error;
+      }
+      let count = data[0]['COUNT(notice)'];
+      // console.log(data[0]['COUNT(notice)']);
+
+      // console.log(COUNT(notice));
+      app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count)
+      // console.log(`SEND NOTICE TO ${counterTo} NUM : ${count}`)
+    })
+  })
+
+  // Quit Typing Socket
   socket.on('quitTyping', function (others) {
     let whoIsTyping = [];
     if (whoIsTyping.length == 0) {
@@ -98,7 +123,6 @@ app.io.on('connection', function (socket) {
     }
   });
 });
-
 
 console.log('Now It Works Fine in Port 3000');
 
