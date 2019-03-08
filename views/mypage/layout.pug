@@ -14,8 +14,6 @@ html(lang='en')
 		// Layout CSS
 		block customCSS
 		link(href='/stylesheets/mypage/mypage.css', rel='stylesheet')
-		
-		
 body#page-top
 	nav.navbar.navbar-expand.navbar-dark.bg-dark.static-top
 		a.navbar-brand.mr-1(href='/') Portfolio World
@@ -32,7 +30,7 @@ body#page-top
 			li.nav-item.dropdown.no-arrow.mx-1
 				a#messagesDropdown.nav-link.dropdown-toggle(href=`/${userId}/admin/contact`, role='button')
 					i.fas.fa-envelope.fa-fw
-					span.badge.badge-danger 7
+					span.badge.badge-danger#counter
 			li.nav-item.dropdown.no-arrow
 				a#userDropdown.nav-link.dropdown-toggle(href='#', role='button', data-toggle='dropdown', aria-haspopup='true', aria-expanded='false')
 					i.fas.fa-user-circle.fa-fw
@@ -56,6 +54,8 @@ body#page-top
 					i.fas.fa-fw.fa-user
 					span User Information
 		block content
+script.
+	let userId=!{JSON.stringify(userId)}
 
 // Bootstrap JS CDN
 script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js', integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo', crossorigin='anonymous')
@@ -63,8 +63,10 @@ script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.m
 script(src='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js', integrity='sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM', crossorigin='anonymous')
 // Socket IO Script
 script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js")
+// Global JS
+script(src='/javascripts/mypage/mypage.js')
+
 block customJS
 // SweetAlert JS CDN
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
-// Global JS
-script(src='/javascripts/mypage/mypage.js')
+

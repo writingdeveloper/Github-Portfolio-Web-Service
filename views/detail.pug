@@ -1,15 +1,16 @@
 doctype html
-head
-  meta(charset='UTF-8')
-  meta(name='viewport', content='width=device-width, initial-scale=1.0')
-  meta(http-equiv='X-UA-Compatible', content='ie=edge')
-  title= `${userId}'s Portfolio`
-  link(rel='stylesheet', href='/stylesheets/detail.css')
-  // BootStrap CDN
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no")
+    meta(http-equiv='X-UA-Compatible', content='ie=edge')
+    title= `${userId}'s Portfolio`
   
-  link(href='/stylesheets/core/bootstrap.min.css', rel='stylesheet')
-  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
-  link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css')
+    // BootStrap CDN
+    
+    //- link(href='/stylesheets/core/bootstrap.min.css', rel='stylesheet')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css', integrity='sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M', crossorigin='anonymous')
+    link(rel='stylesheet', href='/stylesheets/detail.css')
 nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
   .container
     a.navbar-brand(href=`/${userId}`)=`${userId}'s Portfolio`
@@ -29,7 +30,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
           input#input-url(type='hidden', value='Copied!')
           a.nav-link(href='#' id='btn-copy') Copy this URL
         li.nav-item.active
-          a.nav-link(href='#') Contact
+          a.nav-link(href=`/${userId}/contact`) Contact
 section#works.l-section(role='region')
   .l-section-holder
     h2.section-heading
@@ -83,22 +84,18 @@ section#works.l-section(role='region')
           ul.unstyled-list
             - if(email){
             li
-              a(href='mailto:super2451894@gmail.com', title='email')
+              a(href=`mailto:${email}`, title='email')
                 img(src="https://png.icons8.com/material-outlined/50/ffffff/new-post.png" class="icons")
                 span.iconed-text=`${email}`
             li
             -}
             - if(phoneNumber) {
-              span(title='전화')
+              span(title='phone')
                 img(src='https://png.icons8.com/material/50/ffffff/google-mobile.png' class="icons")
                 span.iconed-text=`${phoneNumber}`
             -}
-            //- li
-            //-   span(title='카카오톡')
-            //-     img(src='https://png.icons8.com/ios/50/ffffff/speech-bubble.png' class="icons")
-            //-     span.iconed-text leesihung@KakaoTalk
             li
-              a(href=`${githuburl}`, target='_blank', title='githubURL')
+              a(href=`https://github.com/${userId}`, target='_blank', title='githubURL')
                 img(src='https://png.icons8.com/windows/50/ffffff/github.png' class="icons")
                 span.iconed-text Github Account
   #tools
@@ -129,10 +126,12 @@ section#works.l-section(role='region')
         br
         b this
     - }
-script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
-script(src='/javascripts/core/bootstrap.min.js')
-script(src='https://code.jquery.com/jquery-3.3.1.min.js')
-script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
+// Bootstrap CDN JS
+script(src='https://code.jquery.com/jquery-3.2.1.slim.min.js', integrity='sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN', crossorigin='anonymous')
+script(src='https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js', integrity='sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh', crossorigin='anonymous')
+script(src='https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/js/bootstrap.min.js', integrity='sha384-h0AbiXch4ZDo7tp9hKZ4TsHbi047NrKGLO3SEJAg45jXxnGIfYzk4Si90RDIqNm1', crossorigin='anonymous')
+// Sweetalert CDN JS
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
+// Clipboard CDN JS
 script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
 script(type='application/javascript', charset='utf-8', src='/javascripts/setting.js')
