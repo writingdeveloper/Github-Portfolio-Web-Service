@@ -1,4 +1,28 @@
 /* Global */
+let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
+
+// Request Counter Data Function
+function counter() {
+    socket.emit('counter', {
+        userId: userId
+    });
+}
+
+// Counter Receiver every 3 Seconds
+setInterval(counter, 3000);
+
+// Get Notice Counter Socket
+socket.on('noticeAlarm', function (count) {
+    // console.log(count);
+    if (count == 0) {
+        document.getElementById('counter').innerHTML = '';  // If no counter Data SET NULL
+    } else {
+        document.getElementById('counter').innerHTML = count;   // Data Exists SET to count Data
+    }
+});
+
+
+// socket.on('noticeAlarm')
 
 // Side bar
 ! function (t) {
@@ -54,4 +78,3 @@ function logout() {
         }
     })
 }
-

@@ -1,5 +1,7 @@
+/* Chat Page JS */
+
 /* Chat Functions */
-var socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
+// let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
 let joinedRoomName, current, others;
 
 /* Click Each Room list Function */
@@ -11,14 +13,12 @@ function joinChat() {
     socket.emit('JoinRoom', {
         joinedRoomName,
         leave: current,
+        receiver: userId
     });
     current = joinedRoomName;
-    console.log(`CURRENT ROOM : ${current}`);
-    console.log(`NewJoined ROOM ${joinedRoomName}`)
 
     // Get Previous Chat Data
     fetch(`/${userId}/${joinedRoomName}/admin/getPreviousChat`).then(res => res.json()).then(data => {
-        console.log(data);
         for (let i = 0; i < data.length; i++) {
             let date = data[i].chatDate;
             if (data[i].chatSender != userId) {
@@ -29,8 +29,23 @@ function joinChat() {
         }
         Scroll(); // Scroll to Bottom
     })
-    console.log(`GET PREV CHAT : ${joinedRoomName}`)
 }
+
+// SET Notice Data '0' Function
+function intervalCheck() {
+    if (joinedRoomName === undefined) {
+        console.log('Not yet Joined');
+    } else {
+        socket.emit('JoinRoom', {
+            joinedRoomName,
+            receiver: userId
+        });
+        console.log(`JOINED : ${joinedRoomName}`)
+    }
+}
+
+// When Join's in the room SET notice data to '0'
+setInterval(intervalCheck, 3000);
 
 /* Scroll To Bottom in Chat Area */
 function Scroll() {
@@ -48,7 +63,6 @@ $(function () {
     /* When Submit */
     $('#chat').submit(function () {
         if (joinedRoomName === undefined) {
-            console.log('NO ROOM');
             $('#message').val('Joined ROOM First!!');
         } else {
             //submit only if it's not empty
@@ -58,6 +72,7 @@ $(function () {
                     msg: msg,
                     userId: userId,
                     loginedId: loginedId,
+                    receiver: others,
                     joinedRoomName: joinedRoomName
                 });
             }
@@ -89,7 +104,6 @@ $(function () {
 
     /* End Typing Socket */
     socket.on('endTyping', function () {
-        console.log('endTyping');
         whoIsTyping = [];
         $('#message').attr('placeholder', "Type a Message"); // If Notyping Reset to Init placeholder
     })
@@ -101,14 +115,12 @@ $(function () {
                 others,
                 joinedRoomName
             });
-            console.log(`emit typing ${others}`);
         } else if ($('#message').val() == "" && whoIsTyping.includes(others)) {
 
             socket.emit('quitTyping', {
                 others,
                 joinedRoomName
             });
-            console.log('emit quitTyping');
         }
     });
 });
