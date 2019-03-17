@@ -15,11 +15,11 @@ block content
 								h4 Recent
 							.srch_bar
 								.stylish-input-group
-									input.search-bar(type='text', placeholder='Search')
+									input.search-bar(type='text', id='contactSearch' placeholder='Search' onkeyup="filter()")
 									span.input-group-addon
 										button(type='button')
 											i.fa.fa-search(aria-hidden='true')
-						.inbox_chat
+						.inbox_chat(id='contact')
 							//- .chat_list.active_chat
 							//- 	.chat_people
 							//- 		.chat_img
@@ -35,7 +35,7 @@ block content
 								.chat_list
 									.chat_people
 										.chat_img
-											img(src='https://ptetutorials.com/images/user-profile.png', alt='sunil')
+											img(src='https://ptetutorials.com/images/user-profile.png', class='listImage')
 										.chat_ib
 											a(href='#' onclick='joinChat()')
 												- if (roomData.chatSender === userId){

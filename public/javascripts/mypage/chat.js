@@ -1,5 +1,28 @@
 /* Chat Page JS */
 
+/* Contact Search Filter */
+function filter() {
+    // Declare variables
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById('contactSearch');
+    filter = input.value.toUpperCase();
+    // console.log(filter);
+    ul = document.getElementById("contact");
+    li = ul.getElementsByClassName('chat_list')
+  
+    // Loop through all list items, and hide those who don't match the search query
+    for (i = 0; i < li.length; i++) {
+      a = document.getElementsByClassName("chat_list")[i];
+      txtValue = a.textContent || a.innerText;
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+
+
 /* Chat Functions */
 // let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
 let joinedRoomName, current, others;
@@ -34,13 +57,13 @@ function joinChat() {
 // SET Notice Data '0' Function
 function intervalCheck() {
     if (joinedRoomName === undefined) {
-        console.log('Not yet Joined');
+        // console.log('Not yet Joined');
     } else {
         socket.emit('JoinRoom', {
             joinedRoomName,
             receiver: userId
         });
-        console.log(`JOINED : ${joinedRoomName}`)
+        // console.log(`JOINED : ${joinedRoomName}`)
     }
 }
 
