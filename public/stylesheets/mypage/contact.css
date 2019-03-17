@@ -444,7 +444,7 @@ td>img {
 }
 
 img {
-    max-width: 100%;
+    max-width: 65%;
 }
 
 .inbox_people {
@@ -559,14 +559,18 @@ img {
 
 .incoming_msg_img {
     display: inline-block;
-    width: 6%;
+    width: 5%;
 }
 
 .received_msg {
     display: inline-block;
-    padding: 0 0 0 10px;
+    padding: 0 0 0 0px;
     vertical-align: top;
     width: 92%;
+}
+
+.listImage{
+    max-width: 100%;
 }
 
 .received_withd_msg p {
