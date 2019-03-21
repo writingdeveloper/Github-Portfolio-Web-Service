@@ -15,14 +15,6 @@ router.use(express.static(path.join(__dirname, "public")));
 const cheerio = require("cheerio");
 const request = require("request");
 
-/* Socket IO Settings */
-// const server = require('http').Server(express);
-// const io = require('socket.io')(server);
-// let port = process.env.PORT || 3000;
-// server.listen(port, function () {
-//   console.log(`SocketIO Listening on port : ${port}`)
-// });
-
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
@@ -56,25 +48,43 @@ router.get(`/:userId`, function (req, res, next) {
   }
   console.log(`Owner Check ${ownerCheck}`);
   // console.log(userId);
-  db.query(
-    `SELECT * FROM Personal_Data WHERE githubid='${userId}' ORDER BY pjdate2 DESC`,
-    function (error, data) {
-      if (error) {
-        throw error;
+
+  db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, data) {
+    if (error) {
+      console.log('error');
+    } else {
+
+      console.log(data[0])
+      if (data[0] === undefined) {
+        res.render('customError', {
+          user: userId, // Entered User ID
+          loginedId: ownerCheck, // Logined User ID
+          error: 'USER MISSING',
+          description: 'Report Please'
+        })
+      } else {
+        db.query(
+          `SELECT * FROM Personal_Data WHERE githubid='${userId}' ORDER BY pjdate2 DESC`,
+          function (error, data) {
+            if (error) {
+              throw error;
+            }
+            for (let i = 0; i < data.length; i++) {
+              if (data[i].imgurl === null) {
+                data[i].imgurl = `/images/app/${data[i].type}.png`;
+              } else {
+                data[i].imgurl = data[i].imgurl
+              }
+            }
+            res.render("portfolioItems", {
+              dataarray: data,
+              userId: userId,
+              ownerCheck: ownerCheck
+            });
+          });
       }
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].imgurl === null) {
-          data[i].imgurl = `/images/app/${data[i].type}.png`;
-        } else {
-          data[i].imgurl = data[i].imgurl
-        }
-      }
-      res.render("portfolioItems", {
-        dataarray: data,
-        userId: userId,
-        ownerCheck: ownerCheck
-      });
-    });
+    }
+  });
 });
 
 
@@ -283,34 +293,37 @@ router.get(`/:userId/admin/contact`, function (req, res, next) {
     if (error) {
       throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
     }
-    db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, data) {
-      if (error) {
-        throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
-      }
+    // db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, data) {
+    //   if (error) {
+    //     throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
+    //   }
 
-      for (let i = 0; i < data.length; i++) {
-        if (data[i].chatSender === userId) {
-          chatListImageArray.push(data[i].chatReceiver)
-        } else {
-          chatListImageArray.push(data[i].chatSender)
-        }
-      }
-      console.log(chatListImageArray);
-      for (let i = 0; i < chatListImageArray.length; i++) {
-        db.query(`SELECT avatar_url FROM user WHERE login=?`, [chatListImageArray[i]], function (error, profileImage) {
-          if (error) {
-            throw error;
-          }
-          // console.log(profileImage)
-          profileImageArray.push(profileImage)
-        })
-      }
-      console.log(profileImageArray)
-      res.render('mypage/contact', {
-        userId: userId,
-        loginedId: loginedId,
-        room: room
-      })
+    // for (let i = 0; i < room.length; i++) {
+    //   if (room[i].chatSender === userId) {
+    //     chatListImageArray.push(room[i].chatReceiver)
+    //   } else {
+    //     chatListImageArray.push(room[i].chatSender)
+    //   }
+    // }
+    // console.log(chatListImageArray); // Chat list Array
+    // console.log(room)
+
+    // for (let i = 0; i < chatListImageArray.length; i++) {
+    //   db.query(`SELECT avatar_url FROM user WHERE login=?`, [chatListImageArray[i]], function (error, profileImage) {
+    //     if (error) {
+    //       throw error;
+    //     }
+    //     // console.log(profileImage)
+    //     profileImageArray.push(profileImage[0].avatar_url)
+    //     console.log(profileImageArray)
+    //   })
+    // }
+    res.render('mypage/contact', {
+      userId: userId,
+      loginedId: loginedId,
+      room: room
+      // profileImage: profileImageArray
+      // })
     })
   });
 });
@@ -580,7 +593,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
     mm = '0' + mm
   }
   date = `${yyyy}-${mm}-${dd}`;
-  console.log(date);
   let ownerCheck;
   let imageNullCheck;
   // Owner Check
