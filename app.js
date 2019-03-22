@@ -10,7 +10,7 @@ app.io = require('socket.io')();
 
 const indexRouter = require('./routes/index.js');
 const portfolioRouter = require('./routes/portfolioData.js');
-const errorRouter=require('./routes/error.js');
+const errorRouter = require('./routes/error.js');
 
 
 // view engine setup
@@ -28,7 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', portfolioRouter);
-app.use('/', errorRouter);
+app.use('/reportError', errorRouter); // Error Page Router
 
 
 // catch 404 and forward to error handler
@@ -41,7 +41,14 @@ app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
+  console.log(err);
+  console.log(req.connection.remoteAddress.split(`:`).pop());
+  let sender = req.connection.remoteAddress.split(`:`).pop();
+  let errorMessage= err.message;
+  let userAgent =req.get('User-Agent');
+  let errorFrom = req.header('Referer');
 
+  db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent , 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
   // render the error page
   res.status(err.status || 500);
   res.render('error');
