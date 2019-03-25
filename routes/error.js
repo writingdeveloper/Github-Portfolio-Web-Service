@@ -8,26 +8,26 @@ router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
 /* Anonymous Error Report */
-router.post(`/reportError/er/anonymous`, function (req, res, next) {
+router.post(`/er/anonymous`, function (req, res, next) {
     let sender = req.body.sender;
     let userAgent = req.body.userAgent;
     let vendor = req.body.vendor;
     let language = req.body.language;
     let errorMessage = 'No User Error'
-    console.log(sender);
-    db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage) VALUES (?,?,?,?,?)`, [sender, userAgent, vendor, language, errorMessage])
+    let errorFrom = req.header('Referer');
+    db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, vendor, language, errorMessage, errorFrom])
     res.redirect('/');
 });
 
 /* Logined User Error Report */
-router.post(`/reportError/er/:userId`, function (req, res, next) {
+router.post(`/er/:userId`, function (req, res, next) {
     let sender = req.body.sender;
     let userAgent = req.body.userAgent;
     let vendor = req.body.vendor;
     let language = req.body.language;
     let errorMessage = 'No User Error'
-    console.log(`HELP!!! ${sender} : ${userAgent}`);
-    db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage) VALUES (?,?,?,?,?)`, [sender, userAgent, vendor, language, errorMessage])
+    let errorFrom = req.header('Referer');
+    db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, vendor, language, errorMessage, errorFrom])
     res.redirect('/');
 });
 
