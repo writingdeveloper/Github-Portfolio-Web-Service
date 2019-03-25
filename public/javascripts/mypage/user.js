@@ -7,6 +7,7 @@ function userInformationSend() {
         phoneNumber: document.getElementById('phoneNumber').value,
         bio: document.getElementById('bio').value
     }
+    /* Use Fetch API */
     fetch(`/${userId}/admin/submit`, {
         method: 'POST',
         body: JSON.stringify(data),
@@ -14,7 +15,7 @@ function userInformationSend() {
             'Content-type': 'application/json'
         })
     }).then(res => res.json()).then(data => {
-        console.log(data);
+        // console.log(data);
         Swal.fire(
             'Modification completed',
             '',
