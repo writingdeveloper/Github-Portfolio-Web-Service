@@ -23,25 +23,26 @@ This Web Application contains the following features:
 
 👨‍💻FINISHED👨‍💻
 
-✅ Login function using Github API (Passport.js)  
-✅ Use Github API to generate personal portfolio page by using information from individual repository after login  
-✅ Ability to parse the README.md file for that Github in the details page and display the details.  
-✅ If you are the owner of the portfolio, you will be able to add, delete and modify projects (personal identification using Session)  
-✅ Use Amazon S3 storage to use External Storage (Fix existing code Create & Update & Delete Process)  
-✅ Development of member personal information management page  
-✅ Developing an admin member management page  
-✅ Developing chat pages for contact items  
-✅ Development of the method for naming image files when uploading images and the function to delete images when deleting portfolios   
-✅ Image files should save in External Storage, not in heroku or Github Server   
+✅ Login with Github Function (Passport.js)  
+✅ Login with Google Function (Passport.js)  
+✅ After login, parse Github Repository to use individual portfolio page (Github API)   
+✅ Each portfolio page can parse README.md file from Github (Request, CheerIO Package)  
+✅ Owner Check to show different UI (Passport.js with Session and Cookies)  
+✅ Use Amazon S3 storage to use External Image Storage (AWS)  
+✅ Developing 'Mypage' to manage portfolio data (MySQL)  
+✅ Developing 'Chat' Page in Admin panel to contact each other (SocketIO)  
+✅ Developing 'Error' Page to handle Error and report to Administrator & Log (MySQL, Express)  
+✅ Fix number of bugs that users might encounter in their use
+
+Please check the detailed function list below.
 
 🧶NOT YET FINISHED🧶
-1. If the member sign - up method was used instead of logging in through Github, a discussion on how to manage member information
-2. In Mypage check the owner in Server-Side
-3. Layout Problems in Mypage
-4. Responsive Design in Chat pages
-5. Chat simliar part should be fixed
-6. Register with Google Method Add
-7. Update Page Profile Setting
+1. When if register with 'Google' users cannot use their portfolio's README.md file
+2. In Mypage check the owner in Server-Side (Pending due to test)
+3. Responsive Design in Chat pages
+4. Developing Personal Introduction Page
+
+## Detailed Function
 
 ### Prerequisites
 
@@ -54,7 +55,6 @@ The tested version is shown below and is developed based on the LTS version of N
 ```
 
 ### Installing
-
 
 The program will also be uploaded to the NPM in the future, and currently it will only write the installation method through the ZIP file.
 
@@ -82,8 +82,6 @@ From the web browser, you can access the following address:
 ## Issues
 
 Use the Issue tab if you have any problems and questions with this program. Please give some ideas or ask for cooperation! [Issue](https://github.com/sangumee/Github-Portfolio-Web-Service/issues)
-
-Also, since the member personal page has not been developed, there is no membership withdrawal function after signing up. And now Github's personal information is stored on the server. If you request me to delete this, send your Github nickname to super2451894@gmail.com and I will notify you after deleting your personal information.
 
 ## License
 
