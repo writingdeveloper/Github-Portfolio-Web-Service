@@ -96,7 +96,7 @@ function removeData() {
       return fetch(`/${userId}/admin/removeData`) // Fetch Data from server
         .then(res => res.json()).then(data => {
           let existTable = $('#dataTable').DataTable();
-          console.log(data);
+          // console.log(data);
           if (data === 'removed') {
             existTable
               .clear()
@@ -114,7 +114,7 @@ function removeData() {
     },
     allowOutsideClick: () => !Swal.isLoading()
   }).then((result) => {
-    console.log(result);
+    // console.log(result);
     if (result.value === 'removed') {
       Swal.fire(
         'Remove Data Success',
@@ -122,7 +122,7 @@ function removeData() {
         'success'
       )
     } else if (result.dismiss === 'cancel') {
-      console.log('Canceled : DO NOTHING');
+      // console.log('Canceled : DO NOTHING');
     } else {
       Swal.fire(
         'ERROR?',
