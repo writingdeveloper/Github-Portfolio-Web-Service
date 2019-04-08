@@ -36,7 +36,7 @@ This Web Application contains the following features:
 
 Please check the detailed function list below.
 
-🧶NOT YET FINISHED🧶
+👨‍💻NOT YET FINISHED👨‍💻
 1. When if register with 'Google' users cannot use their portfolio's README.md file
 2. In Mypage check the owner in Server-Side (Pending due to test)
 3. Responsive Design in Chat pages
