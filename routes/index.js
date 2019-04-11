@@ -84,7 +84,7 @@ router.get("/", function (req, res, next) {
   // Parse LinkedIn Profile Image
   let id = req.body.id;
   // Main page Profile Data Process
-  db.query(`SELECT * FROM user ORDER BY register_time DESC LIMIT 5`, function (error, data) { // GET Data sort with register_time and get 6 Profile
+  db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 5`, function (error, data) { // GET Data sort with register_time and get 6 Profile
     // Log Error
     if (error) {
       console.log(error);
