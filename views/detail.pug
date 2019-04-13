@@ -35,35 +35,35 @@ section#works.l-section(role='region')
   .l-section-holder
     h2.section-heading
       span.secondary Portfolio 😁
-      span.primary= `${name}`
+      span.primary= `${projectName}`
     #portfolio.section-content.gallery.alternate
       article#work1.gallery-item(role='article')
         figure.gallery-figure(role='group')
           .gallery-image
-            img.gallery-image-thumb(src=`${imgurl}`)
+            img.gallery-image-thumb(src=`${imageUrl}`)
           figcaption.gallery-caption
             //- h3.gallery-title= name
             ul.gallery-spec
               li.gallery-spec-item
                 strong.gallery-spec-key Views
-                span.gallery-spec-value= counter
+                span.gallery-spec-value= `${counter}`
               li.gallery-spec-item
                 strong.gallery-spec-key Type
-                span.gallery-spec-value= type
+                span.gallery-spec-value= `${type}`
               li.gallery-spec-item
                 strong.gallery-spec-key Project Keywords
-                span.gallery-spec-value= sumlang
+                span.gallery-spec-value= `${keyword}`
               li.gallery-spec-item
                 strong.gallery-spec-key Term
-                span.gallery-spec-value= startDate +'~'+ endDate
+                span.gallery-spec-value= `${projectDate1} ~ ${projectDate2}`
             #work1Description
             strong.gallery-spec-key Summary
-            span.gallery-spec-value= explanation
+            span.gallery-spec-value= `${summary}`
             .ui-group
-              - if(url){
-              a.ui-button(role='button', href=`${url}`, target='_blank') Demo
+              - if(projectDemoUrl){
+              a.ui-button(role='button', href=`${projectDemoUrl}`, target='_blank') Demo
               - }
-              a.ui-button(role='button', href=`${githuburl}`, target='_blank') Github Repo
+              a.ui-button(role='button', href=`${githubUrl}`, target='_blank') Github Repo
         div(id="readme" class="Box Box--condensed instapaper_body md js-code-block-container")
           .Box-header.px-2.clearfix
             h3.Box-title.pr-3

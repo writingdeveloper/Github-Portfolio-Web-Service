@@ -44,12 +44,12 @@ router.get(`/:userId`, function (req, res, next) {
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
-    ownerCheck = req.user.login;
+    ownerCheck = req.user.loginId;
   }
   console.log(`Owner Check ${ownerCheck}`);
   // console.log(userId);
 
-  db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, data) {
+  db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
     if (error) {
       console.log('error');
     } else {
@@ -64,16 +64,16 @@ router.get(`/:userId`, function (req, res, next) {
         })
       } else {
         db.query(
-          `SELECT * FROM Personal_Data WHERE githubid='${userId}' ORDER BY pjdate2 DESC`,
+          `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
           function (error, data) {
             if (error) {
               throw error;
             }
             for (let i = 0; i < data.length; i++) {
-              if (data[i].imgurl === null) {
-                data[i].imgurl = `/images/app/${data[i].type}.png`;
+              if (data[i].imageUrl === null) {
+                data[i].imageUrl = `/images/app/${data[i].type}.png`;
               } else {
-                data[i].imgurl = data[i].imgurl
+                data[i].imageUrl = data[i].imageUrl
               }
             }
             res.render("portfolioItems", {
@@ -109,39 +109,40 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
     thisWeek[i] = yyyy + '-' + mm + '-' + dd;
   }
   // Chart Data SQL
-  db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, data) {
+  db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, data) {
     if (error) {
       throw (`Error From Router /:userId/mypage \n ${error}`);
     }
     for (var i = 0; i < data.length; i++) {
-      if (data[i].imgurl === null) {
-        data[i].imgurl = '/images/app/404.png'
+      if (data[i].imageUrl === null) {
+        data[i].imageUrl = '/images/app/404.png'
+        console.log(`HELLO WORKS!`)
       }
     }
     data.forEach(results => {
-      let date1 = results.pjdate1;
-      let date2 = results.pjdate2;
-      results.pjdate1 = date1;
-      results.pjdate2 = date2;
+      let date1 = results.projectDate1;
+      let date2 = results.projectDate2;
+      results.projectDate1 = date1;
+      results.projectDate2 = date2;
     })
     // Total Counter SQL
-    db.query(`SELECT SUM(counter) FROM counter WHERE login='${userId}'`, function (error, counterSum) {
+    db.query(`SELECT SUM(counter) FROM counter WHERE userId='${userId}'`, function (error, counterSum) {
       if (error) {
         throw (`Error FROM Router /:userId/mypage \n ${error}`);
       }
       //  This Week visitor Data SQL
-      db.query(`SELECT counter FROM counter WHERE login='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
+      db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
         if (error) {
           throw (`Error From Router /:userId/mypage \n ${error}`);
         }
-        db.query(`SELECT counter FROM counter WHERE login='${userId}' AND date=?`, [currentDay.toISOString().split('T')[0]], function (error, todayVisitorData) {
+        db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND date=?`, [currentDay.toISOString().split('T')[0]], function (error, todayVisitorData) {
           if (error) {
             throw (`Error From Router /:userId/mypage \n ${error}`);
           }
           if (todayVisitorData[0] === undefined) {
             console.log('NULL');
             todayVisitorData[0] = 0;
-            db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
+            db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
           }
           console.log(todayVisitorData);
           let chartData = [];
@@ -174,9 +175,9 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
 router.get(`/:userId/admin/removeData`, function (req, res, next) {
   let userId = req.params.userId;
   let currentDay = new Date();
-  db.query(`DELETE FROM Personal_Data WHERE githubid='${userId}'`); // Delete Personal_Data Table
-  db.query(`DELETE FROM counter WHERE login='${userId}'`); // Delete counter Table
-  db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
+  db.query(`DELETE FROM project WHERE userId='${userId}'`); // Delete project Table
+  db.query(`DELETE FROM counter WHERE userId='${userId}'`); // Delete counter Table
+  db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
   res.json('removed');
 });
 
@@ -185,12 +186,12 @@ router.get(`/:userId/admin/removeData`, function (req, res, next) {
 router.get(`/:userId/admin/getData`, function (req, res, next) {
   let userId = req.params.userId;
 
-  db.query(`SELECT register_type FROM user WHERE login=?`, [userId], function (error, data) {
+  db.query(`SELECT registerType FROM user WHERE loginId=?`, [userId], function (error, data) {
     if (error) {
       throw (`Error from Router /:userId/admin/getData Router \n ${error}`)
     }
-    console.log(data[0].register_type);
-    if (data[0].register_type === 'Google') {
+    console.log(data[0].registerTime);
+    if (data[0].registerTime === 'Google') {
       res.json('Type:Google')
     } else {
       // User Repository API Option Set
@@ -210,32 +211,32 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
         for (i = 0; i < result.length; i++) {
           // console.log(result[i]);
           let sid = shortid.generate();
-          let githubid = result[i].owner.login;
-          let name = result[i].name;
-          let demoUrl = result[i].homepage;
-          let githuburl = result[i].html_url;
-          let explanation = result[i].description;
-          let created_at = result[i].created_at;
-          let updated_at = result[i].updated_at;
-          let sqlData = [sid, githubid, name, demoUrl, githuburl, explanation, created_at.split('T')[0], updated_at.split('T')[0]];
+          let userId = result[i].owner.login;
+          let projectName = result[i].name;
+          let projectDemoUrl = result[i].homepage;
+          let githubUrl = result[i].html_url;
+          let summary = result[i].description;
+          let projectDate1 = result[i].created_at;
+          let projectDate2 = result[i].updated_at;
+          let sqlData = [sid, userId, projectName, projectDemoUrl, githubUrl, summary, projectDate1.split('T')[0], projectDate2.split('T')[0]];
           console.log(sqlData);
-          let sql = `INSERT INTO Personal_Data (id, githubid, name, url, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?,?)`;
+          let sql = `INSERT INTO project (sid, userId , projectName, projectDemoUrl, githubUrl, summary, projectDate1, projectDate2) VALUES (?,?,?,?,?,?,?,?)`;
           db.query(sql, sqlData);
         }
-        db.query(`SELECT * FROM Personal_Data WHERE githubid='${userId}'`, function (error, redrawData) {
+        db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, redrawData) {
           if (error) {
             throw (`Error From Router /:userId/mypage \n ${error}`);
           }
           for (var i = 0; i < redrawData.length; i++) {
-            if (redrawData[i].imgurl === null) {
-              redrawData[i].imgurl = '/images/app/404.png'
+            if (redrawData[i].imageUrl === null) {
+              redrawData[i].imageUrl = '/images/app/404.png'
             }
           }
           redrawData.forEach(results => {
-            let date1 = results.pjdate1.split('T')[0];
-            let date2 = results.pjdate2.split('T')[0];
-            results.pjdate1 = date1;
-            results.pjdate2 = date2;
+            let date1 = results.projectDate1.split('T')[0];
+            let date2 = results.projectDate2.split('T')[0];
+            results.projectDate1 = date1;
+            results.projectDate2 = date2;
           })
           res.json(redrawData);
         })
@@ -247,21 +248,21 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
 /* GET Mypage User Setting Page */
 router.get(`/:userId/admin/user`, function (req, res, next) {
   let userId = req.params.userId;
-  db.query(`SELECT * FROM user WHERE login='${userId}'`, function (error, data) {
+  db.query(`SELECT * FROM user WHERE loginId='${userId}'`, function (error, data) {
     if (error) {
       throw (`Error From ${userId}/admin/user Router ${error}`);
     }
     let results = data[0];
-    let uniqueId = `${results.id}-${results.register_type}`;
+    let uniqueId = `${results.userId}-${results.registerTime}`;
     res.render('mypage/user', {
       userId: userId,
       uniqueId: uniqueId,
-      avatarUrl: results.avatar_url,
+      avatarUrl: results.avatarUrl,
       name: results.name,
       bio: results.bio,
       email: results.email,
       phoneNumber: results.phoneNumber,
-      registerTime: results.register_time
+      registerDate: results.registerDate
     })
   })
 })
@@ -273,9 +274,9 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
   let phoneNumber = req.body.phoneNumber;
   let bio = req.body.bio;
   // Update User Data SQL
-  db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE login=?`, [email, phoneNumber, bio, userId]);
+  db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE loginId=?`, [email, phoneNumber, bio, userId]);
   // Check Data From DB SQL
-  db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, AjaxData) {
+  db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, AjaxData) {
     if (error) {
       throw (`Error FROM /:userId/admin/user POST ROUTER : ${error}`);
     }
@@ -286,7 +287,7 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
 /* MyPage User Chat Room */
 router.get(`/:userId/admin/contact`, function (req, res, next) {
   let userId = req.params.userId;
-  let loginedId = req.user.login;
+  let loginedId = req.user.loginId;
   let chatListImageArray = [];
   let profileImageArray = [];
   db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
@@ -348,8 +349,8 @@ router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res,
 /* MyPage User Chat Room */
 router.get(`/:userId/contact`, function (req, res, next) {
   let userId = req.params.userId;
-  let loginedId = req.user.login;
-  let roomName = `${loginedId}-${userId}`;
+  let loginId = req.user.loginId;
+  let roomName = `${loginId}-${userId}`;
   db.query(`SELECT * FROM chatRoom WHERE roomName=?`, [roomName], function (err, roomCheck) {
     if (err) {
       throw `Error from /:userId/contact Router \n${err}`
@@ -357,10 +358,10 @@ router.get(`/:userId/contact`, function (req, res, next) {
     // Checks Room Exist
     if (roomCheck[0] === undefined) {
       // Create Room
-      db.query(`INSERT INTO chatRoom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginedId])
-      res.redirect(`/${loginedId}/admin/contact`)
+      db.query(`INSERT INTO chatRoom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginId])
+      res.redirect(`/${loginId}/admin/contact`)
     } else {
-      res.redirect(`/${loginedId}/admin/contact`)
+      res.redirect(`/${loginId}/admin/contact`)
     }
   })
 });
@@ -371,7 +372,7 @@ router.get(`/:userId/create`, function (req, res, next) {
   res.render("create", {
     // Sample Image
     userId: userId,
-    imgurl: "https://via.placeholder.com/730x444?text=Portfolio Image will be display here!"
+    imageUrl: "https://via.placeholder.com/730x444?text=Portfolio Image will be display here!"
   });
 });
 
@@ -385,29 +386,29 @@ router.post("/:userId/create_process", upload.single("projectImg"), function (
 
   let userId = req.params.userId;
   let sid = shortid.generate();
-  let githubid = req.params.userId;
+  let userId = req.params.userId;
   let name = req.body.projectName;
   let type = req.body.portType;
   let url = req.body.projectUrl;
   let explanation = req.body.projectExplanation;
   // files information are in req.file object
   // Check Image Process
-  let imgurl = req.file.location;
+  let imageUrl = req.file.location;
   let sumlang = req.body.sumLang;
   let pjdate1 = req.body.pjdate1;
   let pjdate2 = req.body.pjdate2;
   let githuburl = req.body.githuburl;
 
   db.query(
-    "INSERT INTO Personal_Data (id, githubid, name, type, url, explanation, imgurl, sumlang, pjdate1, pjdate2, githuburl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+    "INSERT INTO project (id, userId, name, type, url, explanation, imageUrl, sumlang, pjdate1, pjdate2, githuburl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
     [
       sid,
-      githubid,
+      userId,
       name,
       type,
       url,
       explanation,
-      imgurl,
+      imageUrl,
       sumlang,
       pjdate1,
       pjdate2,
@@ -423,16 +424,16 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   console.log(userId + " and " + pageId);
-  db.query(`SELECT imgurl FROM Personal_Data WHERE id='${pageId}'`, function (error, data) {
+  db.query(`SELECT imageUrl FROM project WHERE id='${pageId}'`, function (error, data) {
     if (error) {
       console.log(`Error Message From UPDATE: ${error}`);
     } else {
       console.log(data);
       let params = {
         Bucket: 'portfolioworld',
-        Key: data[0].imgurl.substr(55)
+        Key: data[0].imageUrl.substr(55)
       };
-      console.log(data[0].imgurl.substr(55));
+      console.log(data[0].imageUrl.substr(55));
       s3.deleteObject(params, function (error, data) {
         if (error) {
           console.log(`Error Message From UPDATE : ${error}`);
@@ -442,7 +443,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
       })
     }
   });
-  db.query(`DELETE FROM Personal_Data WHERE id=${pageId}`, function (
+  db.query(`DELETE FROM project WHERE id=${pageId}`, function (
     error,
     data
   ) {
@@ -459,7 +460,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
 router.get("/:userId/:pageId/update", function (req, res) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
+  db.query(`SELECT * FROM project WHERE id=?`, [pageId], function (
     error,
     data
   ) {
@@ -468,10 +469,10 @@ router.get("/:userId/:pageId/update", function (req, res) {
     }
     let results = data[0];
     // Image NULL Check
-    if (results.imgurl === null) {
+    if (results.imageUrl === null) {
       imageNullCheck = `/images/app/${results.type}.png` // If image data not exists, return default tpye image
     } else {
-      imageNullCheck = results.imgurl; // Image file Exists
+      imageNullCheck = results.imageUrl; // Image file Exists
     }
     res.render("update", {
       userId: userId,
@@ -480,7 +481,7 @@ router.get("/:userId/:pageId/update", function (req, res) {
       type: results.type,
       url: results.url,
       explanation: results.explanation,
-      imgurl: imageNullCheck,
+      imageUrl: imageNullCheck,
       startDate: results.pjdate1.substr(0, 7),
       endDate: results.pjdate2.substr(0, 7),
       githuburl: results.githuburl,
@@ -496,7 +497,7 @@ router.post(
   function (req, res) {
     let userId = req.params.userId;
     let pageId = req.params.pageId;
-    db.query(`SELECT imgurl FROM Personal_Data WHERE id=?`, [pageId], function (
+    db.query(`SELECT imageUrl FROM project WHERE id=?`, [pageId], function (
       error,
       data
     ) {
@@ -508,17 +509,17 @@ router.post(
       let type = req.body.portType;
       let url = req.body.projectUrl;
       let explanation = req.body.projectExplanation;
-      let imgurl = req.file ? req.file.location : undefined;
+      let imageUrl = req.file ? req.file.location : undefined;
       let sumlang = req.body.sumLang;
       let pjdate1 = req.body.pjdate1;
       let pjdate2 = req.body.pjdate2;
       let githuburl = req.body.githuburl;
 
       console.log(pjdate1)
-      // If Imgurl is undefined
-      if (imgurl === undefined) {
+      // If imageUrl is undefined
+      if (imageUrl === undefined) {
         db.query(
-          `UPDATE Personal_Data SET name=?, type=?, url=?, explanation=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
+          `UPDATE project SET name=?, type=?, url=?, explanation=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
           [
             name,
             type,
@@ -531,19 +532,19 @@ router.post(
             pageId
           ]
         );
-        // If Imgurl is exist
+        // If imageUrl is exist
       } else {
-        db.query(`SELECT imgurl FROM Personal_Data WHERE id='${pageId}'`, function (error, data) {
+        db.query(`SELECT imageUrl FROM project WHERE id='${pageId}'`, function (error, data) {
           if (error) {
             console.log(`Error Message From UPDATE: ${error}`);
           } else {
             console.log(data);
-            if (data[0].imgurl === null) {
+            if (data[0].imageUrl === null) {
               console.log('NO PREVIOUS IMAGE DATA');
             } else {
               let params = {
                 Bucket: 'portfolioworld',
-                Key: data[0].imgurl.substr(55)
+                Key: data[0].imageUrl.substr(55)
               };
               s3.deleteObject(params, function (error, data) {
                 if (error) {
@@ -556,13 +557,13 @@ router.post(
           }
         });
         db.query(
-          `UPDATE Personal_Data SET name=?, type=?, url=?, explanation=?, imgurl=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
+          `UPDATE project SET name=?, type=?, url=?, explanation=?, imageUrl=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
           [
             name,
             type,
             url,
             explanation,
-            imgurl,
+            imageUrl,
             sumlang,
             pjdate1,
             pjdate2,
@@ -599,29 +600,30 @@ router.get("/:userId/:pageId", function (req, res, next) {
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
-    ownerCheck = req.user.login;
+    ownerCheck = req.user.loginId;
   }
   console.log(`Owner Check ${ownerCheck}`);
-  // Personal_Data Table Counter SET
-  db.query(`UPDATE Personal_Data SET counter=counter+1 WHERE id=?`, [pageId]);
+  // project Table Counter SET
+  db.query(`UPDATE project SET counter=counter+1 WHERE sid=?`, [pageId]);
   // User Table Total Counter SET
-  db.query(`UPDATE user SET counter=counter+1 WHERE login=?`, [userId]);
+  console.log(userId)
+  db.query(`UPDATE user SET counter=counter+1 WHERE loginId=?`, [userId]);
 
-  db.query(`SELECT * from counter WHERE login=? AND date=?`, [userId, date], function (error, dayDateResult) {
+  db.query(`SELECT * from counter WHERE userId=? AND date=?`, [userId, date], function (error, dayDateResult) {
     if (error) {
       console.log(`Error From Router Detail Page, Counter \n ${error}`);
     }
     if (dayDateResult[0] === undefined) {
       console.log('NULL');
-      db.query(`INSERT INTO counter (login, date, counter) VALUES (?,?,?)`, [userId, date, 1])
+      db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, date, 1])
     } else {
       console.log('Not NULL');
       // Counter Table Day Counter SET
-      db.query(`UPDATE counter SET counter = counter+1 WHERE login=?`, [userId]);
+      db.query(`UPDATE counter SET counter = counter+1 WHERE userId=?`, [userId]);
     }
   })
   // GET Data from Personal Data
-  db.query(`SELECT * FROM Personal_Data WHERE id=?`, [pageId], function (
+  db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
     error,
     data
   ) {
@@ -634,13 +636,13 @@ router.get("/:userId/:pageId", function (req, res, next) {
     } else {
       let results = data[0];
       // Get github URL
-      let url = results.githuburl;
-      if (results.imgurl === null) {
+      let url = results.githubUrl;
+      if (results.imageUrl === null) {
         console.log('NO IMAGE');
         imageNullCheck = `/images/app/${results.type}.png`
         console.log(imageNullCheck);
       } else {
-        imageNullCheck = results.imgurl;
+        imageNullCheck = results.imageUrl;
       }
       // Use Request Module to parsing Web page
       request(url, function (error, response, html) {
@@ -664,7 +666,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
         if (readme === undefined) { // If readme is undefined
           readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
         }
-        db.query(`SELECT * FROM user WHERE login=?`, [userId], function (error, data) {
+        db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
           if (error) {
             throw (`Error from Detail Router GET USER DATA SQL ${error}`)
           }
@@ -676,15 +678,15 @@ router.get("/:userId/:pageId", function (req, res, next) {
           res.render("detail", {
             userId: userId,
             pageId: pageId,
-            name: results.name,
-            imgurl: imageNullCheck,
+            projectName: results.projectName,
+            imageUrl: imageNullCheck,
             type: results.type,
-            sumlang: results.sumlang,
-            startDate: results.pjdate1,
-            endDate: results.pjdate2,
-            explanation: results.explanation,
-            url: results.url,
-            githuburl: results.githuburl,
+            keyword: results.keyword,
+            projectDate1: results.projectDate1,
+            projectDate2: results.projectDate2,
+            summary: results.summary,
+            projectDemoUrl: results.projectDemoUrl,
+            githubUrl: results.githubUrl,
             counter: results.counter,
             markdown: readme,
             email: email,

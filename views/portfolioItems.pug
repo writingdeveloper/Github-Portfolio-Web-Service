@@ -53,18 +53,18 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
           .card-type(class=`${projects.type}`)
             p.text
              =projects.type
-          img.card-img-top(src=`${projects.imgurl}`)
+          img.card-img-top(src=`${projects.imageUrl}`)
           .card-body
             h4.card-title
-              a(href=`/${userId}/${projects.id}`)
-                = projects.name
-            - if(projects.sumlang) {
+              a(href=`/${userId}/${projects.sid}`)
+                = projects.projectName
+            - if(projects.summary) {
             p.card-keyword
-              = `Keyword : ${projects.sumlang}`
+              = `Keyword : ${projects.keyword}`
             - }
             p.card-text
-              = projects.explanation
-          a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details
+              = `${projects.summary}`
+          a(href= `/${userId}/${projects.sid}` class="viewDetail") View Details
   // /.row
   // Pagination
   ul.pagination.justify-content-center

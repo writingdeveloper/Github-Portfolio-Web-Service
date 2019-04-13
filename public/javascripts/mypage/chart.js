@@ -159,37 +159,37 @@ function getData() {
             $('#dataTable').DataTable({
               aaData: data, // Returned Data from Server
               aoColumns: [{
-                  mData: 'id',
+                  mData: 'sid',
                   "render": function (value, type, row) {
-                    return `<a href="/${userId}/${row.id}">${row.id}</a>`;
+                    return `<a href="/${userId}/${row.sid}">${row.sid}</a>`;
                   }
                 },
                 {
-                  mData: 'name'
+                  mData: 'projectName'
                 },
                 {
                   mData: 'type'
                 },
                 {
-                  mData: 'url'
+                  mData: 'projectDemoUrl'
                 },
                 {
-                  mData: 'imgurl',
+                  mData: 'imageUrl',
                   "render": function (value, type, row) {
-                    return `<img src="${row.imgurl}">`;
+                    return `<img src="${row.imageUrl}">`;
                   }
                 },
                 {
-                  mData: 'sumlang'
+                  mData: 'keyword'
                 },
                 {
-                  mData: 'pjdate1'
+                  mData: 'projectDate1'
                 },
                 {
-                  mData: 'pjdate2'
+                  mData: 'projectDate2'
                 },
                 {
-                  mData: 'githuburl'
+                  mData: 'githubUrl'
                 }
               ]
             })

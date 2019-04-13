@@ -87,19 +87,19 @@ block content
 								each data in dataArray
 									tr
 										td
-											a(href=`/${userId}/${data.id}`)=`${data.id}`
-										td= `${data.name}`
+											a(href=`/${userId}/${data.sid}`)=`${data.sid}`
+										td= `${data.projectName}`
 										td= `${data.type}`
 										td
-											a(href=`${data.url}`)=`${data.url}`
+											a(href=`${data.projectDemoUrl}`)=`${data.projectDemoUrl}`
 										//- td= `${data.explanation}`
 										td
-											img(src=`${data.imgurl}`)
-										td= `${data.sumlang}`
-										td= `${data.pjdate1}`
-										td= `${data.pjdate2}`
+											img(src=`${data.imageUrl}`)
+										td= `${data.summary}`
+										td= `${data.projectDate1}`
+										td= `${data.projectDate2}`
 										td
-											a(href=`${data.githuburl}`)=`${data.githuburl}`
+											a(href=`${data.githubUrl}`)=`${data.githubUrl}`
 				.card-footer.small.text-muted=`Updated at ${updatedTime}`
 			footer.sticky-footer
 				.container.my-auto

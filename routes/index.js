@@ -140,7 +140,7 @@ router.post("/user", function (req, res, next) {
     if (result.name === null) {
       result.name = result.login;
     }
-    db.query(`INSERT INTO user (login, id, avatar_url, name, bio) VALUES (?,?,?,?,?)`, [result.login, result.id, result.avatar_url, result.name, result.bio]); // User Information INSERT SQL
+    db.query(`INSERT INTO user (loginId, displayId, avatarUrl, name, bio, registerType) VALUES (?,?,?,?,?,'Gtihub')`, [result.login, result.id, result.avatar_url, result.name, result.bio]); // User Information INSERT SQL
   });
 
   // User Repository Information API Process
@@ -151,15 +151,15 @@ router.post("/user", function (req, res, next) {
     let result = JSON.parse(data);
     for (i = 0; i < result.length; i++) {
       let sid = shortid.generate();
-      let githubid = result[i].owner.login;
-      let name = result[i].name;
-      let githuburl = result[i].html_url;
-      let explanation = result[i].description;
-      let created_at = result[i].created_at;
-      let updated_at = result[i].updated_at;
-      let sqlData = [sid, githubid, name, githuburl, explanation, created_at, updated_at];
+      let userId = result[i].owner.login;
+      let projectName = result[i].name;
+      let githubUrl = result[i].html_url;
+      let summary = result[i].description;
+      let projectDate1 = result[i].created_at;
+      let projectDate2 = result[i].updated_at;
+      let sqlData = [sid, userId, projectName, githubUrl, summary, projectDate1, projectDate2];
       console.log(sqlData);
-      let sql = `INSERT INTO Personal_Data (id, githubid, name, githuburl, explanation, pjdate1, pjdate2) VALUES (?,?,?,?,?,?,?)`;
+      let sql = `INSERT INTO project (sid, userId, projectName, githubUrl, summary, projectDate1, projectDate2) VALUES (?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
   });
