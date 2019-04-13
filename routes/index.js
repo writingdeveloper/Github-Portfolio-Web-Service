@@ -91,7 +91,7 @@ router.get("/", function (req, res, next) {
     }
     let url = ''
     if (req.user) {
-      url = req.user.login
+      url = req.user.loginId
     } else {
       url = '';
     }
