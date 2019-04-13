@@ -15,14 +15,14 @@ form(method='post', action=`/${userId}/${pageId}/update_process` enctype="multip
         span.secondary Update Page
         span.primary
             label(for="projectName") Name :
-            input(type="text" id="projectName" name="projectName" class="create_form" value=`${name}`)
+            input(type="text" id="projectName" name="projectName" class="create_form" value=`${projectName}`)
       #portfolio.section-content.gallery.alternate
         article#work1.gallery-item(role='article')
           figure.gallery-figure(role='group')
             .gallery-image
-              img.gallery-image-thumb(src=`${imgurl}`)
+              img.gallery-image-thumb(src=`${imageUrl}`)
             figcaption.gallery-caption
-              select#portfolio-type-select(name='portType' class="create_form")
+              select#portfolio-type-select(name='type' class="create_form")
                   option(value=`${type}` selected hidden)= `${type}`
                   option(value='Project') Project
                   option(value='Certificate') Certification
@@ -30,22 +30,22 @@ form(method='post', action=`/${userId}/${pageId}/update_process` enctype="multip
               ul.gallery-spec
                 li.gallery-spec-item
                   strong.gallery-spec-key Project Keywords
-                  input(type="text" id="sumLang" name="sumLang" class="create_form" value=`${sumlang}`)
+                  input(type="text" id="sumLang" name="keyword" class="create_form" value=`${keyword}`)
                 li.gallery-spec-item
                   strong.gallery-spec-key Term
-                  input(type="month" id="pjdate1" name="pjdate1" class="create_form" value=`${startDate}`)
+                  input(type="month" id="pjdate1" name="projectDate1" class="create_form" value=`${projectDate1}`)
                   p(id="create_p") ~
-                  input(type="month" id="pjdate2" name="pjdate2" class="create_form" value=`${endDate}`)
+                  input(type="month" id="pjdate2" name="projectDate2" class="create_form" value=`${projectDate2}`)
               strong.gallery-spec-key Summary
               #work1Description
-                textarea(cols="30", rows="10" id="projectExplanation" name="projectExplanation" class="create_form")= `${explanation}`
+                textarea(cols="30", rows="10" id="projectExplanation" name="summary" class="create_form")= `${summary}`
                 strong.gallery-spec-key Demo Link
-                input(type="text" id="projectUrl" name="projectUrl" class="create_form" value=`${url}`)
+                input(type="text" id="projectUrl" name="projectDemoUrl" class="create_form" value=`${projectDemoUrl}`)
                 br
                 strong.gallery-spec-key Github repository Link
-                input(type="text" id="githuburl" name="githuburl" class="create_form" placeholder="This form will get Github Repos README.md file" value=`${githuburl}`)
+                input(type="text" id="githuburl" name="githubUrl" class="create_form" placeholder="This form will get Github Repos README.md file" value=`${githubUrl}`)
                 strong.gallery-spec-key Image Upload
-                input(type="file" id="projectImg" name="projectImg" class="create_form" accept="image/*" value=`${imgurl}`)
+                input(type="file" id="projectImg" name="imageUrl" class="create_form" accept="image/*" value=`${imageUrl}`)
                 input(type="submit")
         #readme.Box.Box--condensed.instapaper_body.md
         .Box-header.px-2.clearfix
