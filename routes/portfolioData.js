@@ -57,7 +57,7 @@ router.get(`/:userId`, function (req, res, next) {
       console.log(data[0])
       if (data[0] === undefined) {
         res.render('customError', {
-          user: userId, // Entered User ID
+          userId: userId, // Entered User ID
           loginedId: ownerCheck, // Logined User ID
           error: 'USER MISSING',
           description: 'Report Please'
@@ -377,45 +377,44 @@ router.get(`/:userId/create`, function (req, res, next) {
 });
 
 /* POST Create_Process Page */
-router.post("/:userId/create_process", upload.single("projectImg"), function (
+router.post("/:userId/create_process", upload.single("imageUrl"), function (
   req,
   res,
   next
 ) {
   console.log('This' + req.file.location);
 
-  let userId = req.params.userId;
   let sid = shortid.generate();
   let userId = req.params.userId;
-  let name = req.body.projectName;
-  let type = req.body.portType;
-  let url = req.body.projectUrl;
-  let explanation = req.body.projectExplanation;
+  let projectName = req.body.projectName;
+  let type = req.body.type;
+  let projectDemoUrl = req.body.projectDemoUrl;
+  let summary = req.body.summary;
   // files information are in req.file object
   // Check Image Process
   let imageUrl = req.file.location;
-  let sumlang = req.body.sumLang;
-  let pjdate1 = req.body.pjdate1;
-  let pjdate2 = req.body.pjdate2;
-  let githuburl = req.body.githuburl;
+  let keyword = req.body.keyword;
+  let projectDate1 = req.body.projectDate1;
+  let projectDate2 = req.body.projectDate2;
+  let githubUrl = req.body.githubUrl;
 
   db.query(
-    "INSERT INTO project (id, userId, name, type, url, explanation, imageUrl, sumlang, pjdate1, pjdate2, githuburl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+    "INSERT INTO project (sid, userId, projectName, type, projectDemoUrl, summary, imageUrl, keyword, projectDate1, projectDate2, githubUrl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
     [
       sid,
       userId,
-      name,
+      projectName,
       type,
-      url,
-      explanation,
+      projectDemoUrl,
+      summary,
       imageUrl,
-      sumlang,
-      pjdate1,
-      pjdate2,
-      githuburl
+      keyword,
+      projectDate1,
+      projectDate2,
+      githubUrl
     ]
   );
-  res.redirect("/" + userId);
+  res.redirect(`/${userId}`);
 });
 
 /* Delete Process */
@@ -424,7 +423,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   console.log(userId + " and " + pageId);
-  db.query(`SELECT imageUrl FROM project WHERE id='${pageId}'`, function (error, data) {
+  db.query(`SELECT imageUrl FROM project WHERE sid='${pageId}'`, function (error, data) {
     if (error) {
       console.log(`Error Message From UPDATE: ${error}`);
     } else {
@@ -443,7 +442,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
       })
     }
   });
-  db.query(`DELETE FROM project WHERE id=${pageId}`, function (
+  db.query(`DELETE FROM project WHERE sid='${pageId}'`, function (
     error,
     data
   ) {
@@ -453,14 +452,14 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
     console.log(data);
   });
   /* TODO :: ERROR IN userID*/
-  res.redirect("/" + userId);
+  res.redirect(`/${userId}`);
 });
 
 /* GET Update Page */
 router.get("/:userId/:pageId/update", function (req, res) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  db.query(`SELECT * FROM project WHERE id=?`, [pageId], function (
+  db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
     error,
     data
   ) {
@@ -477,15 +476,15 @@ router.get("/:userId/:pageId/update", function (req, res) {
     res.render("update", {
       userId: userId,
       pageId: pageId,
-      name: results.name,
+      projectName: results.projectName,
       type: results.type,
-      url: results.url,
-      explanation: results.explanation,
+      projectDemoUrl: results.projectDemoUrl,
+      summary: results.summary,
       imageUrl: imageNullCheck,
-      startDate: results.pjdate1.substr(0, 7),
-      endDate: results.pjdate2.substr(0, 7),
-      githuburl: results.githuburl,
-      sumlang: results.sumlang
+      projectDate1: results.projectDate1.substr(0, 7),
+      projectDate2: results.projectDate2.substr(0, 7),
+      githubUrl: results.githubUrl,
+      keyword: results.keyword
     });
   });
 });
@@ -493,11 +492,11 @@ router.get("/:userId/:pageId/update", function (req, res) {
 /* POST Update Page */
 router.post(
   "/:userId/:pageId/update_process",
-  upload.single("projectImg"),
+  upload.single("imageUrl"),
   function (req, res) {
     let userId = req.params.userId;
     let pageId = req.params.pageId;
-    db.query(`SELECT imageUrl FROM project WHERE id=?`, [pageId], function (
+    db.query(`SELECT imageUrl FROM project WHERE sid=?`, [pageId], function (
       error,
       data
     ) {
@@ -505,36 +504,34 @@ router.post(
         throw error;
       }
       console.log(data[0]);
-      let name = req.body.projectName;
-      let type = req.body.portType;
-      let url = req.body.projectUrl;
-      let explanation = req.body.projectExplanation;
+      let projectName = req.body.projectName;
+      let type = req.body.type;
+      let projectDemoUrl = req.body.projectDemoUrl;
+      let summary = req.body.summary;
       let imageUrl = req.file ? req.file.location : undefined;
-      let sumlang = req.body.sumLang;
-      let pjdate1 = req.body.pjdate1;
-      let pjdate2 = req.body.pjdate2;
-      let githuburl = req.body.githuburl;
-
-      console.log(pjdate1)
+      let keyword = req.body.keyword;
+      let projectDate1 = req.body.projectDate1;
+      let projectDate2 = req.body.projectDate2;
+      let githubUrl = req.body.githubUrl;
       // If imageUrl is undefined
       if (imageUrl === undefined) {
         db.query(
-          `UPDATE project SET name=?, type=?, url=?, explanation=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
+          `UPDATE project SET projectName=?, type=?, projectDemoUrl=?, summary=?, keyword=?, projectDate1=?, projectDate2=?, githubUrl=? WHERE sid=?`,
           [
-            name,
+            projectName,
             type,
-            url,
-            explanation,
-            sumlang,
-            pjdate1,
-            pjdate2,
-            githuburl,
+            projectDemoUrl,
+            summary,
+            keyword,
+            projectDate1,
+            projectDate2,
+            githubUrl,
             pageId
           ]
         );
         // If imageUrl is exist
       } else {
-        db.query(`SELECT imageUrl FROM project WHERE id='${pageId}'`, function (error, data) {
+        db.query(`SELECT imageUrl FROM project WHERE sid='${pageId}'`, function (error, data) {
           if (error) {
             console.log(`Error Message From UPDATE: ${error}`);
           } else {
@@ -557,17 +554,17 @@ router.post(
           }
         });
         db.query(
-          `UPDATE project SET name=?, type=?, url=?, explanation=?, imageUrl=?, sumlang=?, pjdate1=?, pjdate2=?, githuburl=? WHERE id=?`,
+          `UPDATE project SET projectName=?, type=?, projectDemoUrl=?, summary=?, imageUrl=?, keyword=?, projectDate1=?, projectDate2=?, githubUrl=? WHERE sid=?`,
           [
-            name,
+            projectName,
             type,
-            url,
-            explanation,
+            projectDemoUrl,
+            summary,
             imageUrl,
-            sumlang,
-            pjdate1,
-            pjdate2,
-            githuburl,
+            keyword,
+            projectDate1,
+            projectDate2,
+            githubUrl,
             pageId
           ]
         );
