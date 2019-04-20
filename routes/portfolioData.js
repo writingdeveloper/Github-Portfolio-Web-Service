@@ -190,8 +190,8 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
     if (error) {
       throw (`Error from Router /:userId/admin/getData Router \n ${error}`)
     }
-    console.log(data[0].registerTime);
-    if (data[0].registerTime === 'Google') {
+    console.log(data[0].registerType);
+    if (data[0].registerType === 'Google') {
       res.json('Type:Google')
     } else {
       // User Repository API Option Set
