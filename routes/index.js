@@ -80,9 +80,6 @@ router.use(
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
-  console.log('/', req.user);
-  // Parse LinkedIn Profile Image
-  let id = req.body.id;
   // Main page Profile Data Process
   db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 5`, function (error, data) { // GET Data sort with register_time and get 6 Profile
     // Log Error
@@ -97,7 +94,6 @@ router.get("/", function (req, res, next) {
     }
     // Main Page BIO NULL Check
     data.forEach(results => {
-      console.log(results.bio);
       if (results.bio === null) {
         results.bio = 'NO BIO';
       }
