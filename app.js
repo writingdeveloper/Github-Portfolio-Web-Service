@@ -4,14 +4,20 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const db = require("./lib/db");
+
+const request = require("request");
+const moment = require('moment-timezone');
+
 const app = express();
 
 app.io = require('socket.io')();
 
+const server = require('./routes/server.js');
 const indexRouter = require('./routes/index.js');
 const portfolioRouter = require('./routes/portfolioData.js');
 const mypageRouter = require('./routes/mypage.js');
 const errorRouter = require('./routes/error.js');
+
 
 
 // view engine setup
@@ -27,10 +33,12 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
+app.use('/telegram', server); // Telegram Bot Router
 app.use('/', indexRouter);
 app.use('/', portfolioRouter);
 app.use('/', mypageRouter);
 app.use('/reportError', errorRouter); // Error Page Router
+
 
 
 // catch 404 and forward to error handler
@@ -51,6 +59,10 @@ app.use(function (err, req, res, next) {
   let errorFrom = req.header('Referer');
   // Error Report SQL
   db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
+  const telegramKey = process.env.telegramKey;
+  let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
+  let coreMessage = `ERROR TIME : ${timeData} ERROR MESSAGE : ${errorMessage} ERROR FROM : ${errorFrom} ERROR SENDER : ${sender}`;
+  request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
   // render the error page
   res.status(err.status || 500);
   res.render('error');
