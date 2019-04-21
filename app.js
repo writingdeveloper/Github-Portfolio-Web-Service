@@ -10,6 +10,7 @@ app.io = require('socket.io')();
 
 const indexRouter = require('./routes/index.js');
 const portfolioRouter = require('./routes/portfolioData.js');
+const mypageRouter = require('./routes/mypage.js');
 const errorRouter = require('./routes/error.js');
 
 
@@ -28,6 +29,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/', portfolioRouter);
+app.use('/', mypageRouter);
 app.use('/reportError', errorRouter); // Error Page Router
 
 
@@ -42,13 +44,13 @@ app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
   console.log(err);
-  console.log(req.connection.remoteAddress.split(`:`).pop());
+  // console.log(req.connection.remoteAddress.split(`:`).pop());
   let sender = req.connection.remoteAddress.split(`:`).pop();
-  let errorMessage= err.message;
-  let userAgent =req.get('User-Agent');
+  let errorMessage = err.message;
+  let userAgent = req.get('User-Agent');
   let errorFrom = req.header('Referer');
-
-  db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent , 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
+  // Error Report SQL
+  db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
   // render the error page
   res.status(err.status || 500);
   res.render('error');
@@ -70,10 +72,10 @@ app.io.on('connection', function (socket) {
 
   // Send Message Socket
   socket.on('say', function (data) {
-    console.log(`${data.userId} : ${data.msg}`);
+    // console.log(`${data.userId} : ${data.msg}`);
     //chat message to the others
     app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
-    console.log(`Message Send to : ${data.joinedRoomName}`)
+    // console.log(`Message Send to : ${data.joinedRoomName}`)
     // console.log(`Message Content : ${data.userId} : ${data.message}`);
     // Chat Message Save to DB SQL
     db.query(`INSERT INTO chatData (roomName, chatSender, chatReceiver, chatMessage) VALUES (?,?,?,?)`, [data.joinedRoomName, data.userId, data.receiver, data.msg])
@@ -101,7 +103,6 @@ app.io.on('connection', function (socket) {
       }
       let count = data[0]['COUNT(notice)'];
       // console.log(data[0]['COUNT(notice)']);
-
       // console.log(COUNT(notice));
       app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count)
       // console.log(`SEND NOTICE TO ${counterTo} NUM : ${count}`)
@@ -122,7 +123,7 @@ app.io.on('connection', function (socket) {
       if (index != -1) {
         whoIsTyping.splice(index, 1);
         if (whoIsTyping.length == 0) {
-          console.log('emit endTyping');
+          // console.log('emit endTyping');
           app.io.emit('endTyping');
         } else {
           app.io.emit('typing', whoIsTyping);
