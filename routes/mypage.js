@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require("../lib/db");
 const request = require("request");
+const shortid = require("shortid");
+const bodyParser = require("body-parser");
 
 /* GET MyPage Page */
 router.get(`/:userId/admin/mypage`, function (req, res, next) {
