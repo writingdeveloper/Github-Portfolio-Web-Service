@@ -72,7 +72,7 @@ setInterval(intervalCheck, 3000);
 
 /* Scroll To Bottom in Chat Area */
 function Scroll() {
-    let d = $('.msg_history')
+    let d = $('.mesgs')
     d.scrollTop(d.prop("scrollHeight"))
 }
 
@@ -139,7 +139,6 @@ $(function () {
                 joinedRoomName
             });
         } else if ($('#message').val() == "" && whoIsTyping.includes(others)) {
-
             socket.emit('quitTyping', {
                 others,
                 joinedRoomName
