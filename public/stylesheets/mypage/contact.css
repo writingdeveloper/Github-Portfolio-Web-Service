@@ -224,6 +224,8 @@ img {
     font-size: 15px;
     min-height: 48px;
     width: 100%;
+    padding-left: 12px;
+    padding-top: 10px;
 }
 
 .type_msg {
@@ -240,8 +242,8 @@ img {
     font-size: 17px;
     height: 33px;
     position: absolute;
-    right: 0;
-    top: 8px;
+    right: 11px;
+    top: 13px;
     width: 33px;
 }
 
