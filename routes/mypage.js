@@ -32,7 +32,6 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
       for (var i = 0; i < data.length; i++) {
         if (data[i].imageUrl === null) {
           data[i].imageUrl = '/images/app/404.png'
-          console.log(`HELLO WORKS!`)
         }
       }
       data.forEach(results => {
@@ -56,11 +55,9 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
               throw (`Error From Router /:userId/mypage \n ${error}`);
             }
             if (todayVisitorData[0] === undefined) {
-              console.log('NULL');
               todayVisitorData[0] = 0;
               db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
             }
-            console.log(todayVisitorData);
             let chartData = [];
             if (visitorData.length < 7) { // If visitor data's length is lower than 7, Push Data 0 to create Array
               for (let i = 0; i < 7 - visitorData.length; i++) {
@@ -69,7 +66,6 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
             }
             for (let i = 0; i < visitorData.length; i++) { // Create Counter Array for chart data
               chartData.push(visitorData[i].counter)
-              console.log(chartData);
             }
             res.render('mypage/main', {
               userId: userId,
@@ -135,7 +131,6 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
             let projectDate1 = result[i].created_at;
             let projectDate2 = result[i].updated_at;
             let sqlData = [sid, userId, projectName, projectDemoUrl, githubUrl, summary, projectDate1.split('T')[0], projectDate2.split('T')[0]];
-            console.log(sqlData);
             let sql = `INSERT INTO project (sid, userId , projectName, projectDemoUrl, githubUrl, summary, projectDate1, projectDate2) VALUES (?,?,?,?,?,?,?,?)`;
             db.query(sql, sqlData);
           }
@@ -169,7 +164,7 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
         throw (`Error From ${userId}/admin/user Router ${error}`);
       }
       let results = data[0];
-      let uniqueId = `${results.userId}-${results.registerTime}`;
+      let uniqueId = `${results.loginId}-${results.registerType}`;
       res.render('mypage/user', {
         userId: userId,
         uniqueId: uniqueId,
