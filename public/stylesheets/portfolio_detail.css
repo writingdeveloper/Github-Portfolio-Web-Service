@@ -173,6 +173,10 @@ button {
   .container {
     max-width: 1600px;
   }
+
+  #first_nav {
+    height: auto;
+  }
 }
 
 
