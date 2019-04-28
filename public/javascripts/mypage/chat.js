@@ -3,24 +3,24 @@
 /* Contact Search Filter */
 function filter() {
     // Declare variables
-    var input, filter, ul, li, a, i, txtValue;
+    let input, filter, ul, li, a, i, txtValue;
     input = document.getElementById('contactSearch');
     filter = input.value.toUpperCase();
     // console.log(filter);
     ul = document.getElementById("contact");
     li = ul.getElementsByClassName('chat_list')
-  
+
     // Loop through all list items, and hide those who don't match the search query
     for (i = 0; i < li.length; i++) {
-      a = document.getElementsByClassName("chat_list")[i];
-      txtValue = a.textContent || a.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        li[i].style.display = "";
-      } else {
-        li[i].style.display = "none";
-      }
+        a = document.getElementsByClassName("chat_list")[i];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
     }
-  }
+}
 
 
 /* Chat Functions */
@@ -79,18 +79,18 @@ function Scroll() {
 /* SocketIO Functions */
 $(function () {
     $('#message').focus(); // Init Focus to Input
-    var fontColor = 'black';
-    var nickName = '';
-    var whoIsTyping = [];
+    let fontColor = 'black';
+    let nickName = '';
+    let whoIsTyping = [];
 
-    /* When Submit */
+    /* Submit Event (Keyboard Enter) */
     $('#chat').submit(function () {
         if (joinedRoomName === undefined) {
             $('#message').val('Joined ROOM First!!');
         } else {
             //submit only if it's not empty
             if ($('#message').val() != "") {
-                var msg = $('#message').val();
+                let msg = $('#message').val();
                 socket.emit('say', {
                     msg: msg,
                     userId: userId,
@@ -99,7 +99,30 @@ $(function () {
                     joinedRoomName: joinedRoomName
                 });
             }
-            //say event means someone transmitted chat
+            // Say event means someone transmitted chat
+            $('#message').val('');
+            socket.emit('quitTyping')
+        }
+        return false;
+    });
+
+    /* Click Event (Click Send Button) */
+    $('.msg_send_btn').click(function () {
+        if (joinedRoomName === undefined) {
+            $('#message').val('Joined ROOM First!!');
+        } else {
+            //submit only if it's not empty
+            if ($('#message').val() != "") {
+                let msg = $('#message').val();
+                socket.emit('say', {
+                    msg: msg,
+                    userId: userId,
+                    loginedId: userId,
+                    receiver: others,
+                    joinedRoomName: joinedRoomName
+                });
+            }
+            // Say event means someone transmitted chat
             $('#message').val('');
             socket.emit('quitTyping')
         }
