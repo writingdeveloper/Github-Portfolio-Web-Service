@@ -198,7 +198,7 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
   /* MyPage User Chat Room */
   router.get(`/:userId/admin/contact`, function (req, res, next) {
     let userId = req.params.userId;
-    let loginedId = req.user.loginId;
+    // let loginedId = req.user.loginId;
     let chatListImageArray = [];
     let profileImageArray = [];
     db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
@@ -232,7 +232,7 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
       // }
       res.render('mypage/contact', {
         userId: userId,
-        loginedId: loginedId,
+        // loginedId: loginedId,
         room: room
         // profileImage: profileImageArray
         // })
