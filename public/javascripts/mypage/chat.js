@@ -94,7 +94,7 @@ $(function () {
                 socket.emit('say', {
                     msg: msg,
                     userId: userId,
-                    loginedId: loginedId,
+                    loginedId: userId,
                     receiver: others,
                     joinedRoomName: joinedRoomName
                 });
@@ -113,6 +113,7 @@ $(function () {
         d = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours() > 12 ? d.getHours() - 12 : d.getHours()} : ${d.getMinutes()} ${(d.getHours() >= 12 ? "PM" : "AM")}`;
         if (data.userId != userId) {
             $('.msg_history').append(`<div class="incoming_msg"><div class="incoming_msg_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"></div><div class="received_msg"><div class="received_withd_msg"><p>${data.msg}</p><span class="time_date">${d}</span></div></div></div>`);
+            $('#chatData').text(`${data.msg}`)
         } else {
             $('.msg_history').append(`<div class="outgoing_msg"><div class="sent_msg"><p>${data.msg}</p><span class="time_date"> ${d}</span></div></div>`);
         }

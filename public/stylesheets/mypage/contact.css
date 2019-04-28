@@ -121,7 +121,7 @@ img {
     float: right;
 }
 
-.chat_ib p {
+#chatData {
     font-size: 14px;
     color: #989898;
     margin: auto

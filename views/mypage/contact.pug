@@ -41,7 +41,7 @@ block content
 										=`${roomData.chatSender}`
 									- }
 								span.chat_date Dec 25
-								p
+								#chatData
 									| Test, which is a new approach to have all solutions
 									| astrology under one roof.
 		.mesgs
@@ -55,9 +55,5 @@ block content
 						i.fa.fa-paper-plane(aria-hidden='true')
 
 block customJS
-	// Custom scripts
-	script.
-		//- let userId=!{JSON.stringify(userId)}
-		let loginedId=!{JSON.stringify(loginedId)}
 	// Chat JS
 	script(src='/javascripts/mypage/chat.js')
