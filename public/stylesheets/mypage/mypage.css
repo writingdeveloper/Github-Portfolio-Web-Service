@@ -13,6 +13,10 @@ body {
   height: 100%;
 }
 
+.bg-dark {
+  background-color: #252831 !important;
+}
+
 #wrapper {
   display: -webkit-box;
   display: -ms-flexbox;
@@ -399,12 +403,12 @@ td>img {
   margin-left: 0px;
 }
 
-#profileImageContainer{
+#profileImageContainer {
   width: 20rem;
   margin-right: 30px;
 }
 
-#profile{
+#profile {
   min-width: 40%;
 }
 
@@ -434,4 +438,3 @@ td>img {
 .tooltip.left .tooltip-arrow {
   border-left-color: #00acd6;
 }
-

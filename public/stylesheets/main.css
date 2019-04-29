@@ -8,12 +8,16 @@ body {
   color: #5a5a5a;
 }
 
-.col-md-5 > img {
+.bg-dark {
+  background-color: #252831 !important;
+}
+
+.col-md-5>img {
   -webkit-box-shadow: 0 0 60px 0 #bdbdbd;
-    -moz-box-shadow: 0 0 60px 0 #bdbdbd;
-    -ms-box-shadow: 0 0 60px 0 #bdbdbd;
-    -o-box-shadow: 0 0 60px 0 #bdbdbd;
-    box-shadow: 0 0 60px 0 #bdbdbd;
+  -moz-box-shadow: 0 0 60px 0 #bdbdbd;
+  -ms-box-shadow: 0 0 60px 0 #bdbdbd;
+  -o-box-shadow: 0 0 60px 0 #bdbdbd;
+  box-shadow: 0 0 60px 0 #bdbdbd;
 }
 
 
