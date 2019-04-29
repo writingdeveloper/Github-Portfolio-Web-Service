@@ -21,9 +21,6 @@ socket.on('noticeAlarm', function (count) {
     }
 });
 
-
-// socket.on('noticeAlarm')
-
 // Side bar
 ! function (t) {
     "use strict";
