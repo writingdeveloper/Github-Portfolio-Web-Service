@@ -25,7 +25,7 @@ body {
 
 
 .navbar-brand {
-  letter-spacing: 8px;
+  letter-spacing: 3px;
   text-transform: uppercase;
 }
 
@@ -140,12 +140,16 @@ button {
 
 
 /* CUSTOM */
-@media screen and (max-width:575px) {
+@media screen and (max-width:600px) {
 
   .col-md-4 {
     -ms-flex: 0 0 100%;
     flex: 0 0 100%;
     max-width: 100%;
+  }
+
+  button {
+    padding: 6px 1px 6px 1px;
   }
 
   .container {
