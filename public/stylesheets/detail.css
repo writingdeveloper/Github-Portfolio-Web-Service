@@ -270,7 +270,7 @@ div#readme h1 {
 }
 
 
-@media screen and (max-width:575px) {
+@media screen and (max-width:600px) {
   .primary {
     display: block;
     font-size: 28px;
@@ -292,5 +292,9 @@ div#readme h1 {
 
   .gallery-image-thumb {
     width: 100%;
+  }
+
+  .p-5 {
+    padding: 10px 3px 10px 3px !important;
   }
 }
