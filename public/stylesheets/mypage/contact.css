@@ -45,6 +45,12 @@ body {
     grid-area: c;
 }
 
+#contactListButton {
+    grid-area: l;
+    cursor: pointer;
+    display: none;
+}
+
 /* Chat */
 
 img {
@@ -266,10 +272,10 @@ img {
         padding-bottom: 0px !important;
 
         grid-template-columns: repeat(8, 1fr);
-        grid-template-rows: 1fr 1fr 1fr 1fr 1fr 60px;
+        grid-template-rows: 0.4fr 1fr 1fr 1fr 1fr 60px;
         grid-template-areas:
-            "r r r r r r r r"
-            "r r r r r r r r"
+            "l l l l l l l l"
+            "m m m m m m m m"
             "m m m m m m m m"
             "m m m m m m m m"
             "m m m m m m m m"
@@ -277,6 +283,21 @@ img {
     }
 
     .inbox_people {
-        /* display: none; */
+        display: none;
+    }
+
+    #contactListButton {
+        grid-area: l;
+        background-color: #3B4C80;
+        cursor: pointer;
+        display: block;
+        text-align: center;
+    }
+
+    #contactListContent {
+        transform: translateY(50%);
+        color: #C2D1FF;
+        font-size: larger;
+        font-weight: bolder;
     }
 }
