@@ -4,8 +4,8 @@ const bodyParser = require("body-parser");
 const path = require("path");
 const request = require("request");
 const shortid = require("shortid");
-let session = require('express-session')
-let FileStore = require('session-file-store')(session)
+let session = require('express-session');
+let FileStore = require('session-file-store')(session);
 
 router.use(session({
   secret: process.env.session_secret || 'Hello World',
