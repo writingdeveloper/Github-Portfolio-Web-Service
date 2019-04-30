@@ -58,14 +58,15 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
             h4.card-title
               a(href=`/${userId}/${projects.sid}`)
                 = projects.projectName
-            - if(projects.summary) {
+            - if(projects.keyword){
             p.card-keyword
               = `Keyword : ${projects.keyword}`
             - }
+            - if(projects.summary) {
             p.card-text
               = `${projects.summary}`
+            - } 
           a(href= `/${userId}/${projects.sid}` class="viewDetail") View Details
-  // /.row
   // Pagination
   ul.pagination.justify-content-center
     li.page-item
