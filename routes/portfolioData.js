@@ -1,19 +1,19 @@
 const express = require('express');
 const path = require("path");
-const shortid = require("shortid");
+const shortid = require("shortid"); // Short ID Module
 const bodyParser = require("body-parser");
-const db = require("../lib/db");
-const aws = require('aws-sdk')
-const multer = require("multer"); // multer모듈 적용 (for 파일업로드)
-const multerS3 = require('multer-s3');
+const db = require("../lib/db");  // DB Connection Module
+const aws = require('aws-sdk')  // Amazon SDK Module
+const multer = require("multer"); // File Upload Module
+const multerS3 = require('multer-s3');  // Amazon S3 Storage Upload Module
 const router = express.Router();
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
 // Parsing Dependency
-const cheerio = require("cheerio");
-const request = require("request");
+const cheerio = require("cheerio"); // Parsing Module
+const request = require("request"); // Request Module
 
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
@@ -29,7 +29,6 @@ let upload = multer({
     key: function (req, file, cb) {
       let newFileName = Date.now() + "-" + file.originalname;
       let fullPath = `public/images/member/${req.params.userId}/${newFileName}`;
-      console.log(file);
       cb(null, fullPath); //use Date.now() for unique file keys
     }
   })
@@ -45,14 +44,13 @@ router.get(`/:userId`, function (req, res, next) {
   } else {
     ownerCheck = req.user.loginId;
   }
-  // console.log(userId);
 
   db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
     if (error) {
-      console.log('error');
+      throw `${error} in /:userId Page`
     } else {
       if (data[0] === undefined) {
-        res.render('customError', {
+        res.render('customError', { // User Missing Error Handling
           userId: userId, // Entered User ID
           loginedId: ownerCheck, // Logined User ID
           error: 'USER MISSING',
@@ -63,13 +61,26 @@ router.get(`/:userId`, function (req, res, next) {
           `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
           function (error, data) {
             if (error) {
-              throw error;
+              throw `${error} in userId Page`;
             }
+            /* image URL Null Check */
             for (let i = 0; i < data.length; i++) {
               if (data[i].imageUrl === null) {
                 data[i].imageUrl = `/images/app/${data[i].type}.png`;
               } else {
-                data[i].imageUrl = data[i].imageUrl
+                data[i].imageUrl = data[i].imageUrl;
+              }
+            }
+            /* Keyword Null Check*/
+            for(let i=0; i<data.length; i++){
+              if(data[i].keyword === null){
+                data[i].keyword = '';
+              }
+            }
+             /* Summary Null Check*/
+             for(let i=0; i<data.length; i++){
+              if(data[i].summary === null){
+                data[i].summary = '';
               }
             }
             res.render("portfolioItems", {
