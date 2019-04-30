@@ -4,6 +4,10 @@ const db = require("../lib/db");
 const request = require("request");
 const shortid = require("shortid");
 const bodyParser = require("body-parser");
+const path = require("path");
+
+router.use(bodyParser.json());
+router.use(express.static(path.join(__dirname, "public")));
 
 /* GET MyPage Page */
 router.get(`/:userId/admin/mypage`, function (req, res, next) {
@@ -201,7 +205,7 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
     // let loginedId = req.user.loginId;
     let chatListImageArray = [];
     let profileImageArray = [];
-    db.query(`SELECT * FROM chatRoom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
+    db.query(`SELECT * FROM chatroom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
       if (error) {
         throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
       }
@@ -262,14 +266,14 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
     let userId = req.params.userId;
     let loginId = req.user.loginId;
     let roomName = `${loginId}-${userId}`;
-    db.query(`SELECT * FROM chatRoom WHERE roomName=?`, [roomName], function (err, roomCheck) {
+    db.query(`SELECT * FROM chatroom WHERE roomName=?`, [roomName], function (err, roomCheck) {
       if (err) {
         throw `Error from /:userId/contact Router \n${err}`
       }
       // Checks Room Exist
       if (roomCheck[0] === undefined) {
         // Create Room
-        db.query(`INSERT INTO chatRoom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginId])
+        db.query(`INSERT INTO chatroom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginId])
         res.redirect(`/${loginId}/admin/contact`)
       } else {
         res.redirect(`/${loginId}/admin/contact`)
