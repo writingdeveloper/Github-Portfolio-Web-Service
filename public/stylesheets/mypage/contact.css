@@ -20,21 +20,24 @@ body {
     grid-template-columns: repeat(8, 1fr);
     grid-template-rows: 1fr 1fr 1fr 1fr 1fr 60px;
     grid-template-areas:
-        "r r m m m m m m"
-        "r r m m m m m m"
-        "r r m m m m m m"
-        "r r m m m m m m"
-        "r r m m m m m m"
-        "r r c c c c c c";
+        "l l m m m m m m"
+        "l l m m m m m m"
+        "l l m m m m m m"
+        "l l m m m m m m"
+        "l l m m m m m m"
+        "l l t t t t t t";
+}
+
+#contactListButton {
+    display: none;
 }
 
 #wrapper {
     height: calc(100% - 56px) !important;
 }
 
-
 .inbox_people {
-    grid-area: r;
+    grid-area: l;
 }
 
 .mesgs {
@@ -42,11 +45,11 @@ body {
 }
 
 .type_msg {
-    grid-area: c;
+    grid-area: t;
 }
 
 #contactListButton {
-    grid-area: l;
+    grid-area: b;
     cursor: pointer;
     display: none;
 }
@@ -275,22 +278,22 @@ img {
         grid-template-rows: 0.4fr 1fr 1fr 1fr 1fr 60px;
         grid-template-areas:
             "l l l l l l l l"
-            "m m m m m m m m"
-            "m m m m m m m m"
-            "m m m m m m m m"
-            "m m m m m m m m"
-            "c c c c c c c c";
+            "l l l l l l l l"
+            "l l l l l l l l"
+            "l l l l l l l l"
+            "l l l l l l l l"
+            "l l l l l l l l";
     }
 
     .inbox_people {
-        display: none;
+        display: block;
     }
 
     #contactListButton {
-        grid-area: l;
+        grid-area: b;
         background-color: #3B4C80;
         cursor: pointer;
-        display: block;
+        display: none;
         text-align: center;
     }
 
@@ -299,5 +302,13 @@ img {
         color: #C2D1FF;
         font-size: larger;
         font-weight: bolder;
+    }
+
+    .mesgs {
+        display: none;
+    }
+
+    .type_msg{
+        display: none;
     }
 }

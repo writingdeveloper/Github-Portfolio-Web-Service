@@ -11,7 +11,7 @@ function filter() {
     li = ul.getElementsByClassName('chat_list')
 
     // Loop through all list items, and hide those who don't match the search query
-    for (i = 0; i < li.length; i++) {
+    for (let i = 0; i < li.length; i++) {
         a = document.getElementsByClassName("chat_list")[i];
         txtValue = a.textContent || a.innerText;
         if (txtValue.toUpperCase().indexOf(filter) > -1) {
@@ -22,13 +22,58 @@ function filter() {
     }
 }
 
+/* Back to Contact list Button Action in Mobile web */
+document.getElementById('contactListButton').onclick = function () {
+    let buttonElement = document.getElementById('contactListButton');
+    let mesgElement = document.getElementsByClassName('mesgs')[0];
+    let contactList = document.getElementsByClassName('inbox_people')[0];
+    let typeMessage = document.getElementsByClassName('type_msg')[0];
+    contactList.style.display = "block";
+    buttonElement.style.display = 'none';
+    mesgElement.style.display = 'none';
+    typeMessage.style.display = 'none';
+
+    let elem = document.getElementById('content-wrapper');
+    elem.style.gridTemplateAreas = '"l l l l l l l l" "l l l l l l l l" "l l l l l l l l" "l l l l l l l l" "l l l l l l l l" "l l l l l l l l"';
+}
+
+/* Responsive (Mobile) Display */
+function responsiveMobileDisplay() {
+    let buttonElement = document.getElementById('contactListButton');
+    let mesgElement = document.getElementsByClassName('mesgs')[0];
+    let contactList = document.getElementsByClassName('inbox_people')[0];
+    let typeMessage = document.getElementsByClassName('type_msg')[0];
+    let elem = document.getElementById('content-wrapper');
+
+    contactList.style.display = "none";
+    buttonElement.style.display = 'block';
+    mesgElement.style.display = 'block';
+    typeMessage.style.display = 'inline';
+    elem.style.gridTemplateAreas = '"b b b b b b b b" "m m m m m m m m" "m m m m m m m m" "m m m m m m m m" "m m m m m m m m" "t t t t t t t t"';
+}
+
+/*  Responsive (Desktop) Display */
+function responsiveDesktopDisplay(){
+    let typeMessage = document.getElementsByClassName('type_msg')[0];
+    let mesgElement = document.getElementsByClassName('mesgs')[0];
+    let elem = document.getElementById('content-wrapper');
+    mesgElement.style.display = 'block';
+    typeMessage.style.display = 'inline';
+    elem.style.gridTemplateAreas = '"l l m m m m m m" "l l m m m m m m" "l l m m m m m m" "l l m m m m m m" "l l m m m m m m" "l l t t t t t t"';
+
+}
 
 /* Chat Functions */
-// let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
 let joinedRoomName, current, others;
 
 /* Click Each Room list Function */
 function joinChat() {
+    let screenWidth = $(document).width();
+    if (screenWidth < 800) {
+        responsiveMobileDisplay();
+    } else {
+        responsiveDesktopDisplay();
+    }
     joinedRoomName = window.event.target.id; // Get clicked id (ROOM NAME)
     others = document.getElementById(joinedRoomName).innerHTML; // Talk with this person
     $('.msg_history').empty(); // to Remove Previous Chats
