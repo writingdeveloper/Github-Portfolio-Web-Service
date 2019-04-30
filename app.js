@@ -35,8 +35,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/telegram', server); // Telegram Bot Router
 app.use('/', indexRouter);
-app.use('/', portfolioRouter);
 app.use('/', mypageRouter);
+app.use('/', portfolioRouter);
 app.use('/reportError', errorRouter); // Error Page Router
 
 
