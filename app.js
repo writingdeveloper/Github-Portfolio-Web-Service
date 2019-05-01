@@ -17,6 +17,7 @@ setInterval(function () {
 /* Socket IO */
 app.io = require('socket.io')();
 
+/* Router Sequences */
 const server = require('./routes/server.js');
 const indexRouter = require('./routes/index.js');
 const portfolioRouter = require('./routes/portfolioData.js');
