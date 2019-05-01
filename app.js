@@ -11,7 +11,7 @@ const app = express();
 
 /* Prevent Sleep in Heroku Server */
 setInterval(function () {
-  http.get("https://expressme.herokuapp.com");
+  http.get("http://expressme.herokuapp.com");
 }, 600000); // every 10 minutes
 
 /* Socket IO */
