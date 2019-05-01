@@ -1,15 +1,20 @@
-const createError = require('http-errors');
 const express = require('express');
+const createError = require('http-errors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 const db = require("./lib/db");
-
 const request = require("request");
 const moment = require('moment-timezone');
-
+const http = require("http");
 const app = express();
 
+/* Prevent Sleep in Heroku Server */
+setInterval(function () {
+  http.get("https://expressme.herokuapp.com");
+}, 600000); // every 10 minutes
+
+/* Socket IO */
 app.io = require('socket.io')();
 
 const server = require('./routes/server.js');
@@ -18,12 +23,11 @@ const portfolioRouter = require('./routes/portfolioData.js');
 const mypageRouter = require('./routes/mypage.js');
 const errorRouter = require('./routes/error.js');
 
-
-
-// view engine setup
+/* View Engine Setup to PUG */
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
+/* Logger & Path Set */
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({
@@ -32,27 +36,23 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
+/* Router Set */
 app.use('/telegram', server); // Telegram Bot Router
 app.use('/', indexRouter);
 app.use('/', mypageRouter);
 app.use('/', portfolioRouter);
 app.use('/reportError', errorRouter); // Error Page Router
 
-
-
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-// error handler
+/* Error Handler */
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-  console.log(err);
-  // console.log(req.connection.remoteAddress.split(`:`).pop());
   let sender = req.connection.remoteAddress.split(`:`).pop();
   let errorMessage = err.message;
   let userAgent = req.get('User-Agent');
@@ -69,7 +69,6 @@ app.use(function (err, req, res, next) {
 });
 
 /* Socket IO Functions */
-
 app.io.on('connection', function (socket) {
   // Join Room Scoket
   socket.on('JoinRoom', function (data) {
@@ -149,5 +148,4 @@ app.io.on('connection', function (socket) {
 });
 
 console.log('Now It Works Fine in Port 3000');
-
 module.exports = app;
