@@ -5,9 +5,8 @@ function checkDelete() {
   return confirm("Are you really sure to delete this Data?");
 }
 
-
 /* Copy URL */
-var clipboard = new Clipboard('#btn-copy', {
+let clipboard = new Clipboard('#btn-copy', {
   text: function () {
     return document.querySelector('input[type=hidden]').value;
   }
@@ -28,7 +27,6 @@ if (navigator.vendor.indexOf("Apple") == 0 && /\sSafari\//.test(navigator.userAg
 
   });
 }
-
 
 /* ---------- Main PAGE ---------- */
 
@@ -111,6 +109,25 @@ function selectBoxUpdate() {
     }
   }
 }
+
+/* QR Code Button Function */
+let clickqrCode = document.getElementById('qrCode').addEventListener('click', qrShow);
+
+let data = new QRCode(document.getElementById("hiddenQR"), {
+  text: window.location.href,
+  correctLevel: QRCode.CorrectLevel.H
+});
+
+function qrShow() {
+  let imageValue = document.getElementById('hiddenQR').value = data._oDrawing._elImage.currentSrc;
+  Swal.fire({
+    title: 'Share it!',
+    imageUrl: imageValue,
+    imageAlt: 'QR Code',
+    footer: `<i class="fas fa-download"> Download QR Code</i>`
+  })
+}
+
 
 /* ---------- CREATE PAGE ---------- */
 

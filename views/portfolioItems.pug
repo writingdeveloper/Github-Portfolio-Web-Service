@@ -9,6 +9,7 @@ head
   link(href='stylesheets/core/bootstrap.min.css', rel='stylesheet')
   // Custom styles for this template
   link(href='/stylesheets/portfolio_detail.css', rel='stylesheet')
+  link(rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous")
 // Navigation
 nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
   .container
@@ -39,10 +40,15 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
     option(value='Certificate') Certifications
     option(value='Education') Education
   - if(ownerCheck === userId) {
-  button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
+  button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) New Data
   -}
   input#input-url(type='hidden', value='Copied!')
   button(class='button' id='btn-copy') Copy URL
+  input#hiddenQR(type='hidden')
+  button(class='button' id='qrCode')
+    i.fas.fa-qrcode
+      p  QR Code
+  div(id='lemon')
 // Page Content
 .container
   // Page Heading
@@ -91,51 +97,8 @@ footer.bg-dark
 // Bootstrap core JavaScript
 script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
 script(src='javascripts/core/bootstrap.min.js')
+//- Custom JavaScript
 script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
+script(type='application/javascript', charset='utf-8', src='javascripts/qrcode.js')
 script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
-
-
-
-
-
-//- extends layout
-
-//- block content
-//-   header
-//-     nav
-//-       h1
-//-         a(href='/')= `${userId}`
-//-   main#maincontent
-//-     section
-//-       .filter-options
-//-         h2 Filter Results
-//-         select#neighborhoods-select(name='neighborhoods', onchange='selectBoxUpdate();')
-//-           option(value='All') All Achievements
-//-           option(value='Project') Projects
-//-           option(value='Certificate') Certifications
-//-           option(value='Education') Education
-//-         button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) Create Information
-//-         input#input-url(type='hidden', value='Copied!')
-//-         button(class='button' id='btn-copy') Copy this URL
-//-     ul#restaurants-list
-//-       each projects in dataarray
-//-         li(class=`${projects.type}`)
-//-           .type-box
-//-             p(class=`paragraph-`+`${projects.type}`)=`${projects.type}`
-//-           img.restaurant-img(src=`/images/member/${userId}/${projects.imgurl}` onerror=`this.src='/images/app/${projects.type}.png'`)
-//-           a(href=`/${projects.id}`)
-//-             h1= projects.name
-//-           p(class="element" style="font-weight: bold")= `Keyword : ${projects.sumlang}`
-//-           p(class="explanation")= `${projects.explanation}`
-//-             br
-//-           a(href= `/${userId}/` + `${projects.id}` class="viewDetail") View Details
-//-   script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
-//-   script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
-//-   script(type='application/javascript', charset='utf-8', src='javascripts/sw_register.js')
-  
-//-   footer#footer
-//-     | Copyright (c) 2018
-//-     a(href='https://www.linkedin.com/in/sihyeonglee/')
-//-       strong Si Hyeong Lee
-//-     |  All Rights Reserved.
