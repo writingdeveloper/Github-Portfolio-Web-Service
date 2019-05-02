@@ -23,7 +23,6 @@ body {
   flex: 1;
 }
 
-
 .navbar-brand {
   letter-spacing: 3px;
   text-transform: uppercase;
@@ -132,14 +131,16 @@ button {
   box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
 
-
 .pagination {
   margin-bottom: 30px;
 }
 
-
-
 /* CUSTOM */
+.fa-qrcode>p {
+  font-size: xx-small;
+  margin-bottom: 0px;
+}
+
 @media screen and (max-width:600px) {
 
   .col-md-4 {
