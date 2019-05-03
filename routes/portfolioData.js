@@ -2,10 +2,11 @@ const express = require('express');
 const path = require("path");
 const shortid = require("shortid"); // Short ID Module
 const bodyParser = require("body-parser");
-const db = require("../lib/db");  // DB Connection Module
-const aws = require('aws-sdk')  // Amazon SDK Module
+const db = require("../lib/db"); // DB Connection Module
+const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
-const multerS3 = require('multer-s3');  // Amazon S3 Storage Upload Module
+const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
+const QRCode = require('qrcode'); // QR Code Generator Module
 const router = express.Router();
 
 router.use(bodyParser.json());
@@ -44,6 +45,10 @@ router.get(`/:userId`, function (req, res, next) {
   } else {
     ownerCheck = req.user.loginId;
   }
+  let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
+  QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
+    console.log(qrCodeImageUrl);
+  
 
   db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
     if (error) {
@@ -72,25 +77,27 @@ router.get(`/:userId`, function (req, res, next) {
               }
             }
             /* Keyword Null Check*/
-            for(let i=0; i<data.length; i++){
-              if(data[i].keyword === null){
+            for (let i = 0; i < data.length; i++) {
+              if (data[i].keyword === null) {
                 data[i].keyword = '';
               }
             }
-             /* Summary Null Check*/
-             for(let i=0; i<data.length; i++){
-              if(data[i].summary === null){
+            /* Summary Null Check*/
+            for (let i = 0; i < data.length; i++) {
+              if (data[i].summary === null) {
                 data[i].summary = '';
               }
             }
             res.render("portfolioItems", {
               dataarray: data,
               userId: userId,
+              qrCodeImageUrl: qrCodeImageUrl,
               ownerCheck: ownerCheck
             });
           });
       }
     }
+  })
   });
 });
 
