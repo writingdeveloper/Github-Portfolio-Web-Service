@@ -1,7 +1,7 @@
 doctype html
 head
   meta(charset='utf-8')
-  meta(name='viewport', content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(name='viewport', content='width=device-width', initial-scale='1')
   meta(name='description', content='')
   meta(name='author', content='')
   title=`${userId}'s Portfolio`
@@ -102,3 +102,6 @@ script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
 script(type='application/javascript', charset='utf-8', src='javascripts/qrcode.js')
 script(type='application/javascript', charset='utf-8', src='javascripts/setting.js')
+script.
+  let qrCodeImageUrl=!{JSON.stringify(qrCodeImageUrl)}
+  let userId=!{JSON.stringify(userId)}
