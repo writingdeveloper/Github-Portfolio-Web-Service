@@ -110,24 +110,18 @@ function selectBoxUpdate() {
   }
 }
 
-/* QR Code Button Function */
+/* QR Code Click Button Function */
 let clickqrCode = document.getElementById('qrCode').addEventListener('click', qrShow);
 
-let data = new QRCode(document.getElementById("hiddenQR"), {
-  text: window.location.href,
-  correctLevel: QRCode.CorrectLevel.H
-});
-
+// QR Code SweetAlert Function
 function qrShow() {
-  let imageValue = document.getElementById('hiddenQR').value = data._oDrawing._elImage.currentSrc;
   Swal.fire({
     title: 'Share it!',
-    imageUrl: imageValue,
+    imageUrl: qrCodeImageUrl,
     imageAlt: 'QR Code',
-    footer: `<i class="fas fa-download"> Download QR Code</i>`
+    footer: `<i class="fas fa-download"><a href="${qrCodeImageUrl}" download="${userId} Portfolio.png"> Download QR Code</a></i>`
   })
 }
-
 
 /* ---------- CREATE PAGE ---------- */
 
