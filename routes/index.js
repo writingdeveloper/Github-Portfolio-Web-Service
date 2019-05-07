@@ -38,7 +38,7 @@ router.get('/auth/github/callback',
   }),
   function (req, res) {
     // Successful authentication, redirect home.
-    // console.log('SUCESS!!' ,req);
+    console.log('SUCESS!!' ,req.user);
     res.redirect(`/${req.user.username}`);
   });
 
@@ -53,7 +53,7 @@ router.get('/auth/google/callback',
   }),
   function (req, res) {
     // Successful authentication, redirect home.
-    res.redirect(`/${req.user.displayName}`);
+    res.redirect(`/`);
   });
 
 /* Login Page Router */
