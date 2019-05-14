@@ -21,7 +21,7 @@ I felt that the existing resume was not suitable for use with the developer's re
 ## TODO
 This Web Application contains the following features:
 
-👨‍💻FINISHED👨‍💻
+## 👨‍💻FINISHED👨‍💻
 
 ✅ Login with Github Function (Passport.js)  
 ✅ Login with Google Function (Passport.js)  
@@ -36,13 +36,24 @@ This Web Application contains the following features:
 
 Please check the detailed function list below.
 
-👨‍💻NOT YET FINISHED👨‍💻
+## 👨‍💻NOT YET FINISHED👨‍💻
 1. When if register with 'Google' users cannot use their portfolio's README.md file
 2. In Mypage check the owner in Server-Side (Pending due to test)
 3. Responsive Design in Chat pages
 4. Developing Personal Introduction Page
 
 ## Detailed Function
+
+### Main Page
+
+### Portfolio Page
+
+✅ Responsive Design with Media Query
+✅ Portfolio Filter Function (Projects, Certifications, Education)
+✅ Image Uploaded in Amazon S3 Storage (Create, Update, Delete function Added)
+
+### Admin Page
+
 
 ### Prerequisites
 
