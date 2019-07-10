@@ -14,6 +14,13 @@ html(lang='en')
 		// Layout CSS
 		block customCSS
 		link(href='/stylesheets/mypage/mypage.css', rel='stylesheet')
+		// Global site tag (gtag.js) - Google Analytics
+		script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-68310012-4')
+		script.
+			window.dataLayer = window.dataLayer || [];
+			function gtag(){dataLayer.push(arguments);}
+			gtag('js', new Date());
+			gtag('config', 'UA-68310012-4');
 body#page-top
 	nav.navbar.navbar-expand.navbar-dark.bg-dark.static-top
 		a.navbar-brand.mr-1(href='/') Portfolio World
