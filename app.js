@@ -49,6 +49,14 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
+/* Redirect http to https */
+app.get('*', function (req, res, next) {
+  if (req.headers['x-forwarded-proto'] != 'https' && process.env.NODE_ENV === 'production')
+    res.redirect('https://' + req.hostname + req.url)
+  else
+    next() /* Continue to other routes if we're not redirecting */
+});
+
 /* Error Handler */
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
