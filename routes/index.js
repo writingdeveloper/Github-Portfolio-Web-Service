@@ -7,6 +7,14 @@ const shortid = require("shortid");
 let session = require('express-session');
 let FileStore = require('session-file-store')(session);
 
+/* Redirect http to https */
+router.get('*', function (req, res, next) {
+  if (req.headers['x-forwarded-proto'] != 'https' && process.env.NODE_ENV === 'production')
+    res.redirect('https://' + req.hostname + req.url)
+  else
+    next() /* Continue to other routes if we're not redirecting */
+});
+
 router.use(session({
   secret: process.env.session_secret || 'Hello World',
   resave: false,
@@ -38,7 +46,7 @@ router.get('/auth/github/callback',
   }),
   function (req, res) {
     // Successful authentication, redirect home.
-    console.log('SUCESS!!' ,req.user);
+    console.log('SUCESS!!', req.user);
     res.redirect(`/${req.user.username}`);
   });
 
