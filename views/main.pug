@@ -72,11 +72,8 @@ main(role='main')
     a.carousel-control-next(href='#myCarousel' role='button' data-slide='next')
       span.carousel-control-next-icon(aria-hidden='true')
       span.sr-only Next
-  //
-    Marketing messaging and featurettes
-    ==================================================
-  // Wrap the rest of the page in another container to center all the content.
-  .container.marketing
+  // Container
+  .container
     // Three columns of text below the carousel
     .row
       .col-lg-4
@@ -94,6 +91,9 @@ main(role='main')
           p=`${profile.bio}`
           p
             a.btn.btn-secondary(href=`/${profile.loginId}` role='button') View details &raquo;
+      .moreUser
+        a(href=`/find-users`)
+          <button type="button" class="btn btn-primary">Discover more users in Expressme</button>
     // /.row
     // START THE FEATURETTES
     hr.featurette-divider

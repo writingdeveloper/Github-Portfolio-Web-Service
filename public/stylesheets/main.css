@@ -50,24 +50,31 @@ body {
 }
 
 
-/* MARKETING CONTENT
--------------------------------------------------- */
-
-/* Center align the text within the three columns below the carousel */
-.marketing .col-lg-4 {
+/* Container */
+.container .col-lg-4 {
   margin-bottom: 1.5rem;
   text-align: center;
+  border-radius: .5rem;
+  box-shadow: 0 2rem 1.5rem -1.5rem rgba(33, 37, 41, .15), 0 0 1.5rem 0.5rem rgba(33, 37, 41, .05);
+  overflow: hidden;
 }
 
-.marketing h2 {
+.container h2 {
   font-weight: 400;
 }
 
-.marketing .col-lg-4 p {
+.col-lg-4 p {
   margin-right: .75rem;
   margin-left: .75rem;
 }
 
+.col-lg-4>.rounded-circle {
+  margin-top: 15px;
+}
+
+.moreUser {
+  margin: 0 auto;
+}
 
 /* Featurettes
 ------------------------- */
