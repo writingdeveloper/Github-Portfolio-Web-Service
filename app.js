@@ -20,6 +20,7 @@ app.io = require('socket.io')();
 /* Router Sequences */
 const server = require('./routes/server.js');
 const indexRouter = require('./routes/index.js');
+const findUserRouter = require('./routes/findUser.js')
 const portfolioRouter = require('./routes/portfolioData.js');
 const mypageRouter = require('./routes/mypage.js');
 const errorRouter = require('./routes/error.js');
@@ -40,6 +41,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 /* Router Set */
 app.use('/telegram', server); // Telegram Bot Router
 app.use('/', indexRouter);
+app.use('/', findUserRouter)
 app.use('/', mypageRouter);
 app.use('/', portfolioRouter);
 app.use('/reportError', errorRouter); // Error Page Router
