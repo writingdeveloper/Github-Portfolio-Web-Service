@@ -32,8 +32,9 @@ router.use(session({
 let favicon = require("serve-favicon");
 router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 
-// DB Import
+/* Import Database Settings */
 const db = require("../lib/db");
+/* Import Authentication Setting (Passport.js) */
 const passport = require('../lib/passport')(router, db, request, shortid);
 
 /* Github Auth Router */
