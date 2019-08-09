@@ -4,7 +4,6 @@ const router = express.Router();
 /* Import Database Settings */
 const db = require("../lib/db");
 
-let page = 8;
 
 router.get("/find-users", function (req, res, next) {
 
@@ -34,6 +33,7 @@ router.get("/find-users", function (req, res, next) {
 });
 
 router.get(`/find-users/moreuser`, function (req, res, next) {
+  let page = 8;
   console.log(page)
   db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT ${page}, 8`, function (error, data) {
     console.log(data.length);
