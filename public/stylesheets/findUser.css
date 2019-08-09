@@ -2,6 +2,10 @@
   --jumbotron-padding-y: 3rem;
 }
 
+.main {
+  background-color: #f8f9fa !important;
+}
+
 .jumbotron {
   padding-top: var(--jumbotron-padding-y);
   padding-bottom: var(--jumbotron-padding-y);
@@ -49,7 +53,7 @@ footer p {
 
 .card-text {
   margin-top: 0;
-  margin-bottom: 1rem;
+  /* margin-bottom: 1rem; */
   display: inline-block;
   white-space: nowrap;
   overflow: hidden;
@@ -57,4 +61,8 @@ footer p {
   white-space: normal;
   line-height: 1.2;
   height: 3.6em;
+}
+
+.moreUser {
+  margin: 0 auto;
 }
