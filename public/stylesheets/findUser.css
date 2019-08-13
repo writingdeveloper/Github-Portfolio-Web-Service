@@ -61,6 +61,7 @@ footer p {
   white-space: normal;
   line-height: 1.2;
   height: 3.6em;
+  width: -webkit-fill-available;
 }
 
 .moreUser {
