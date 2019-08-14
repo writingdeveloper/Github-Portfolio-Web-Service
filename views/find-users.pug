@@ -5,7 +5,7 @@ head
   meta(name='description', content='')
   meta(name='author', content='')
   link(rel='icon', href='/docs/4.0/assets/img/favicons/favicon.ico')
-  title Album example for Bootstrap
+  title Find User
   link(rel='canonical', href='https://getbootstrap.com/docs/4.0/examples/album/')
   // Bootstrap core CSS
   link(rel='stylesheet', href='https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css', integrity='sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T', crossorigin='anonymous')
@@ -40,7 +40,7 @@ main(role='main' class='main')
     .input-group
       input.form-control(type='text', placeholder="Search Skills, Name, etc", aria-label="Recipient's username", aria-describedby='basic-addon2')
       .input-group-append
-        button.btn.btn-outline-secondary(type='button') Search
+        button.btn.btn-outline-secondary(type='button' onclick="searchUsers();") Search
 
 
   .album.py-5.bg-light
