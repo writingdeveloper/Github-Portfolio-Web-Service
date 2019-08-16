@@ -82,7 +82,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
                 = projects.projectName
             - if(projects.keyword){
             p.card-keyword
-              = `Keyword : ${projects.keyword}`
+              = `keyword : ${Object.keys(JSON.parse(projects.keyword))}`
             - }
             - if(projects.summary) {
             p.card-text
