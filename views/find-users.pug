@@ -38,7 +38,7 @@ header
 main(role='main' class='main')
   .container.bg-light
     .input-group
-      input.form-control(type='text', placeholder="Search Skills, Name, etc", aria-label="Recipient's username", aria-describedby='basic-addon2')
+      input.form-control(type='text',  id='searchUsers' placeholder="Search Skills, Name, etc", aria-label="Search Placeholder", aria-describedby='basic-addon2')
       .input-group-append
         button.btn.btn-outline-secondary(type='button' onclick="searchUsers();") Search
 
@@ -57,7 +57,7 @@ main(role='main' class='main')
                         .d-flex.justify-content-between.align-items-center
                             .btn-group
                                 button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='${profile.loginId}'`) View
-                                button.btn.btn-sm.btn-outline-secondary(type='button') Edit
+                                button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='${profile.loginId}/contact'`) Contact
                             small.text-muted 9 mins
       .moreUser
         <button type="button" onclick="loadMoreUsers();" class="btn btn-primary">Load More Users</button>
