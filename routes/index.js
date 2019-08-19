@@ -171,4 +171,39 @@ router.post("/user", function (req, res, next) {
   res.redirect("/");
 });
 
+/* Get newly Data */
+router.get(`/getAllData`, function (req, res, next) {
+  // Main page Profile Data Process
+  db.query(`SELECT * FROM project WHERE keyword IS NULL`, function (error, data) { // GET Data sort with register_time and get 6 Profile
+    // Log Error
+    if (error) {
+      console.log(error);
+    }
+
+    function timer(ms) {
+      return new Promise(res => setTimeout(res, ms));
+    }
+    async function load() { // We need to wrap the loop into an async function for this to work
+      for (let i = 0; i < data.length; i++) {
+        let getDataOption = {
+          url: `https://api.github.com/repos/${data[i].userId}/${data[i].projectName}/languages`,
+          headers: {
+            "User-Agent": "request"
+          }
+        };
+        request(getDataOption, function (err, res, body) {
+          console.log(body);
+          if (err) {
+            console.log(err);
+          }
+          db.query(`UPDATE project SET keyword='${body}' WHERE userId='${data[i].userId}' AND projectName='${data[i].projectName}'`)
+        });
+        await timer(3000); // then the created Promise can be awaited
+      }
+    }
+    load();
+    res.end()
+  });
+});
+
 module.exports = router;
