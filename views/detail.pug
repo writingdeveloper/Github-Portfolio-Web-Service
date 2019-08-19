@@ -49,7 +49,7 @@ section#works.l-section(role='region')
                 span.gallery-spec-value= `${type}`
               li.gallery-spec-item
                 strong.gallery-spec-key Project Keywords
-                span.gallery-spec-value= `${keyword}`
+                span.gallery-spec-value= `${Object.keys(JSON.parse(keyword))}`
               li.gallery-spec-item
                 strong.gallery-spec-key Term
                 span.gallery-spec-value= `${projectDate1} ~ ${projectDate2}`
