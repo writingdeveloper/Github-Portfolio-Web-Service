@@ -25,6 +25,17 @@ head
   link(rel='stylesheet', type='text/css', href='/external/Login/css/util.css')
   link(rel='stylesheet', type='text/css', href='/external/Login/css/main.css')
   // ===============================================================================================
+nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
+  .container
+    a.navbar-brand(href='/')=`Portfolio World`
+    button.navbar-toggler(type='button' id="toolButton", data-toggle='collapse', data-target='#navbarResponsive', aria-controls='navbarResponsive', aria-expanded='false', aria-label='Toggle navigation')
+      span.navbar-toggler-icon
+    #navbarResponsive.collapse.navbar-collapse
+      ul.navbar-nav.ml-auto
+        li.nav-item.active
+          a.nav-link(href='/')
+            | Home
+            span.sr-only (current)
 .limiter
   .container-login100(style="background-image: url('/external/Login/images/bg-01.jpg');")
     .wrap-login100.p-l-110.p-r-110.p-t-62.p-b-33
