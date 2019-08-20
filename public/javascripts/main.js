@@ -50,11 +50,7 @@ function scaleBannerVideoSize(element) {
                 'margin-top': 0,
                 'margin-left': -(videoWidth - windowWidth) / 2 + 'px'
             });
-
             $(this).width(videoWidth).height(videoHeight);
         }
-
-        $('.homepage-hero-module .video-container video').addClass('fadeIn animated');
-
     });
 }
