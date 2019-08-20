@@ -6,24 +6,9 @@ head
   meta(property='og:title' content='Expressme Main Page')
   meta(property='og:description' content='Portfolio Site for Developers')
   title Portfolio World
-  script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
-  script.
-    (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-3427879236190872",
-    enable_page_level_ads: true
-    });
-
-  // Global site tag (gtag.js) - Google Analytics
-  script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-68310012-4')
-  script.
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-68310012-4');
-    
-  // Bootstrap core CSS
-  link(rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous")
-  // Custom styles for this template
+  include libraries/googleadsense.pug  
+  include libraries/googleanalytics.pug  
+  include libraries/bootstrapcss.pug
   link(href='stylesheets/main.css' rel='stylesheet')
 header
   nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
@@ -47,14 +32,12 @@ header
         button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Register
 main(role='main')
   #myCarousel.carousel
-   
     .carousel-inner
       .carousel-item.active
-        //- img.first-slide(src='images/app/main/background-iamge.jpg' alt='First slide')
         .homepage-hero-module
           .video-container
             .filter
-            video.fillWidth(autoplay='0' loop='1' muted='1' playsinline='1' src='images/app/main/background.mp4')
+            video.fillWidth(autoplay='' loop='' muted='' playsinline='' src='images/app/main/background.mp4')
 
         .container
           .carousel-caption.text-left
@@ -68,9 +51,7 @@ main(role='main')
             p
               a.btn.btn-lg.btn-primary(href='/auth/login' role='button') Register with Github or Google
             - }
-  // Container
   .container
-    // Three columns of text below the carousel
     .row
       .col-lg-4
         img.rounded-circle(src='https://avatars1.githubusercontent.com/u/6832586?s=460&v=4' alt='Generic placeholder image' width='140' height='140')
@@ -79,7 +60,6 @@ main(role='main')
           | Hello! I'm developer of this Web Site
         p
           a.btn.btn-secondary(href='/sangumee' role='button') View details &raquo;
-      // /.col-lg-4
       each profile in dataarray
         .col-lg-4
           img.rounded-circle(src=`${profile.avatarUrl}` alt='Generic placeholder image' width='140' height='140')
@@ -90,8 +70,6 @@ main(role='main')
       .moreUser
         a(href=`/find-users`)
           <button type="button" class="btn btn-primary">Discover more users in Expressme</button>
-    // /.row
-    // START THE FEATURETTES
     hr.featurette-divider
     .row.featurette
       .col-md-7(id="intro_1_text")
@@ -120,9 +98,6 @@ main(role='main')
       .col-md-5(id="intro_3_img")
         img.featurette-image.img-fluid.mx-auto(src='/images/app/main/intro_3.png' alt='Generic placeholder image')
     hr.featurette-divider
-    // /END THE FEATURETTES
-  // /.container
-  // FOOTER
   footer.container
     p.float-right
       a(href='#') Back to top
@@ -131,12 +106,5 @@ main(role='main')
       a(href='#') Privacy
       |  &middot; 
       a(href='#') Terms
-//
-  Bootstrap core JavaScript
-  ==================================================
-// Placed at the end of the document so the pages load faster
-script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
-script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous")
-script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous")
-
+include libraries/bootstrapjs.pug
 script(src='/javascripts/main.js')
