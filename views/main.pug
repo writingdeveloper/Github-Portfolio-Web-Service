@@ -46,14 +46,16 @@ header
         input.form-control.mr-sm-2(type='text' name='id' placeholder='Github ID' aria-label='Search')
         button.btn.btn-outline-success.my-2.my-sm-0(type='submit') Register
 main(role='main')
-  #myCarousel.carousel.slide(data-ride='carousel')
-    ol.carousel-indicators
-      li.active(data-target='#myCarousel' data-slide-to='0')
-      li(data-target='#myCarousel' data-slide-to='1')
-      li(data-target='#myCarousel' data-slide-to='2')
+  #myCarousel.carousel
+   
     .carousel-inner
       .carousel-item.active
-        img.first-slide(src='images/app/main/background-iamge.jpg' alt='First slide')
+        //- img.first-slide(src='images/app/main/background-iamge.jpg' alt='First slide')
+        .homepage-hero-module
+          .video-container
+            .filter
+            video.fillWidth(autoplay='0' loop='1' muted='1' playsinline='1' src='images/app/main/background.mp4')
+
         .container
           .carousel-caption.text-left
             h1 Portfolio site for Software Developers
@@ -66,12 +68,6 @@ main(role='main')
             p
               a.btn.btn-lg.btn-primary(href='/auth/login' role='button') Register with Github or Google
             - }
-    a.carousel-control-prev(href='#myCarousel' role='button' data-slide='prev')
-      span.carousel-control-prev-icon(aria-hidden='true')
-      span.sr-only Previous
-    a.carousel-control-next(href='#myCarousel' role='button' data-slide='next')
-      span.carousel-control-next-icon(aria-hidden='true')
-      span.sr-only Next
   // Container
   .container
     // Three columns of text below the carousel
@@ -143,3 +139,4 @@ script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-
 script(src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous")
 script(src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous")
 
+script(src='/javascripts/main.js')
