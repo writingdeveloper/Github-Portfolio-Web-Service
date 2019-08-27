@@ -6,9 +6,8 @@ head
   meta(property='og:title' content='Expressme Main Page')
   meta(property='og:description' content='Portfolio Site for Developers')
   title Portfolio World
-  include libraries/googleadsense.pug  
-  include libraries/googleanalytics.pug  
   include libraries/bootstrapcss.pug
+  include libraries/googleadsense.pug
   link(href='stylesheets/main.css' rel='stylesheet')
 header
   nav.navbar.navbar-expand-md.navbar-dark.fixed-top.bg-dark
@@ -107,4 +106,5 @@ main(role='main')
       |  &middot; 
       a(href='#') Terms
 include libraries/bootstrapjs.pug
+include libraries/googleanalytics.pug
 script(src='/javascripts/main.js')
