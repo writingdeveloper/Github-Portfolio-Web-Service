@@ -4,13 +4,11 @@ head
   meta(name='viewport', content='width=device-width, initial-scale=1.0')
   meta(http-equiv='X-UA-Compatible', content='ie=edge')
   title Project Detail
+  include libraries/bootstrapcss.pug
+  include libraries/googleadsense.pug
   link(rel='stylesheet', href='/stylesheets/create.css')
-  // BootStrap CDN
-  script(src='https://code.jquery.com/jquery-3.3.1.min.js')
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css')
   link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css')
-  script(src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js')
-  script(src='/javascripts/setting.js')
 form(method='post', action=`/${userId}/create_process` enctype="multipart/form-data" id="searchForm" onsubmit="return validateForm()")
   section#works.l-section(role='region')
     .l-section-holder
@@ -92,3 +90,7 @@ footer#footer.l-footer(role='contentinfo')
       | page
       br
       b top
+// Bootstrap core JavaScript
+include libraries/bootstrapjs.pug
+include libraries/googleanalytics.pug
+script(src='/javascripts/setting.js')

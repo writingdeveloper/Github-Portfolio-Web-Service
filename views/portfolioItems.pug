@@ -6,23 +6,8 @@ head
   meta(name='author', content='')
   meta(name='theme-color', content='#252831')
   title=`${userId}'s Portfolio`
-
-  script(async='', src='//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js')
-  script.
-    (adsbygoogle = window.adsbygoogle || []).push({
-    google_ad_client: "ca-pub-3427879236190872",
-    enable_page_level_ads: true
-    });
-  // Global site tag (gtag.js) - Google Analytics
-  script(async='', src='https://www.googletagmanager.com/gtag/js?id=UA-68310012-4')
-  script.
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'UA-68310012-4');
-
-  // Bootstrap core CSS
-  link(href='stylesheets/core/bootstrap.min.css', rel='stylesheet')
+  include libraries/bootstrapcss.pug
+  include libraries/googleadsense.pug
   // Custom styles for this template
   link(href='/stylesheets/portfolio_detail.css', rel='stylesheet')
   link(rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous")
@@ -111,8 +96,8 @@ footer.bg-dark
     p.m-0.text-center.text-white 
       =`Copyright © ${userId} 2018`
 // Bootstrap core JavaScript
-script(src='https://code.jquery.com/jquery-3.3.1.slim.min.js' integrity='sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo' crossorigin='anonymous')
-script(src='javascripts/core/bootstrap.min.js')
+include libraries/bootstrapjs.pug
+include libraries/googleanalytics.pug
 //- Custom JavaScript
 script(src='https://cdn.jsdelivr.net/clipboard.js/1.5.10/clipboard.min.js')
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@8')
