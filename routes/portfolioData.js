@@ -35,6 +35,15 @@ let upload = multer({
   })
 });
 
+function loginCheck() {
+  // Owner Check
+  if (req.user === undefined) {
+    ownerCheck = null;
+  } else {
+    ownerCheck = req.user.loginId;
+  }
+}
+
 /* GET home page. */
 router.get(`/:userId`, function (req, res, next) {
   let userId = req.params.userId;
@@ -48,56 +57,56 @@ router.get(`/:userId`, function (req, res, next) {
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
     console.log(qrCodeImageUrl);
-  
 
-  db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
-    if (error) {
-      throw `${error} in /:userId Page`
-    } else {
-      if (data[0] === undefined) {
-        res.render('customError', { // User Missing Error Handling
-          userId: userId, // Entered User ID
-          loginedId: ownerCheck, // Logined User ID
-          error: 'USER MISSING',
-          description: 'Report Please'
-        })
+
+    db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
+      if (error) {
+        throw `${error} in /:userId Page`
       } else {
-        db.query(
-          `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
-          function (error, data) {
-            if (error) {
-              throw `${error} in userId Page`;
-            }
-            /* image URL Null Check */
-            for (let i = 0; i < data.length; i++) {
-              if (data[i].imageUrl === null) {
-                data[i].imageUrl = `/images/app/${data[i].type}.png`;
-              } else {
-                data[i].imageUrl = data[i].imageUrl;
+        if (data[0] === undefined) {
+          res.render('customError', { // User Missing Error Handling
+            userId: userId, // Entered User ID
+            loginedId: ownerCheck, // Logined User ID
+            error: 'USER MISSING',
+            description: 'Report Please'
+          })
+        } else {
+          db.query(
+            `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
+            function (error, data) {
+              if (error) {
+                throw `${error} in userId Page`;
               }
-            }
-            /* Keyword Null Check*/
-            for (let i = 0; i < data.length; i++) {
-              if (data[i].keyword === null) {
-                data[i].keyword = '';
+              /* image URL Null Check */
+              for (let i = 0; i < data.length; i++) {
+                if (data[i].imageUrl === null) {
+                  data[i].imageUrl = `/images/app/${data[i].type}.png`;
+                } else {
+                  data[i].imageUrl = data[i].imageUrl;
+                }
               }
-            }
-            /* Summary Null Check*/
-            for (let i = 0; i < data.length; i++) {
-              if (data[i].summary === null) {
-                data[i].summary = '';
+              /* Keyword Null Check*/
+              for (let i = 0; i < data.length; i++) {
+                if (data[i].keyword === null) {
+                  data[i].keyword = '';
+                }
               }
-            }
-            res.render("portfolioItems", {
-              dataarray: data,
-              userId: userId,
-              qrCodeImageUrl: qrCodeImageUrl,
-              ownerCheck: ownerCheck
+              /* Summary Null Check*/
+              for (let i = 0; i < data.length; i++) {
+                if (data[i].summary === null) {
+                  data[i].summary = '';
+                }
+              }
+              res.render("portfolioItems", {
+                dataarray: data,
+                userId: userId,
+                qrCodeImageUrl: qrCodeImageUrl,
+                ownerCheck: ownerCheck
+              });
             });
-          });
+        }
       }
-    }
-  })
+    })
   });
 });
 

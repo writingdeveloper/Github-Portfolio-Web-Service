@@ -7,7 +7,19 @@ const {
 /* Import Database Settings */
 const db = require("../lib/db");
 
+/* Login Check */
+function loginCheck(req) {
+  // Owner Check
+  if (req.user === undefined) {
+    ownerCheck = null;
+  } else {
+    ownerCheck = req.user.loginId;
+  }
+}
+
 router.get("/find-users", function (req, res, next) {
+  let loginInformation = req.user;
+  console.log(loginInformation)
   db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 0, 8`, function (
     error,
     data
@@ -22,7 +34,8 @@ router.get("/find-users", function (req, res, next) {
       }
     });
     res.render("find-users", {
-      dataarray: data
+      dataarray: data,
+      loginData: loginCheck(req)
     });
   });
 });
