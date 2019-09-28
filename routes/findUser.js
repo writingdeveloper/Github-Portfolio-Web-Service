@@ -8,8 +8,7 @@ const {
 const db = require("../lib/db");
 
 /* Login Check */
-function loginCheck(req) {
-  // Owner Check
+let loginCheck = req => {
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
