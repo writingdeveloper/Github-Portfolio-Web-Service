@@ -1,11 +1,9 @@
 /* Find Users Page */
+let removeElements = elms => elms.forEach(el => el.remove());
 
 /* Search Users Button Function */
 function searchUsers() {
   let queryString = document.getElementById("searchUsers").value;
-  let removeElements = elms => elms.forEach(el => el.remove());
-  console.log(queryString);
-
   if (['', '{', '}', '{}'].includes(queryString)) {
     removeElements(document.querySelectorAll(".col-md-3"));
     removeElements(document.querySelectorAll("#loadMoreUsers"));
@@ -16,12 +14,12 @@ function searchUsers() {
         </div>`
     document.getElementById("container").appendChild(newDiv);
   } else {
+    /* Fetch Data */
     fetch(`/find-users/${queryString}`, { // Request Search Data to DB server
         method: "GET"
       })
       .then(res => res.json())
       .then(data => {
-        console.log(data);
         if (data === "NODATA") {
           // End of the Profile Data
           removeElements(document.querySelectorAll(".col-md-3"));
@@ -57,13 +55,12 @@ function searchUsers() {
             <button class="btn btn-sm btn-outline-secondary" type="button" onClick="location.href='${
               data[i].loginId
             }/contact'">Contact</button></div>
-            <small class="text-muted">9 mins</small></div></div></div>
+            <small class="text-muted">View Score : ${data[i].counter}</small></div></div></div>
             `;
             document.getElementById("additional").appendChild(newDiv);
           }
         }
       })
-
       .catch(err => {
         console.log(err); // Log Error
       });
@@ -73,15 +70,15 @@ function searchUsers() {
 /* Load More Users Button Function */
 function loadMoreUsers() {
   let pageNumber = document.getElementsByClassName("col-md-3").length;
-  console.log(pageNumber);
+  /* Fetch Data */
   fetch(`/find-users/moreuser/${pageNumber}`, {
       method: "GET"
     })
     .then(res => res.json())
     .then(data => {
-      console.log(data);
       if (data === "NODATA") {
         // End of the Profile Data
+        removeElements(document.querySelectorAll("#loadMoreUsers"));
       } else {
         for (let i = 0; i < data.length; i++) {
           let newDiv = document.createElement("div");
@@ -99,8 +96,10 @@ function loadMoreUsers() {
             <button class="btn btn-sm btn-outline-secondary" type="button" onClick="location.href='${
               data[i].loginId
             }'">View</button>
-            <button class="btn btn-sm btn-outline-secondary" type="button">Edit</button></div>
-            <small class="text-muted">9 mins</small></div></div></div>
+            <button class="btn btn-sm btn-outline-secondary" type="button" onClick="location.href='${
+              data[i].loginId
+            }/contact'">Contact</button></div>
+            <small class="text-muted">View Score : ${data[i].counter}</small></div></div></div>
             `;
           document.getElementById("additional").appendChild(newDiv);
         }
