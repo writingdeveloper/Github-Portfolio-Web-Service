@@ -50,7 +50,7 @@ main(role='main' class='main')
                             .btn-group
                                 button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='${profile.loginId}'`) View
                                 button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='${profile.loginId}/contact'`) Contact
-                            small.text-muted 9 mins
+                            small.text-muted=`View Score : ${profile.counter}`
       .moreUser
         <button type="button" onclick="loadMoreUsers();" class="btn btn-primary" id="loadMoreUsers">Load More Users</button>
 
