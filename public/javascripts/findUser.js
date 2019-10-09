@@ -45,7 +45,7 @@ function searchUsers() {
               data[i].avatarUrl
             }">
             <div class="card-body">
-            <p class="card-name">${data[i].loginId}</p>
+            <b><p class="card-name">${data[i].loginId}</p></b>
             <p class="card-text">${data[i].bio}</p>
             <div class="d-flex justify-content-between align-items-center">
             <div class="btn-group">
@@ -89,7 +89,7 @@ function loadMoreUsers() {
               data[i].avatarUrl
             }">
             <div class="card-body">
-            <p class="card-name">${data[i].loginId}</p>
+            <b><p class="card-name">${data[i].loginId}</p></b>
             <p class="card-text">${data[i].bio}</p>
             <div class="d-flex justify-content-between align-items-center">
             <div class="btn-group">
