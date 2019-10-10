@@ -91,6 +91,13 @@ router.get(`/:userId`, function (req, res, next) {
                   data[i].keyword = '';
                 }
               }
+              for (let i = 0; i < data.length; i++) {
+                if (data[i].keyword.substring(0, 5) === `{"lan`) {
+                  let keywordData = data[i].keyword.substring(14).slice(0, -2);
+                  console.log(`${keywordData}`)
+                  data[i].keyword = `{"${keywordData}" : "language"}`
+                }
+              }
               /* Summary Null Check*/
               for (let i = 0; i < data.length; i++) {
                 if (data[i].summary === null) {
