@@ -95,7 +95,11 @@ router.get(`/:userId`, function (req, res, next) {
                 if (data[i].keyword.substring(0, 5) === `{"lan`) {
                   let keywordData = data[i].keyword.substring(14).slice(0, -2);
                   console.log(`${keywordData}`)
-                  data[i].keyword = `{"${keywordData}" : "language"}`
+                  if (keywordData === 'null') {
+                    data[i].keyword = `{" " : "language"}`
+                  } else {
+                    data[i].keyword = `{"${keywordData}" : "language"}`
+                  }
                 }
               }
               /* Summary Null Check*/
