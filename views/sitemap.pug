@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+        title Document
+    style.
+        table {
+        font-family: arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+        }
+        td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+        }
+        tr:nth-child(even) {
+        background-color: #dddddd;
+        }
+    body
+        table
+            tr
+                th User
+                th display ID
+                th name
+                th View Count
+                th Register Date
+            each data in dataarray
+                tr
+                    td
+                        a(href=`/${data.loginId}`)=`${data.loginId}`
+                    td=`${data.displayId}`
+                    td=`${data.name}`
+                    td=`${data.counter}`
+                    td=`${data.registerDate}`
