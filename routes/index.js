@@ -7,6 +7,48 @@ const shortid = require("shortid");
 let session = require('express-session');
 let FileStore = require('session-file-store')(session);
 
+/* Sitemap */
+const {
+  SitemapStream,
+  streamToPromise
+} = require('sitemap')
+const {
+  createGzip
+} = require('zlib')
+let sitemap;
+
+router.get('/sitemap.xml', function (req, res) {
+  res.header('Content-Type', 'application/xml');
+  res.header('Content-Encoding', 'gzip');
+  // if we have a cached entry send it
+  if (sitemap) {
+    res.send(sitemap)
+    return
+  }
+  try {
+    const smStream = new SitemapStream({
+        hostname: 'http://127.0.0.1:3000/'
+      })
+      .pipe(createGzip())
+
+    smStream.write({
+      url: '/',
+      changefreq: 'daily',
+      priority: 0.3
+    })
+
+    // cache the response
+    streamToPromise(gzippedStream).then(sm => sitemap = sm)
+    // stream the response
+    gzippedStream.pipe(res).on('error', (e) => {
+      throw e
+    })
+  } catch (e) {
+    console.error(e)
+    res.status(500).end()
+  }
+})
+
 /* Redirect http to https */
 router.get('*', function (req, res, next) {
   if (req.headers['x-forwarded-proto'] != 'https' && process.env.NODE_ENV === 'production')
@@ -86,6 +128,23 @@ router.use(
     extended: true
   })
 );
+
+/* SiteMap */
+router.get(`/sitemap/:page`, function (req, res, next) {
+  let pageNumber = String(req.params.page) + '00';
+  console.log(pageNumber)
+  // db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
+  db.query(`SELECT * FROM user order by displayId*1 LIMIT ${pageNumber}, 100`, function (error, data) {
+    if (error) {
+      throw error;
+    }
+    // console.log(data);
+
+    res.render("sitemap", {
+      dataarray: data
+    })
+  });
+});
 
 /* GET home page. */
 router.get("/", function (req, res, next) {
