@@ -4,7 +4,7 @@ html(lang="en")
         meta(charset="UTF-8")
         meta(name="viewport", content="width=device-width, initial-scale=1.0")
         meta(http-equiv="X-UA-Compatible", content="ie=edge")
-        title Document
+        title=`Sitemap ${pageNumber}`
     style.
         table {
         font-family: arial, sans-serif;
@@ -35,3 +35,8 @@ html(lang="en")
                     td=`${data.name}`
                     td=`${data.counter}`
                     td=`${data.registerDate}`
+    - if(pageResult ==='NODATA'){
+        p NO MORE DATA
+    - } else {
+        a(href=`/sitemap/${pageResult}`)= `Page ${pageResult}`
+    - }
