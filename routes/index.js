@@ -98,18 +98,18 @@ router.use(
 
 /* SiteMap */
 router.get(`/sitemap/:page`, function (req, res, next) {
-  let pageNumber = (Number(req.params.page) * 1000); // Current Page Number
-  let nextPage = (Number(req.params.page) + 1) * 1000; // Next Page Number
+  let pageNumber = (Number(req.params.page) * 10000); // Current Page Number
+  let nextPage = (Number(req.params.page) + 1) * 10000; // Next Page Number
   let pageResult; // Page Result
   db.query(
-    `SELECT * FROM user order by displayId*1 LIMIT ?, 1000`,
+    `SELECT * FROM user order by displayId*1 LIMIT ?, 10000`,
     [Number(pageNumber)],
     function (error, data) {
       if (error) {
         throw error;
       }
       // console.log(data);
-      db.query(`SELECT * FROM user order by displayId*1 LIMIT ?, 1000`, [Number(nextPage)], function (error, pageData) {
+      db.query(`SELECT * FROM user order by displayId*1 LIMIT ?, 10000`, [Number(nextPage)], function (error, pageData) {
         if (error) {
           throw error;
         }
