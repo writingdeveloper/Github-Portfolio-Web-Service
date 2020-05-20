@@ -12,6 +12,9 @@ const router = express.Router();
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
+const User = require('../lib/models/userModel');
+const Repo = require('../lib/models/repoModel');
+
 // Parsing Dependency
 const cheerio = require("cheerio"); // Parsing Module
 const request = require("request"); // Request Module
@@ -58,66 +61,81 @@ router.get(`/:userId`, function (req, res, next) {
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
     console.log(qrCodeImageUrl);
 
-
-    db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
-      if (error) {
-        throw `${error} in /:userId Page`
-      } else {
-        if (data[0] === undefined) {
-          res.render('customError', { // User Missing Error Handling
-            userId: userId, // Entered User ID
-            loginedId: ownerCheck, // Logined User ID
-            error: 'USER MISSING',
-            description: 'Report Please'
-          })
-        } else {
-          db.query(
-            `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
-            function (error, data) {
-              if (error) {
-                throw `${error} in userId Page`;
-              }
-              /* image URL Null Check */
-              for (let i = 0; i < data.length; i++) {
-                if (data[i].imageUrl === null) {
-                  data[i].imageUrl = `/images/app/${data[i].type}.png`;
-                } else {
-                  data[i].imageUrl = data[i].imageUrl;
-                }
-              }
-              /* Keyword Null Check*/
-              for (let i = 0; i < data.length; i++) {
-                if (data[i].keyword === null) {
-                  data[i].keyword = '';
-                }
-              }
-              for (let i = 0; i < data.length; i++) {
-                if (data[i].keyword.substring(0, 5) === `{"lan`) {
-                  let keywordData = data[i].keyword.substring(14).slice(0, -2);
-                  console.log(`${keywordData}`)
-                  if (keywordData === 'null') {
-                    data[i].keyword = `{" " : "language"}`
-                  } else {
-                    data[i].keyword = `{"${keywordData}" : "language"}`
-                  }
-                }
-              }
-              /* Summary Null Check*/
-              for (let i = 0; i < data.length; i++) {
-                if (data[i].summary === null) {
-                  data[i].summary = '';
-                }
-              }
-              res.render("portfolioItems", {
-                dataarray: data,
-                userId: userId,
-                qrCodeImageUrl: qrCodeImageUrl,
-                ownerCheck: ownerCheck
-              });
-            });
-        }
+    User.find({
+      'login': userId
+    }, 'login', function(err, userData){
+      if(err) console.log(err);
+      console.log(userData);
+      if(userData== false){
+        console.log('No DATA');
+        res.render('customError', { // User Missing Error Handling
+                  userId: userId, // Entered User ID
+                  loginedId: ownerCheck, // Logined User ID
+                  error: 'USER MISSING',
+                  description: 'Report Please'
+                })
       }
+      
     })
+    // db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
+    //   if (error) {
+    //     throw `${error} in /:userId Page`
+    //   } else {
+    //     if (data[0] === undefined) {
+    //       res.render('customError', { // User Missing Error Handling
+    //         userId: userId, // Entered User ID
+    //         loginedId: ownerCheck, // Logined User ID
+    //         error: 'USER MISSING',
+    //         description: 'Report Please'
+    //       })
+    //     } else {
+    //       db.query(
+    //         `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
+    //         function (error, data) {
+    //           if (error) {
+    //             throw `${error} in userId Page`;
+    //           }
+    //           /* image URL Null Check */
+    //           for (let i = 0; i < data.length; i++) {
+    //             if (data[i].imageUrl === null) {
+    //               data[i].imageUrl = `/images/app/${data[i].type}.png`;
+    //             } else {
+    //               data[i].imageUrl = data[i].imageUrl;
+    //             }
+    //           }
+              /* Keyword Null Check*/
+              // for (let i = 0; i < data.length; i++) {
+              //   if (data[i].keyword === null) {
+              //     data[i].keyword = '';
+              //   }
+              // }
+              // for (let i = 0; i < data.length; i++) {
+              //   if (data[i].keyword.substring(0, 5) === `{"lan`) {
+              //     let keywordData = data[i].keyword.substring(14).slice(0, -2);
+              //     console.log(`${keywordData}`)
+              //     if (keywordData === 'null') {
+              //       data[i].keyword = `{" " : "language"}`
+              //     } else {
+              //       data[i].keyword = `{"${keywordData}" : "language"}`
+              //     }
+              //   }
+              // }
+              /* Summary Null Check*/
+              // for (let i = 0; i < data.length; i++) {
+              //   if (data[i].summary === null) {
+              //     data[i].summary = '';
+              //   }
+              // }
+              // res.render("portfolioItems", {
+              //   dataarray: data,
+              //   userId: userId,
+              //   qrCodeImageUrl: qrCodeImageUrl,
+              //   ownerCheck: ownerCheck
+              // });
+            // });
+        // }
+      // }
+    // })
   });
 });
 
