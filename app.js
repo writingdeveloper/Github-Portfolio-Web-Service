@@ -1,13 +1,19 @@
+require('dotenv').config()
 const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const db = require("./lib/db");
+// const db = require("./lib/db");
 const request = require("request");
 const moment = require('moment-timezone');
 const http = require("http");
+const mongoose = require('mongoose');
 const app = express();
+
+/*
+If the environment variable fails to load, run the node app with `node -r dotenv / config. /bin/www`
+*/
 
 /* Prevent Sleep in Heroku Server */
 setInterval(function () {
@@ -61,7 +67,7 @@ app.use(function (err, req, res, next) {
   let userAgent = req.get('User-Agent');
   let errorFrom = req.header('Referer');
   // Error Report SQL
-  db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
+  // db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
   const telegramKey = process.env.telegramKey;
   let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
   let coreMessage = `ERROR TIME : ${timeData} ERROR MESSAGE : ${errorMessage} ERROR FROM : ${errorFrom} ERROR SENDER : ${sender}`;

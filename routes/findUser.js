@@ -6,6 +6,7 @@ const {
 
 /* Import Database Settings */
 const db = require("../lib/db");
+const User = require('../lib/models/userModel')
 
 /* Login Check */
 let loginCheck = req => {
@@ -19,21 +20,20 @@ let loginCheck = req => {
 router.get("/find-users", function (req, res, next) {
   let loginInformation = req.user;
   console.log(loginInformation)
-  db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 0, 8`, function (
-    error,
-    data
-  ) {
-    if (error) {
-      console.log(error);
-    }
-    // data NULL check
-    data.forEach(results => {
-      if (results.bio === null) {
+  User.find({}, 'avatar_url login bio view_counter', {
+    limit: 8
+  }).sort({
+    created_at: -1
+  }).exec(function (err, result) {
+    if (err) throw err;
+    console.log(result);
+    result.forEach(results => {
+      if (results.bio === null) { // If bio is none, replace 'NO BIO' text
         results.bio = "NO BIO";
       }
     });
     res.render("find-users", {
-      dataarray: data,
+      dataarray: result,
       loginData: loginCheck(req)
     });
   });

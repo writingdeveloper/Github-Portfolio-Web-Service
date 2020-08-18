@@ -38,6 +38,7 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 
 /* Import Database Settings */
 const db = require("../lib/db");
+let User = require('../lib/models/userModel');
 /* Import Authentication Setting (Passport.js) */
 const passport = require("../lib/passport")(router, db, request, shortid);
 
@@ -129,35 +130,56 @@ router.get(`/sitemap/:page`, function (req, res, next) {
 });
 
 /* GET home page. */
+// router.get("/", function (req, res, next) {
+//   // Main page Profile Data Process
+//   db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 5`, function (
+//     error,
+//     data
+//   ) {
+//     // GET Data sort with register_time and get 6 Profile
+//     // Log Error
+//     if (error) {
+//       console.log(error);
+//     }
+//     let url = "";
+//     if (req.user) {
+//       url = req.user.loginId;
+//     } else {
+//       url = "";
+//     }
+//     // Main Page BIO NULL Check
+//     data.forEach(results => {
+//       if (results.bio === null) {
+//         results.bio = "NO BIO";
+//       }
+//     });
+//     res.render("main", {
+//       dataarray: data,
+//       _user: req.user,
+//       url: url
+//     });
+//   });
+// });
+
 router.get("/", function (req, res, next) {
-  // Main page Profile Data Process
-  db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 5`, function (
-    error,
-    data
-  ) {
-    // GET Data sort with register_time and get 6 Profile
-    // Log Error
-    if (error) {
-      console.log(error);
-    }
-    let url = "";
-    if (req.user) {
-      url = req.user.loginId;
-    } else {
-      url = "";
-    }
-    // Main Page BIO NULL Check
-    data.forEach(results => {
-      if (results.bio === null) {
+  console.log(`HOME ROUTE!`);
+  User.find({}, 'login bio avatar_url', {
+    limit: 5
+  }).sort({
+    created_at: -1
+  }).exec(function (err, result) {
+    if (err) console.log(err);
+    console.log(result);
+    result.forEach(results => {
+      if (results.bio === null) { // If bio is none, replace 'NO BIO' text
         results.bio = "NO BIO";
       }
     });
-    res.render("main", {
-      dataarray: data,
-      _user: req.user,
-      url: url
-    });
-  });
+    res.render('main', {
+      dataarray: result,
+      _user: req.user
+    })
+  })
 });
 
 /* POST User Save in MySQL DB */

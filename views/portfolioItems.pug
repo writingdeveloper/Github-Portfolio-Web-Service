@@ -55,25 +55,24 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
   // Page Heading
   .row
     each projects in dataarray
-      div(class=`${projects.type} col-lg-3 col-md-4 col-sm-6 portfolio-item`)
+      div(class=`${projects.project_type} col-lg-3 col-md-4 col-sm-6 portfolio-item`)
         .card.h-100
-          .card-type(class=`${projects.type}`)
+          .card-type(class=`${projects.project_type}`)
             p.text
-             =projects.type
+             =projects.project_type
           img.card-img-top(src=`${projects.imageUrl}`)
+          i.devicon-javascript-plain.colored
           .card-body
             h4.card-title
-              a(href=`/${userId}/${projects.sid}`)
-                = projects.projectName
-            - if(projects.keyword){
+              a(href=`/${userId}/${projects.name}`)
+                = projects.name
             p.card-keyword
-              = `keyword : ${Object.keys(JSON.parse(projects.keyword))}`
-            - }
-            - if(projects.summary) {
+              = `keyword : ${projects.language}`
+            - if(projects.description) {
             p.card-text
-              = `${projects.summary}`
+              = `${projects.description}`
             - } 
-          a(href= `/${userId}/${projects.sid}` class="viewDetail") View Details
+          a(href= `/${userId}/${projects.name}` class="viewDetail") View Details
   // Pagination
   ul.pagination.justify-content-center
     li.page-item

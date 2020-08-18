@@ -58,14 +58,14 @@ main(role='main')
         p
           | Hello! I'm developer of this Web Site
         p
-          a.btn.btn-secondary(href='/sangumee' role='button') View details &raquo;
+          a.btn.btn-secondary(href='/writingdeveloper' role='button') View details &raquo;
       each profile in dataarray
         .col-lg-4
-          img.rounded-circle(src=`${profile.avatarUrl}` alt='Generic placeholder image' width='140' height='140')
-          h2=`${profile.name}`
+          img.rounded-circle(src=`${profile.avatar_url}` alt='Generic placeholder image' width='140' height='140')
+          h2=`${profile.login}`
           p=`${profile.bio}`
           p
-            a.btn.btn-secondary(href=`/${profile.loginId}` role='button') View details &raquo;
+            a.btn.btn-secondary(href=`/${profile.login}` role='button') View details &raquo;
       .moreUser
         a(href=`/find-users`)
           <button type="button" class="btn btn-primary">Discover more users in Expressme</button>

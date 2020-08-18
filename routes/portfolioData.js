@@ -7,13 +7,16 @@ const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
 const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
+var urlExists = require('url-exists');
 const router = express.Router();
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
+/* Database Schema */
 const User = require('../lib/models/userModel');
 const Repo = require('../lib/models/repoModel');
+let devicon = require('../config/devicon.json');
 
 // Parsing Dependency
 const cheerio = require("cheerio"); // Parsing Module
@@ -59,23 +62,78 @@ router.get(`/:userId`, function (req, res, next) {
   }
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
-    console.log(qrCodeImageUrl);
+    // console.log(qrCodeImageUrl);
 
     User.find({
       'login': userId
-    }, 'login', function(err, userData){
-      if(err) console.log(err);
+    }, 'login', function (err, userData) {
+      if (err) console.log(err);
       console.log(userData);
-      if(userData== false){
+      if (userData == false) {
         console.log('No DATA');
         res.render('customError', { // User Missing Error Handling
-                  userId: userId, // Entered User ID
-                  loginedId: ownerCheck, // Logined User ID
-                  error: 'USER MISSING',
-                  description: 'Report Please'
-                })
+          userId: userId, // Entered User ID
+          loginedId: ownerCheck, // Logined User ID
+          error: 'USER MISSING',
+          description: 'Report Please'
+        })
+      } else {
+        Repo.find({
+          'owner.login': userId
+        }, 'project_type login name language description', function (err, repoData) {
+          if (err) console.log(err);
+          // console.log(repoData);
+          // console.log(repoData[0].imageUrl);
+
+
+          for (let i = 0; i < repoData.length; i++) {
+            
+            if(repoData[i].language === null){
+              repoData[i].imageUrl = `/images/app/${repoData[i].project_type}.png`;
+            } else {
+              let language_url = repoData[i].language.toLowerCase();
+              repoData[i].imageUrl = `https://raw.githubusercontent.com/konpa/devicon/master/icons/${language_url}/${language_url}-original.svg`;
+            }
+            // let language_url = repoData[i].language.toLowerCase();
+            // function getIconsByCode(language_url){
+            //   return devicon.filter(
+            //     function(devicon){return devicon.name== language_url}
+            //   )
+            // }
+            // let found = getIconsByCode(language_url)
+            // console.log(found[0]);
+            // if(found[0].tags[0]==='different'){
+            //   console.log('different');
+            // }
+
+            // if(found[0] == undefined){
+            //   console.log('apple');
+            //   console.log(repoData[i])
+            // }
+
+          //   let svgData = urlExists(`https://raw.githubusercontent.com/konpa/devicon/master/icons/${language_url}/${language_url}-original.svg`, function(err, exists) {
+          //     // console.log(exists); // true
+          //   });
+          //   if (repoData[i].imageUrl == undefined && repoData[i].language != null) {
+          //     // console.log('NO DIMAGE')
+          //     // Use lowercase letters because URL recognition problems exist when using uppercase characters in the path
+          //     repoData[i].imageUrl = `https://raw.githubusercontent.com/konpa/devicon/master/icons/${language_url}/${language_url}-original.svg`;
+
+          //   } else if (repoData[i].imageUrl == undefined) {
+          //     repoData[i].imageUrl = `/images/app/${repoData[i].project_type}.png`;
+          //   } else {
+          //     repoData[i].imageUrl = repoData[i].imageUrl;
+          //   }
+          }
+          // https://raw.githubusercontent.com/konpa/devicon/master/icons/${projects.language}/${projects.language}-original.svg
+          res.render("portfolioItems", {
+            dataarray: repoData,
+            userId: userId,
+            qrCodeImageUrl: qrCodeImageUrl,
+            ownerCheck: ownerCheck
+          });
+        })
       }
-      
     })
     // db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
     //   if (error) {
@@ -103,38 +161,38 @@ router.get(`/:userId`, function (req, res, next) {
     //               data[i].imageUrl = data[i].imageUrl;
     //             }
     //           }
-              /* Keyword Null Check*/
-              // for (let i = 0; i < data.length; i++) {
-              //   if (data[i].keyword === null) {
-              //     data[i].keyword = '';
-              //   }
-              // }
-              // for (let i = 0; i < data.length; i++) {
-              //   if (data[i].keyword.substring(0, 5) === `{"lan`) {
-              //     let keywordData = data[i].keyword.substring(14).slice(0, -2);
-              //     console.log(`${keywordData}`)
-              //     if (keywordData === 'null') {
-              //       data[i].keyword = `{" " : "language"}`
-              //     } else {
-              //       data[i].keyword = `{"${keywordData}" : "language"}`
-              //     }
-              //   }
-              // }
-              /* Summary Null Check*/
-              // for (let i = 0; i < data.length; i++) {
-              //   if (data[i].summary === null) {
-              //     data[i].summary = '';
-              //   }
-              // }
-              // res.render("portfolioItems", {
-              //   dataarray: data,
-              //   userId: userId,
-              //   qrCodeImageUrl: qrCodeImageUrl,
-              //   ownerCheck: ownerCheck
-              // });
-            // });
-        // }
-      // }
+    /* Keyword Null Check*/
+    // for (let i = 0; i < data.length; i++) {
+    //   if (data[i].keyword === null) {
+    //     data[i].keyword = '';
+    //   }
+    // }
+    // for (let i = 0; i < data.length; i++) {
+    //   if (data[i].keyword.substring(0, 5) === `{"lan`) {
+    //     let keywordData = data[i].keyword.substring(14).slice(0, -2);
+    //     console.log(`${keywordData}`)
+    //     if (keywordData === 'null') {
+    //       data[i].keyword = `{" " : "language"}`
+    //     } else {
+    //       data[i].keyword = `{"${keywordData}" : "language"}`
+    //     }
+    //   }
+    // }
+    /* Summary Null Check*/
+    // for (let i = 0; i < data.length; i++) {
+    //   if (data[i].summary === null) {
+    //     data[i].summary = '';
+    //   }
+    // }
+    // res.render("portfolioItems", {
+    //   dataarray: data,
+    //   userId: userId,
+    //   qrCodeImageUrl: qrCodeImageUrl,
+    //   ownerCheck: ownerCheck
+    // });
+    // });
+    // }
+    // }
     // })
   });
 });
