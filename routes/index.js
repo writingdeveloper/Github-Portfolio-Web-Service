@@ -161,8 +161,8 @@ router.get(`/sitemap/:page`, function (req, res, next) {
 //   });
 // });
 
+/* Main Router */
 router.get("/", function (req, res, next) {
-  console.log(`HOME ROUTE!`);
   User.find({}, 'login bio avatar_url', {
     limit: 5
   }).sort({
