@@ -66,7 +66,7 @@ router.get(`/:userId`, function (req, res, next) {
 
     User.find({
       'login': userId
-    }, 'login', function (err, userData) {
+    }, function (err, userData) {
       if (err) console.log(err);
       console.log(userData);
       if (userData == false) {
