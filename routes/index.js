@@ -40,7 +40,7 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 const db = require("../lib/db");
 let User = require('../lib/models/userModel');
 /* Import Authentication Setting (Passport.js) */
-const passport = require("../lib/passport")(router, db, request, shortid);
+const passport = require("../lib/passport")(router, db, request, shortid, User);
 
 /* Github Auth Router */
 router.get("/auth/github", passport.authenticate("github"));
@@ -163,12 +163,23 @@ router.get(`/sitemap/:page`, function (req, res, next) {
 
 /* Main Router */
 router.get("/", function (req, res, next) {
+
+  let ownerCheck;
+  if (req.user === undefined) {
+    ownerCheck = null;
+  } else {
+    console.log(req.user)
+    ownerCheck = req.user.username;
+  }
+
+
   User.find({}, 'login bio avatar_url', {
     limit: 5
   }).sort({
     created_at: -1
   }).exec(function (err, result) {
     if (err) console.log(err);
+    console.log('-----------------------')
     console.log(result);
     result.forEach(results => {
       if (results.bio === null) { // If bio is none, replace 'NO BIO' text
@@ -177,7 +188,8 @@ router.get("/", function (req, res, next) {
     });
     res.render('main', {
       dataarray: result,
-      _user: req.user
+      _user: req.user,
+      url : ownerCheck
     })
   })
 });
