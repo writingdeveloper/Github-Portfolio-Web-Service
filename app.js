@@ -7,18 +7,11 @@ const logger = require('morgan');
 // const db = require("./lib/db");
 const request = require("request");
 const moment = require('moment-timezone');
-const http = require("http");
-const mongoose = require('mongoose');
 const app = express();
 
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv / config. /bin/www`
 */
-
-/* Prevent Sleep in Heroku Server */
-setInterval(function () {
-  http.get("http://expressme.herokuapp.com");
-}, 600000); // every 10 minutes
 
 /* Socket IO */
 app.io = require('socket.io')();
