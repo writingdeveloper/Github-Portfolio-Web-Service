@@ -40,7 +40,7 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 const db = require("../lib/db");
 let User = require('../lib/models/userModel');
 /* Import Authentication Setting (Passport.js) */
-const passport = require("../lib/passport")(router, db, request, shortid, User);
+const passport = require("../lib/passport")(router, db, request, shortid);
 
 /* Github Auth Router */
 router.get("/auth/github", passport.authenticate("github"));
@@ -52,26 +52,8 @@ router.get(
   }),
   function (req, res) {
     // Successful authentication, redirect home.
-    console.log("SUCESS!!", req.user);
+    console.log(`Current Login User ${req.user.username}`);
     res.redirect(`/${req.user.username}`);
-  }
-);
-
-/* Google Auth Router */
-router.get(
-  "/auth/google",
-  passport.authenticate("google", {
-    scope: ["profile"]
-  })
-);
-router.get(
-  "/auth/google/callback",
-  passport.authenticate("google", {
-    failureRedirect: "/login"
-  }),
-  function (req, res) {
-    // Successful authentication, redirect home.
-    res.redirect(`/`);
   }
 );
 
@@ -84,6 +66,7 @@ router.get(`/auth/login`, function (req, res, next) {
 router.get(`/logout`, function (req, res, next) {
   req.logout();
   req.session.save(function (err) {
+    if(err) console.log(err);
     res.redirect(`/`);
   });
 });
