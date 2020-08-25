@@ -19,7 +19,7 @@ router.get("*", function (req, res, next) {
 
 router.use(
   session({
-    secret: process.env.session_secret || "Hello World",
+    secret: process.env.session_secret,
     resave: false,
     saveUninitialized: true,
     store: new FileStore(),
