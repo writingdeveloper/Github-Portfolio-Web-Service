@@ -17,6 +17,7 @@ router.get("*", function (req, res, next) {
   else next(); /* Continue to other routes if we're not redirecting */
 });
 
+/* Session Settings */
 router.use(
   session({
     secret: process.env.session_secret,
@@ -25,7 +26,6 @@ router.use(
     store: new FileStore(),
     cookie: {
       secure: false,
-      // maxAge: new Date(Date.now() + 3600000)
       maxAge: 24000 * 60 * 60
     },
     key: "connect.sid"
@@ -66,7 +66,7 @@ router.get(`/auth/login`, function (req, res, next) {
 router.get(`/logout`, function (req, res, next) {
   req.logout();
   req.session.save(function (err) {
-    if(err) console.log(err);
+    if (err) console.log(err);
     res.redirect(`/`);
   });
 });
@@ -112,38 +112,6 @@ router.get(`/sitemap/:page`, function (req, res, next) {
   );
 });
 
-/* GET home page. */
-// router.get("/", function (req, res, next) {
-//   // Main page Profile Data Process
-//   db.query(`SELECT * FROM user ORDER BY registerDate DESC LIMIT 5`, function (
-//     error,
-//     data
-//   ) {
-//     // GET Data sort with register_time and get 6 Profile
-//     // Log Error
-//     if (error) {
-//       console.log(error);
-//     }
-//     let url = "";
-//     if (req.user) {
-//       url = req.user.loginId;
-//     } else {
-//       url = "";
-//     }
-//     // Main Page BIO NULL Check
-//     data.forEach(results => {
-//       if (results.bio === null) {
-//         results.bio = "NO BIO";
-//       }
-//     });
-//     res.render("main", {
-//       dataarray: data,
-//       _user: req.user,
-//       url: url
-//     });
-//   });
-// });
-
 /* Main Router */
 router.get("/", function (req, res, next) {
 
@@ -154,16 +122,12 @@ router.get("/", function (req, res, next) {
     console.log(req.user)
     ownerCheck = req.user.username;
   }
-
-
-  User.find({}, 'login bio avatar_url', {
+  User.find({}, 'login bio avatar_url', { // Main profile db query
     limit: 5
   }).sort({
     created_at: -1
   }).exec(function (err, result) {
     if (err) console.log(err);
-    console.log('-----------------------')
-    console.log(result);
     result.forEach(results => {
       if (results.bio === null) { // If bio is none, replace 'NO BIO' text
         results.bio = "NO BIO";
@@ -172,7 +136,7 @@ router.get("/", function (req, res, next) {
     res.render('main', {
       dataarray: result,
       _user: req.user,
-      url : ownerCheck
+      url: ownerCheck
     })
   })
 });
