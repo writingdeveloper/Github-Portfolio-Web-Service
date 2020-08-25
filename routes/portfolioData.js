@@ -58,7 +58,7 @@ router.get(`/:userId`, function (req, res, next) {
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
-    ownerCheck = req.user.loginId;
+    ownerCheck = req.user.username;
   }
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
