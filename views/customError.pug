@@ -13,6 +13,7 @@ html
             ._404 500
             hr
             ._2= `User '${userId}' does not exist. If you think this error information is wrong, please click the 'Report to Administrator' button. It will send error information automatically.`
+            ._2= `ERROR MESSAGE : ${errorMessage}`
             a.btn(href='/') Home
             -if(loginedId !== null){
             form(action=`/reportError/er/${loginedId}` id='submit' method="post")
