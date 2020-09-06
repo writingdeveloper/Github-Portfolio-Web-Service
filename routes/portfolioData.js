@@ -7,7 +7,7 @@ const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
 const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
-var urlExists = require('url-exists');
+// const devicon = require
 const router = express.Router();
 
 router.use(bodyParser.json());
@@ -16,11 +16,13 @@ router.use(express.static(path.join(__dirname, "public")));
 /* Database Schema */
 const User = require('../lib/models/userModel');
 const Repo = require('../lib/models/repoModel');
-let devicon = require('../config/devicon.json');
 
 // Parsing Dependency
 const cheerio = require("cheerio"); // Parsing Module
 const request = require("request"); // Request Module
+const {
+  isNull
+} = require('lodash');
 
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
@@ -32,8 +34,9 @@ let s3 = new aws.S3();
 let upload = multer({
   storage: multerS3({
     s3: s3,
-    bucket: process.env.AWS_S3_BUCKET || 'portfolioworld',
+    bucket: process.env.AWS_S3_BUCKET,
     key: function (req, file, cb) {
+      console.log(req);
       let newFileName = Date.now() + "-" + file.originalname;
       let fullPath = `public/images/member/${req.params.userId}/${newFileName}`;
       cb(null, fullPath); //use Date.now() for unique file keys
@@ -62,70 +65,54 @@ router.get(`/:userId`, function (req, res, next) {
   }
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
+    if (err) console.log(err);
     // console.log(qrCodeImageUrl);
 
     User.find({
       'login': userId
     }, function (err, userData) {
       if (err) console.log(err);
-      console.log(userData);
-      if (userData == false) {
-        console.log('No DATA');
+      if (userData.length == 0) { // If user data is Null([])
         res.render('customError', { // User Missing Error Handling
           userId: userId, // Entered User ID
           loginedId: ownerCheck, // Logined User ID
-          error: 'USER MISSING',
+          errorMessage: 'USER MISSING',
           description: 'Report Please'
         })
       } else {
+        /* special variable */
+        let language_list = require('../config/devicon.json');
+        let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
+        const languages = {
+          'html': 'html5',
+          'css': 'css3',
+          'c#': 'csharp',
+          'c++': 'cplusplus'
+        }
         Repo.find({
           'owner.login': userId
         }, 'project_type login name language description', function (err, repoData) {
           if (err) console.log(err);
-          // console.log(repoData);
-          // console.log(repoData[0].imageUrl);
+          for (i of language_list) {
+            for (repo of repoData) {
+              if (repo.language == null || undefined) {
+                repo.imageUrl = `/images/app/${repo.project_type}.png`;
+              } else {
+                let language_name = repo.language.toLowerCase();
+                if (languages[language_name]) {
+                  language_name = languages[language_name];
+                  console.log(language_name)
+                }
+                if (language_name == i.name) {
+                  repo.imageUrl = `${base_url}${language_name}/${language_name}-${i.versions.svg[0]}.svg`
+                  console.log(repo.imageUrl)
+                }
+                
+              }
 
-
-          for (let i = 0; i < repoData.length; i++) {
-            
-            if(repoData[i].language === null){
-              repoData[i].imageUrl = `/images/app/${repoData[i].project_type}.png`;
-            } else {
-              let language_url = repoData[i].language.toLowerCase();
-              repoData[i].imageUrl = `https://raw.githubusercontent.com/konpa/devicon/master/icons/${language_url}/${language_url}-original.svg`;
             }
-            // let language_url = repoData[i].language.toLowerCase();
-            // function getIconsByCode(language_url){
-            //   return devicon.filter(
-            //     function(devicon){return devicon.name== language_url}
-            //   )
-            // }
-            // let found = getIconsByCode(language_url)
-            // console.log(found[0]);
-            // if(found[0].tags[0]==='different'){
-            //   console.log('different');
-            // }
-
-            // if(found[0] == undefined){
-            //   console.log('apple');
-            //   console.log(repoData[i])
-            // }
-
-          //   let svgData = urlExists(`https://raw.githubusercontent.com/konpa/devicon/master/icons/${language_url}/${language_url}-original.svg`, function(err, exists) {
-          //     // console.log(exists); // true
-          //   });
-          //   if (repoData[i].imageUrl == undefined && repoData[i].language != null) {
-          //     // console.log('NO DIMAGE')
-          //     // Use lowercase letters because URL recognition problems exist when using uppercase characters in the path
-          //     repoData[i].imageUrl = `https://raw.githubusercontent.com/konpa/devicon/master/icons/${language_url}/${language_url}-original.svg`;
-
-          //   } else if (repoData[i].imageUrl == undefined) {
-          //     repoData[i].imageUrl = `/images/app/${repoData[i].project_type}.png`;
-          //   } else {
-          //     repoData[i].imageUrl = repoData[i].imageUrl;
-          //   }
+            
           }
-          // https://raw.githubusercontent.com/konpa/devicon/master/icons/${projects.language}/${projects.language}-original.svg
           res.render("portfolioItems", {
             dataarray: repoData,
             userId: userId,
@@ -432,95 +419,95 @@ router.get("/:userId/:pageId", function (req, res, next) {
     ownerCheck = req.user.loginId;
   }
   // project Table Counter SET
-  db.query(`UPDATE project SET counter=counter+1 WHERE sid=?`, [pageId]);
-  // User Table Total Counter SET
-  db.query(`UPDATE user SET counter=counter+1 WHERE loginId=?`, [userId]);
-  db.query(`SELECT * from counter WHERE userId=? AND date=?`, [userId, date], function (error, dayDateResult) {
-    if (error) {
-      console.log(`Error From Router Detail Page, Counter \n ${error}`);
-    }
-    if (dayDateResult[0] === undefined) {
-      db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, date, 1])
-    } else {
-      // Counter Table Day Counter SET
-      db.query(`UPDATE counter SET counter = counter+1 WHERE userId=?`, [userId]);
-    }
-  })
+  // db.query(`UPDATE project SET counter=counter+1 WHERE sid=?`, [pageId]);
+  // // User Table Total Counter SET
+  // db.query(`UPDATE user SET counter=counter+1 WHERE loginId=?`, [userId]);
+  // db.query(`SELECT * from counter WHERE userId=? AND date=?`, [userId, date], function (error, dayDateResult) {
+  //   if (error) {
+  //     console.log(`Error From Router Detail Page, Counter \n ${error}`);
+  //   }
+  //   if (dayDateResult[0] === undefined) {
+  //     db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, date, 1])
+  //   } else {
+  //     // Counter Table Day Counter SET
+  //     db.query(`UPDATE counter SET counter = counter+1 WHERE userId=?`, [userId]);
+  //   }
+  // })
   // GET Data from Personal Data
-  db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
-    error,
-    data
-  ) {
-    if (error) {
-      throw error;
-    }
-    // If wrong request from Client (Tried Not Exist Portfolio Page), Redirect user page
-    if (data[0] === undefined) {
-      res.redirect(`/${userId}`);
-    } else {
-      let results = data[0];
-      // Get github URL
-      let url = results.githubUrl;
-      if (results.imageUrl === null) {
-        console.log('NO IMAGE');
-        imageNullCheck = `/images/app/${results.type}.png`
-        console.log(imageNullCheck);
-      } else {
-        imageNullCheck = results.imageUrl;
-      }
-      // Use Request Module to parsing Web page
-      request(url, function (error, response, html) {
-        let readme;
-        // If Error with parsing Github README.md
-        if (error) {
-          console.log("Have Some problem with Reading Github README.md file!");
-          console.log(error);
-          readme =
-            "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
-          console.log(readme + "ERROR");
-        } else {
-          // Parsing readme ID in github page
-          let $ = cheerio.load(html);
-          $(".Box-body").each(function () {
-            // save to readme Variable
-            readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
-            // console.log(readme);
-          });
-        }
-        if (readme === undefined) { // If readme is undefined
-          readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
-        }
-        db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
-          if (error) {
-            throw (`Error from Detail Router GET USER DATA SQL ${error}`)
-          }
-          let userResults = data[0];
-          let email = userResults.email;
-          let phoneNumber = userResults.phoneNumber;
-          console.log(results.pjdate1);
-          // console.log(results.pjdate1.toISOString().substr(0,7));
-          res.render("detail", {
-            userId: userId,
-            pageId: pageId,
-            projectName: results.projectName,
-            imageUrl: imageNullCheck,
-            type: results.type,
-            keyword: results.keyword,
-            projectDate1: results.projectDate1,
-            projectDate2: results.projectDate2,
-            summary: results.summary,
-            projectDemoUrl: results.projectDemoUrl,
-            githubUrl: results.githubUrl,
-            counter: results.counter,
-            markdown: readme,
-            email: email,
-            phoneNumber: phoneNumber,
-            ownerCheck: ownerCheck
-          });
-        });
-      })
-    }
+  // db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
+  //   error,
+  //   data
+  // ) {
+  //   if (error) {
+  //     throw error;
+  //   }
+  //   // If wrong request from Client (Tried Not Exist Portfolio Page), Redirect user page
+  //   if (data[0] === undefined) {
+  //     res.redirect(`/${userId}`);
+  //   } else {
+  //     let results = data[0];
+  //     // Get github URL
+  //     let url = results.githubUrl;
+  //     if (results.imageUrl === null) {
+  //       console.log('NO IMAGE');
+  //       imageNullCheck = `/images/app/${results.type}.png`
+  //       console.log(imageNullCheck);
+  //     } else {
+  //       imageNullCheck = results.imageUrl;
+  //     }
+  //     // Use Request Module to parsing Web page
+  //     request(url, function (error, response, html) {
+  //       let readme;
+  //       // If Error with parsing Github README.md
+  //       if (error) {
+  //         console.log("Have Some problem with Reading Github README.md file!");
+  //         console.log(error);
+  //         readme =
+  //           "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
+  //         console.log(readme + "ERROR");
+  //       } else {
+  //         // Parsing readme ID in github page
+  //         let $ = cheerio.load(html);
+  //         $(".Box-body").each(function () {
+  //           // save to readme Variable
+  //           readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
+  //           // console.log(readme);
+  //         });
+  //       }
+  //       if (readme === undefined) { // If readme is undefined
+  //         readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
+  //       }
+  //       db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
+  //         if (error) {
+  //           throw (`Error from Detail Router GET USER DATA SQL ${error}`)
+  //         }
+  //         let userResults = data[0];
+  //         let email = userResults.email;
+  //         let phoneNumber = userResults.phoneNumber;
+  //         console.log(results.pjdate1);
+  //         // console.log(results.pjdate1.toISOString().substr(0,7));
+  res.render("detail", {
+    userId: userId,
+    pageId: pageId,
+    projectName: results.projectName,
+    imageUrl: imageNullCheck,
+    type: results.type,
+    keyword: results.keyword,
+    projectDate1: results.projectDate1,
+    projectDate2: results.projectDate2,
+    summary: results.summary,
+    projectDemoUrl: results.projectDemoUrl,
+    githubUrl: results.githubUrl,
+    counter: results.counter,
+    markdown: readme,
+    email: email,
+    phoneNumber: phoneNumber,
+    ownerCheck: ownerCheck
   });
+  //       });
+  // })
+  // }
+  // });
 });
 
 module.exports = router;
