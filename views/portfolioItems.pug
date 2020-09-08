@@ -24,12 +24,12 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
             | Home
             span.sr-only (current)
         - if(ownerCheck === userId){
-           a.nav-link(href='/logout') Logout
-           a.nav-link(href=`/${userId}/admin/mypage`) My Page
+          a.nav-link(href='/logout') Logout
+          a.nav-link(href=`/${userId}/admin/mypage`) My Page
         - } else if (ownerCheck && (ownerCheck !== userId)){
-           
+
         - } else {
-           a.nav-link(href='/auth/login') Login
+          a.nav-link(href='/auth/login') Login
         - }
         //- li.nav-item
         li.nav-item
@@ -59,8 +59,12 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
         .card.h-100
           .card-type(class=`${projects.project_type}`)
             p.text
-             =projects.project_type
+              =projects.project_type
+          - if(projects.imageUrl){   
           img.card-img-top(src=`${projects.imageUrl}`)
+          - } else if(projects.imageUrl ==null) {
+            img.card-img-top(src=`/images/app/${repo.project_type}.png`) 
+          - }
           i.devicon-javascript-plain.colored
           .card-body
             h4.card-title
@@ -93,7 +97,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
 footer.bg-dark
   .container
     p.m-0.text-center.text-white 
-      =`Copyright © ${userId} 2018`
+      =`Copyright © ${userId} 2020`
 // Bootstrap core JavaScript
 include libraries/bootstrapjs.pug
 include libraries/googleanalytics.pug
