@@ -80,9 +80,11 @@ router.get(`/:userId`, function (req, res, next) {
           description: 'Report Please'
         })
       } else {
-        /* special variable */
-        let language_list = require('../config/devicon.json');
+        
+        let language_list = require('../config/devicon.json');  // official devicon json data
+
         let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
+        /* special variable */
         const languages = {
           'html': 'html5',
           'css': 'css3',
@@ -93,25 +95,36 @@ router.get(`/:userId`, function (req, res, next) {
           'owner.login': userId
         }, 'project_type login name language description', function (err, repoData) {
           if (err) console.log(err);
-          for (i of language_list) {
-            for (repo of repoData) {
-              if (repo.language == null || undefined) {
-                repo.imageUrl = `/images/app/${repo.project_type}.png`;
-              } else {
-                let language_name = repo.language.toLowerCase();
-                if (languages[language_name]) {
-                  language_name = languages[language_name];
-                  console.log(language_name)
-                }
-                if (language_name == i.name) {
-                  repo.imageUrl = `${base_url}${language_name}/${language_name}-${i.versions.svg[0]}.svg`
-                  console.log(repo.imageUrl)
-                }
-                
-              }
 
+          for (repo of repoData) {
+            let result_url;
+            let lowercase_language;
+
+            if (repo.language == 'null' || repo.language == null) { // If null use default image
+              console.log('Null')
+              result_url = `/images/app/${repo.project_type}.png`
+            } else {
+              lowercase_language = repo.language.toLowerCase();
+              console.log(lowercase_language)
             }
-            
+
+            let url = (language_list.filter(function (item) {
+              if (repo.language == null || repo.language == 'null') {
+                result_url = `/images/app/${repo.project_type}.png`
+              } else if (item.name === lowercase_language) {
+                console.log(item.name === lowercase_language)
+                result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+                console.log(result_url);
+              }
+            }))
+
+            if (languages.hasOwnProperty(lowercase_language) == true) {
+              lowercase_language = languages[lowercase_language];
+              result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+            } else if (url === false) {
+              result_url = `/images/app/${repo.project_type}.png`
+            }
+            repo.imageUrl = result_url
           }
           res.render("portfolioItems", {
             dataarray: repoData,
