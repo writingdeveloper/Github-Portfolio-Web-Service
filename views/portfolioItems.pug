@@ -59,11 +59,11 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
         .card.h-100
           .card-type(class=`${projects.project_type}`)
             p.text
-              =projects.project_type
-          - if(projects.imageUrl){   
-          img.card-img-top(src=`${projects.imageUrl}`)
-          - } else if(projects.imageUrl ==null) {
-            img.card-img-top(src=`/images/app/${repo.project_type}.png`) 
+              =projects.projectType
+          - if(projects.imageURL){   
+          img.card-img-top(src=`${projects.imageURL}`)
+          - } else if(projects.imageURL ==null) {
+            img.card-img-top(src=`/images/app/${repo.projectType}.png`) 
           - }
           i.devicon-javascript-plain.colored
           .card-body
