@@ -23,6 +23,12 @@ const request = require("request"); // Request Module
 const {
   isNull
 } = require('lodash');
+const {
+  fn
+} = require('moment');
+const {
+  json
+} = require('express');
 
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
@@ -44,12 +50,12 @@ let upload = multer({
   })
 });
 
-function loginCheck() {
+function loginCheck(req, ownerCheck) {
   // Owner Check
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
-    ownerCheck = req.user.loginId;
+    ownerCheck = req.user.username;
   }
 }
 
@@ -58,15 +64,10 @@ router.get(`/:userId`, function (req, res, next) {
   let userId = req.params.userId;
   // Check Owner of this page
   let ownerCheck;
-  if (req.user === undefined) {
-    ownerCheck = null;
-  } else {
-    ownerCheck = req.user.username;
-  }
+  loginCheck(req, ownerCheck); // User login check
   let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
     if (err) console.log(err);
-    // console.log(qrCodeImageUrl);
 
     User.find({
       'login': userId
@@ -80,9 +81,8 @@ router.get(`/:userId`, function (req, res, next) {
           description: 'Report Please'
         })
       } else {
-        
-        let language_list = require('../config/devicon.json');  // official devicon json data
 
+        let language_list = require('../config/devicon.json'); // official devicon json data
         let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
         /* special variable */
         const languages = {
@@ -93,16 +93,17 @@ router.get(`/:userId`, function (req, res, next) {
         }
         Repo.find({
           'owner.login': userId
-        }, 'project_type login name language description', function (err, repoData) {
+        }, 'projectType login name language description', function (err, repoData) {
           if (err) console.log(err);
 
           for (repo of repoData) {
             let result_url;
             let lowercase_language;
+            console.log(repo.projectType);
 
-            if (repo.language == 'null' || repo.language == null) { // If null use default image
+            if (repo.language == 'Null' || repo.language == null) { // If null use default image
               console.log('Null')
-              result_url = `/images/app/${repo.project_type}.png`
+              result_url = `/images/app/${repo.projectType}.png` // default null image path
             } else {
               lowercase_language = repo.language.toLowerCase();
               console.log(lowercase_language)
@@ -110,7 +111,7 @@ router.get(`/:userId`, function (req, res, next) {
 
             let url = (language_list.filter(function (item) {
               if (repo.language == null || repo.language == 'null') {
-                result_url = `/images/app/${repo.project_type}.png`
+                result_url = `/images/app/${repo.projectType}.png`
               } else if (item.name === lowercase_language) {
                 console.log(item.name === lowercase_language)
                 result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
@@ -122,9 +123,17 @@ router.get(`/:userId`, function (req, res, next) {
               lowercase_language = languages[lowercase_language];
               result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
             } else if (url === false) {
-              result_url = `/images/app/${repo.project_type}.png`
+              result_url = `/images/app/${repo.projectType}.png`
             }
-            repo.imageUrl = result_url
+            repo.imageURL = result_url
+          }
+
+          /* Keyword Null Check */
+          for (let i of repoData) {
+            if (i.language === null || i.language === 'null') {
+              i.language = 'Keyword not set';
+            }
+
           }
           res.render("portfolioItems", {
             dataarray: repoData,
@@ -411,18 +420,20 @@ router.get("/:userId/:pageId", function (req, res, next) {
   // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  // let date = new Date().toISOString().substr(0, 10).replace('T', ' '); // Today Date
-  let date = new Date();
-  let dd = date.getDate();
-  let mm = date.getMonth() + 1; //January is 0!
-  let yyyy = date.getFullYear();
-  if (dd < 10) {
-    dd = '0' + dd
-  }
-  if (mm < 10) {
-    mm = '0' + mm
-  }
-  date = `${yyyy}-${mm}-${dd}`;
+
+  let date = new Date().toISOString().substr(0, 10).replace('T', ' '); // Today Date
+  console.log(date);
+  // // let date = new Date();
+  // let dd = date.getDate();
+  // let mm = date.getMonth() + 1; //January is 0!
+  // let yyyy = date.getFullYear();
+  // if (dd < 10) {
+  //   dd = '0' + dd
+  // }
+  // if (mm < 10) {
+  //   mm = '0' + mm
+  // }
+  // date = `${yyyy}-${mm}-${dd}`;
   let ownerCheck;
   let imageNullCheck;
   // Owner Check
@@ -431,96 +442,184 @@ router.get("/:userId/:pageId", function (req, res, next) {
   } else {
     ownerCheck = req.user.loginId;
   }
-  // project Table Counter SET
-  // db.query(`UPDATE project SET counter=counter+1 WHERE sid=?`, [pageId]);
-  // // User Table Total Counter SET
-  // db.query(`UPDATE user SET counter=counter+1 WHERE loginId=?`, [userId]);
-  // db.query(`SELECT * from counter WHERE userId=? AND date=?`, [userId, date], function (error, dayDateResult) {
-  //   if (error) {
-  //     console.log(`Error From Router Detail Page, Counter \n ${error}`);
-  //   }
-  //   if (dayDateResult[0] === undefined) {
-  //     db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, date, 1])
-  //   } else {
-  //     // Counter Table Day Counter SET
-  //     db.query(`UPDATE counter SET counter = counter+1 WHERE userId=?`, [userId]);
-  //   }
-  // })
-  // GET Data from Personal Data
-  // db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
-  //   error,
-  //   data
-  // ) {
-  //   if (error) {
-  //     throw error;
-  //   }
-  //   // If wrong request from Client (Tried Not Exist Portfolio Page), Redirect user page
-  //   if (data[0] === undefined) {
-  //     res.redirect(`/${userId}`);
-  //   } else {
-  //     let results = data[0];
-  //     // Get github URL
-  //     let url = results.githubUrl;
-  //     if (results.imageUrl === null) {
-  //       console.log('NO IMAGE');
-  //       imageNullCheck = `/images/app/${results.type}.png`
-  //       console.log(imageNullCheck);
-  //     } else {
-  //       imageNullCheck = results.imageUrl;
-  //     }
-  //     // Use Request Module to parsing Web page
-  //     request(url, function (error, response, html) {
-  //       let readme;
-  //       // If Error with parsing Github README.md
-  //       if (error) {
-  //         console.log("Have Some problem with Reading Github README.md file!");
-  //         console.log(error);
-  //         readme =
-  //           "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
-  //         console.log(readme + "ERROR");
-  //       } else {
-  //         // Parsing readme ID in github page
-  //         let $ = cheerio.load(html);
-  //         $(".Box-body").each(function () {
-  //           // save to readme Variable
-  //           readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
-  //           // console.log(readme);
-  //         });
-  //       }
-  //       if (readme === undefined) { // If readme is undefined
-  //         readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
-  //       }
-  //       db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
-  //         if (error) {
-  //           throw (`Error from Detail Router GET USER DATA SQL ${error}`)
-  //         }
-  //         let userResults = data[0];
-  //         let email = userResults.email;
-  //         let phoneNumber = userResults.phoneNumber;
-  //         console.log(results.pjdate1);
-  //         // console.log(results.pjdate1.toISOString().substr(0,7));
-  res.render("detail", {
-    userId: userId,
-    pageId: pageId,
-    projectName: results.projectName,
-    imageUrl: imageNullCheck,
-    type: results.type,
-    keyword: results.keyword,
-    projectDate1: results.projectDate1,
-    projectDate2: results.projectDate2,
-    summary: results.summary,
-    projectDemoUrl: results.projectDemoUrl,
-    githubUrl: results.githubUrl,
-    counter: results.counter,
-    markdown: readme,
-    email: email,
-    phoneNumber: phoneNumber,
-    ownerCheck: ownerCheck
+
+
+  Repo.find({
+    'owner.login': userId,
+    'name': pageId
+  }, function (err, repoData) {
+    if (err) console.log(err);
+    if(repoData.length == 0){
+      console.log('Wrong Page or unvalid user or repo Page')
+      res.render('customError', { // User Missing Error Handling
+        userId: userId, // Entered User ID
+        loginedId: ownerCheck, // Logined User ID
+        errorMessage: 'USER MISSING',
+        description: 'Report Please'
+      })
+    }
+    else {
+      repoData = repoData[0];
+
+
+      // console.log(repoData.projectType);
+      // if (repoData.projectType ==='null') {
+      //   console.log('No Type');
+      //   repoData.projectType = `/images/app/Project.png`
+      // }
+      // let imageData = repoData.imageURL;
+
+      // if (repoData.imageURL === null) {
+      //   console.log('NO IMAGE');
+      //   imageNullCheck = `/images/app/${repoData.projectType}.png`
+      //   console.log(imageNullCheck);
+      // } else {
+      //   imageNullCheck = repoData.imageURL;
+      // }
+
+      // console.log(repoData.name);
+
+
+      request({
+        headers: {
+          'User-Agent': 'request'
+        },
+        json: true,
+        uri: repoData.languages_url
+      },
+      function (error, response, data) {
+        
+        let keywordData;
+        if (error) {
+          console.log(error);
+        } else {
+          keywordData = data;
+          console.log(keywordData)
+        }
+
+        // request.get({
+        //   url: repoData.languages_url,
+        //   json: true,
+        //   headers: {
+        //     'User-Agent': 'request'
+        //   }
+        // }, (err, res, data) => {
+        //   if (err) {
+        //     console.log('Error:', err);
+        //   } else if (res.statusCode !== 200) {
+        //     console.log('Status:', res.statusCode);
+        //   } else {
+        //     console.log(data);
+        //     keywordData = data;
+        //     console.log(keywordData)
+
+        //   }
+        //   console.log(keywordData)
+        //   keywordData=data;
+        // });
+
+
+        // console.log(keywordData)
+
+        // console.log(keywordData)
+        res.render("detail", {
+          userId: userId,
+          pageId: pageId,
+          projectName: repoData.name,
+          imageURL: repoData.imageURL,
+          projectType: repoData.projectType,
+          keyword: keywordData,
+          // projectDate1: repoData.projectDate1,
+          // projectDate2: repoData.projectDate2,
+          description: repoData.description,
+          // projectDemoUrl: repoData.projectDemoUrl,
+          githubURL: repoData.html_url,
+          // counter: repoData.counter,
+          // markdown: repoData.readme,
+          // email: repoData.email,
+          // phoneNumber: repoData.phoneNumber,
+          // ownerCheck: repoData.ownerCheck
+
+        });
+      })
+    }
   });
-  //       });
-  // })
-  // }
-  // });
+
 });
+
+// project Table Counter SET
+// db.query(`UPDATE project SET counter=counter+1 WHERE sid=?`, [pageId]);
+// // User Table Total Counter SET
+// db.query(`UPDATE user SET counter=counter+1 WHERE loginId=?`, [userId]);
+// db.query(`SELECT * from counter WHERE userId=? AND date=?`, [userId, date], function (error, dayDateResult) {
+//   if (error) {
+//     console.log(`Error From Router Detail Page, Counter \n ${error}`);
+//   }
+//   if (dayDateResult[0] === undefined) {
+//     db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, date, 1])
+//   } else {
+//     // Counter Table Day Counter SET
+//     db.query(`UPDATE counter SET counter = counter+1 WHERE userId=?`, [userId]);
+//   }
+// })
+// GET Data from Personal Data
+// db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
+//   error,
+//   data
+// ) {
+//   if (error) {
+//     throw error;
+//   }
+//   // If wrong request from Client (Tried Not Exist Portfolio Page), Redirect user page
+//   if (data[0] === undefined) {
+//     res.redirect(`/${userId}`);
+//   } else {
+//     let results = data[0];
+//     // Get github URL
+//     let url = results.githubUrl;
+//     if (results.imageUrl === null) {
+//       console.log('NO IMAGE');
+//       imageNullCheck = `/images/app/${results.type}.png`
+//       console.log(imageNullCheck);
+//     } else {
+//       imageNullCheck = results.imageUrl;
+//     }
+//     // Use Request Module to parsing Web page
+//     request(url, function (error, response, html) {
+//       let readme;
+//       // If Error with parsing Github README.md
+//       if (error) {
+//         console.log("Have Some problem with Reading Github README.md file!");
+//         console.log(error);
+//         readme =
+//           "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
+//         console.log(readme + "ERROR");
+//       } else {
+//         // Parsing readme ID in github page
+//         let $ = cheerio.load(html);
+//         $(".Box-body").each(function () {
+//           // save to readme Variable
+//           readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
+//           // console.log(readme);
+//         });
+//       }
+//       if (readme === undefined) { // If readme is undefined
+//         readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
+//       }
+//       db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
+//         if (error) {
+//           throw (`Error from Detail Router GET USER DATA SQL ${error}`)
+//         }
+//         let userResults = data[0];
+//         let email = userResults.email;
+//         let phoneNumber = userResults.phoneNumber;
+//         console.log(results.pjdate1);
+//         // console.log(results.pjdate1.toISOString().substr(0,7));
+
+//       });
+// })
+// }
+// });
+
 
 module.exports = router;
