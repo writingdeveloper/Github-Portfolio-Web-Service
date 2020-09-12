@@ -1,5 +1,5 @@
 # Github Portfolio Web Service
-![](https://img.shields.io/badge/Code%20Statue-Open-brightgreen.svg) [![Build Status](https://travis-ci.org/writingdeveloper/Github-Portfolio-Web-Service.svg?branch=master)](https://travis-ci.org/sangumee/Github-Portfolio-Web-Service)
+![](https://img.shields.io/badge/Code%20Statue-Open-brightgreen.svg) [![Build Status](https://travis-ci.org/writingdeveloper/Github-Portfolio-Web-Service.svg?branch=master)](https://travis-ci.org/writingdeveloper/Github-Portfolio-Web-Service)
 
 Developer Portfolio Site Using Github
 
@@ -11,7 +11,7 @@ You can access it from the link below and there may be a delay of up to 5 second
 [Direct Link](https://expressme.herokuapp.com/)
 
 ## Project Map
-<img src="public/images/app/main/Project Map.png">
+<img src="/images/app/main/Project Map.png">
 
 
 ## Introduction
@@ -69,7 +69,7 @@ The tested version is shown below and is developed based on the LTS version of N
 
 The program will also be uploaded to the NPM in the future, and currently it will only write the installation method through the ZIP file.
 
-1. Download ZIP file with this [Link](https://github.com/sangumee/Github-Portfolio-Web-Service/archive/master.zip).
+1. Download ZIP file with this [Link](https://github.com/writingdeveloper/Github-Portfolio-Web-Service/archive/master.zip).
 2. Unzip the downloaded file.
 3. From the command line, navigate to the directory and run it using the following command. It supports two methods.
 
@@ -92,7 +92,7 @@ From the web browser, you can access the following address:
 
 ## Issues
 
-Use the Issue tab if you have any problems and questions with this program. Please give some ideas or ask for cooperation! [Issue](https://github.com/sangumee/Github-Portfolio-Web-Service/issues)
+Use the Issue tab if you have any problems and questions with this program. Please give some ideas or ask for cooperation! [Issue](https://github.com/writingdeveloper/Github-Portfolio-Web-Service/issues)
 
 ## License
 
