@@ -11,7 +11,7 @@ You can access it from the link below and there may be a delay of up to 5 second
 [Direct Link](https://expressme.herokuapp.com/)
 
 ## Project Map
-<img src="./public/images/app/main/Project Map.png">
+<img src="https://github.com/writingdeveloper/Github-Portfolio-Web-Service/raw/master/public/images/app/main/Project%20Map.png">
 
 
 ## Introduction
