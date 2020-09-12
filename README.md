@@ -11,7 +11,7 @@ You can access it from the link below and there may be a delay of up to 5 second
 [Direct Link](https://expressme.herokuapp.com/)
 
 ## Project Map
-<img src="/images/app/main/Project Map.png">
+<img src="./public/images/app/main/Project Map.png">
 
 
 ## Introduction
@@ -48,8 +48,8 @@ Please check the detailed function list below.
 
 ### Portfolio Page
 
-✅ Responsive Design with Media Query
-✅ Portfolio Filter Function (Projects, Certifications, Education)
+✅ Responsive Design with Media Query  
+✅ Portfolio Filter Function (Projects, Certifications, Education)  
 ✅ Image Uploaded in Amazon S3 Storage (Create, Update, Delete function Added)
 
 ### Admin Page
@@ -81,7 +81,7 @@ The program will also be uploaded to the NPM in the future, and currently it wil
 From the web browser, you can access the following address:
 
 ```
-127.0.0.1:3000 (Default Port : 3000)
+127.0.0.1:3001 (Default Port : 3001)
 ```
 
 ## Built With
