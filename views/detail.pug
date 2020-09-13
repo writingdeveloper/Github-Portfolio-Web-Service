@@ -43,7 +43,7 @@ section#works.l-section(role='region')
             ul.gallery-spec
               li.gallery-spec-item
                 strong.gallery-spec-key Views
-                span.gallery-spec-value= `${counter}`
+                span.gallery-spec-value= `${detailViewCounter}`
               li.gallery-spec-item
                 strong.gallery-spec-key Type
                 span.gallery-spec-value= `${projectType}`
@@ -52,13 +52,13 @@ section#works.l-section(role='region')
                 span.gallery-spec-value= `${Object.keys(keyword)}`
               li.gallery-spec-item
                 strong.gallery-spec-key Term
-                span.gallery-spec-value= `${projectDate1} ~ ${projectDate2}`
+                span.gallery-spec-value= `${created_at} ~ ${updated_at}`
             #work1Description
             strong.gallery-spec-key Description
             span.gallery-spec-value= `${description}`
             .ui-group
-              - if(projectDemoUrl){
-              a.ui-button(role='button', href=`${projectDemoUrl}`, target='_blank') Demo
+              - if(projectDemoURL){
+              a.ui-button(role='button', href=`${projectDemoURL}`, target='_blank') Demo
               - }
               a.ui-button(role='button', href=`${githubURL}`, target='_blank') Github Repo
         div(id="readme" class="Box Box--condensed instapaper_body md js-code-block-container")
@@ -70,7 +70,7 @@ section#works.l-section(role='region')
               a.Box-btn-octicon.btn-octicon.float-right(href=`${githubURL}/edit/master/README.md`  target="_blank" , aria-label='Edit this file')
                 svg.octicon.octicon-pencil(viewbox='0 0 14 16', version='1.1', width='14', height='16', aria-hidden='true')
                   path(fill-rule='evenodd', d='M0 12v3h3l8-8-3-3-8 8zm3 2H1v-2h1v1h1v1zm10.3-9.3L12 6 9 3l1.3-1.3a.996.996 0 0 1 1.41 0l1.59 1.59c.39.39.39 1.02 0 1.41z')
-          div(class="Box-body p-6")
+          div(class="markdown-body p-6")
             != `${markdown}`
   footer#footer.l-footer(role='contentinfo')
     .l-section-holder.l-footer-holder.footer-widget-group
