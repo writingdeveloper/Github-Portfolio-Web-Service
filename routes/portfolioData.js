@@ -7,6 +7,8 @@ const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
 const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
+const base64 = require('js-base64').Base64;
+const showdown = require('showdown')
 // const devicon = require
 const router = express.Router();
 
@@ -50,23 +52,30 @@ let upload = multer({
   })
 });
 
-function loginCheck(req, ownerCheck) {
+function loginCheck(req) {
   // Owner Check
   if (req.user === undefined) {
     ownerCheck = null;
   } else {
-    ownerCheck = req.user.username;
+    return req.user.username;
   }
 }
 
 /* GET home page. */
 router.get(`/:userId`, function (req, res, next) {
   let userId = req.params.userId;
+  // console.log(req.user)
   // Check Owner of this page
   let ownerCheck;
-  loginCheck(req, ownerCheck); // User login check
-  let fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
-  QRCode.toDataURL(fullUrl, function (err, qrCodeImageUrl) {
+
+  if (req.user === undefined) {
+    ownerCheck = null;
+  } else {
+    ownerCheck = req.user.username;
+  }
+
+  let fullUrl = `${req.protocol}'://'${req.get('host')}${req.originalURL}`;
+  QRCode.toDataURL(fullUrl, function (err, qrCodeImageURL) {
     if (err) console.log(err);
 
     User.find({
@@ -99,23 +108,18 @@ router.get(`/:userId`, function (req, res, next) {
           for (repo of repoData) {
             let result_url;
             let lowercase_language;
-            console.log(repo.projectType);
 
             if (repo.language == 'Null' || repo.language == null) { // If null use default image
-              console.log('Null')
               result_url = `/images/app/${repo.projectType}.png` // default null image path
             } else {
               lowercase_language = repo.language.toLowerCase();
-              console.log(lowercase_language)
             }
 
             let url = (language_list.filter(function (item) {
               if (repo.language == null || repo.language == 'null') {
                 result_url = `/images/app/${repo.projectType}.png`
               } else if (item.name === lowercase_language) {
-                console.log(item.name === lowercase_language)
                 result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-                console.log(result_url);
               }
             }))
 
@@ -133,13 +137,12 @@ router.get(`/:userId`, function (req, res, next) {
             if (i.language === null || i.language === 'null') {
               i.language = 'Keyword not set';
             }
-
           }
           res.render("portfolioItems", {
             dataarray: repoData,
             userId: userId,
-            qrCodeImageUrl: qrCodeImageUrl,
-            ownerCheck: ownerCheck
+            qrCodeImageURL,
+            ownerCheck
           });
         })
       }
@@ -442,14 +445,14 @@ router.get("/:userId/:pageId", function (req, res, next) {
   } else {
     ownerCheck = req.user.loginId;
   }
-
+  let detailViewCounter;
 
   Repo.find({
     'owner.login': userId,
     'name': pageId
   }, function (err, repoData) {
     if (err) console.log(err);
-    if(repoData.length == 0){
+    if (repoData.length == 0) {
       console.log('Wrong Page or unvalid user or repo Page')
       res.render('customError', { // User Missing Error Handling
         userId: userId, // Entered User ID
@@ -457,94 +460,78 @@ router.get("/:userId/:pageId", function (req, res, next) {
         errorMessage: 'USER MISSING',
         description: 'Report Please'
       })
-    }
-    else {
-      repoData = repoData[0];
+    } else {
+      repoData = repoData[0]; // To use easier
 
+      /* Detail View Counter Prcoess */
+      detailViewCounter = repoData.detailViewCounter;
+      if (detailViewCounter == 0) {
+        console.log(detailViewCounter)
+        detailViewCounter = repoData.detailViewCounter;
+      }
 
-      // console.log(repoData.projectType);
-      // if (repoData.projectType ==='null') {
-      //   console.log('No Type');
-      //   repoData.projectType = `/images/app/Project.png`
-      // }
-      // let imageData = repoData.imageURL;
+      /* Project Term Process */
+      let created_at = repoData.created_at.toISOString().substr(0, 10).replace('T', ' ');;
+      let updated_at = repoData.updated_at.toISOString().substr(0, 10).replace('T', ' ');
 
-      // if (repoData.imageURL === null) {
-      //   console.log('NO IMAGE');
-      //   imageNullCheck = `/images/app/${repoData.projectType}.png`
-      //   console.log(imageNullCheck);
-      // } else {
-      //   imageNullCheck = repoData.imageURL;
-      // }
-
-      // console.log(repoData.name);
-
-
+      /* README.md API Process */
       request({
-        headers: {
-          'User-Agent': 'request'
+          headers: {
+            'User-Agent': 'request',
+            'accept': 'application/vnd.github.VERSION.raw',
+            'charset': 'UTF-8'
+          },
+          json: true,
+          uri: `https://api.github.com/repos/${userId}/${pageId}/readme`
         },
-        json: true,
-        uri: repoData.languages_url
-      },
-      function (error, response, data) {
-        
-        let keywordData;
-        if (error) {
-          console.log(error);
-        } else {
-          keywordData = data;
-          console.log(keywordData)
-        }
-
-        // request.get({
-        //   url: repoData.languages_url,
-        //   json: true,
-        //   headers: {
-        //     'User-Agent': 'request'
-        //   }
-        // }, (err, res, data) => {
-        //   if (err) {
-        //     console.log('Error:', err);
-        //   } else if (res.statusCode !== 200) {
-        //     console.log('Status:', res.statusCode);
-        //   } else {
-        //     console.log(data);
-        //     keywordData = data;
-        //     console.log(keywordData)
-
-        //   }
-        //   console.log(keywordData)
-        //   keywordData=data;
-        // });
-
-
-        // console.log(keywordData)
-
-        // console.log(keywordData)
-        res.render("detail", {
-          userId: userId,
-          pageId: pageId,
-          projectName: repoData.name,
-          imageURL: repoData.imageURL,
-          projectType: repoData.projectType,
-          keyword: keywordData,
-          // projectDate1: repoData.projectDate1,
-          // projectDate2: repoData.projectDate2,
-          description: repoData.description,
-          // projectDemoUrl: repoData.projectDemoUrl,
-          githubURL: repoData.html_url,
-          // counter: repoData.counter,
-          // markdown: repoData.readme,
-          // email: repoData.email,
-          // phoneNumber: repoData.phoneNumber,
-          // ownerCheck: repoData.ownerCheck
-
-        });
-      })
+        function (error, response, data) {
+          let readmeHTML;
+          if (error) {
+            console.log(error);
+          } else {
+            converter = new showdown.Converter(),
+              text = data;
+            readmeHTML = converter.makeHtml(text);
+            // console.log(readmeHTML)
+          }
+          /* Language List API Process */
+          request({
+              headers: {
+                'User-Agent': 'request'
+              },
+              json: true,
+              uri: repoData.languages_url
+            },
+            function (error, response, data) {
+              let keywordData;
+              if (error) {
+                console.log(error);
+              } else {
+                keywordData = data;
+                // console.log(keywordData)
+              }
+              res.render("detail", {
+                userId: userId,
+                pageId: pageId,
+                projectName: repoData.name,
+                imageURL: repoData.imageURL,
+                projectType: repoData.projectType,
+                keyword: keywordData,
+                created_at,
+                updated_at,
+                description: repoData.description,
+                projectDemoURL: repoData.homepage,
+                githubURL: repoData.html_url,
+                detailViewCounter,
+                markdown: readmeHTML,
+                // email: repoData.email,
+                // phoneNumber: repoData.phoneNumber,
+                // ownerCheck: repoData.ownerCheck
+              })
+            });
+        })
     }
   });
-
 });
 
 // project Table Counter SET
