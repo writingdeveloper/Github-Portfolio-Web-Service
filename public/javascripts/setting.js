@@ -117,9 +117,9 @@ let clickqrCode = document.getElementById('qrCode').addEventListener('click', qr
 function qrShow() {
   Swal.fire({
     title: 'Share it!',
-    imageUrl: qrCodeImageUrl,
+    imageUrl: qrCodeImageURL,
     imageAlt: 'QR Code',
-    footer: `<i class="fas fa-download"><a href="${qrCodeImageUrl}" download="${userId} Portfolio.png"> Download QR Code</a></i>`
+    footer: `<i class="fas fa-download"><a href="${qrCodeImageURL}" download="${userId} Portfolio.png"> Download QR Code</a></i>`
   })
 }
 
