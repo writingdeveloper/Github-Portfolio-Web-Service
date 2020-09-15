@@ -8,7 +8,8 @@ Developer Portfolio Site Using Github
 This project is currently hosted in Heroku and MariaDB is available from my raspberry pi server.  
 You can access it from the link below and there may be a delay of up to 5 seconds during the initial connection.
 
-[Direct Link](https://expressme.herokuapp.com/)
+[Direct Link](http://expressme.ga/)
+
 
 ## Project Map
 <img src="https://github.com/writingdeveloper/Github-Portfolio-Web-Service/raw/master/public/images/app/main/Project%20Map.png">
