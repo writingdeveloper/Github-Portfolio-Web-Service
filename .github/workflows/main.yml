@@ -26,6 +26,7 @@
             run: |
                 touch .env
                 echo MONGO_URI =${{ secrets.MONGO_URI }} >> .env
+                echo AWS_SECRET_ACCESS_KEY = ${{ secrets.AWS_SECRET_ACCESS_KEY }} >> .env
     
           - name: Npm install
             run: npm install
