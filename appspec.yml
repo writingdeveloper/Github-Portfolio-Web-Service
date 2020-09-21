@@ -3,7 +3,7 @@ version: 0.0
 os: linux
 files:
   - source: /appspec.yml
-    destination: /home/project
+    destination: /home/project/appspec.yml
 hooks:
   BeforeInstall:
     - location: /initialize.sh
