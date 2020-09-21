@@ -2,7 +2,6 @@ module.exports = function (router, request, shortid) {
   const passport = require('passport')
   const GitHubStrategy = require('passport-github').Strategy;
   /* Import Database Settings */
-  const db = require("../lib/db");
   let User = require('../lib/models/userModel');
 
   // const githubCredentials = require('../config/github.json'); // Development Setting

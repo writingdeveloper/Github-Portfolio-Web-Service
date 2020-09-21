@@ -49,4 +49,4 @@ const userSchema = new Schema({
 });
 console.log('userModele DB Connect!')
 
-module.exports = mongoose.model("Users", userSchema);
+module.exports = mongoose.model("users", userSchema);

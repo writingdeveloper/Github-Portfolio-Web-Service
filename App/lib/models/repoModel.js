@@ -292,19 +292,19 @@ const repoSchema = new Schema({
     },
 
 
-    projectType: {
-        type: String,
-        default: 'Project'
+    "projectType": {
+        "type": "String",
+        "default": 'Project'
     },
-    imageURL: {
-        type: String,
-        default: '/images/app/Project.png'
+    "imageURL": {
+        "type": "String",
+        "default": '/images/app/Project.png'
     },
-    detailViewCounter: {
-        type: Number,
-        default: 0
+    "detailViewCounter": {
+        "type": "Number",
+        "default": 0
     }
 });
 
 console.log('repoModel DB Connect!')
-module.exports = mongoose.model("Repos", repoSchema);
+module.exports = mongoose.model("repos", repoSchema);
