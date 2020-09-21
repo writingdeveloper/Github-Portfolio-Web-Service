@@ -1,2 +1,2 @@
 # /initialize.sh
-if [ -d "/home/ubuntu/build" ]; then rm -Rf "/home/ubuntu/build"; fi
+if [ -d "/home/project" ]; then rm -Rf "/home/project"; fi
