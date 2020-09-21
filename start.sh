@@ -7,5 +7,7 @@ export NVM_DIR="$HOME/.nvm"
 cd $PROJECT_ROOT
 
 # 원래 node 프로세스 종료
-sudo pkill -f node `ps -ef | grep 'node ./bin/www' | awk '{print $2}'`
+sudo pkill -f node
 nohup npm start >/home/project/logs 2>&1 </home/project/errors &
+
+# `ps -ef | grep 'node ./bin/www' | awk '{print $2}'`
