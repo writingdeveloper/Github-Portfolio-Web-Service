@@ -14,4 +14,4 @@ artifacts:
     - "**/*"
 cache:
   paths:
-    - "expressme/node_modules/**/*"
+    - "node_modules/**/*"
