@@ -10,7 +10,7 @@ const moment = require('moment-timezone');
 const app = express();
 
 /*
-If the environment variable fails to load, run the node app with `node -r dotenv / config. /bin/www`
+If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
 
 /* Socket IO */
