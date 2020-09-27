@@ -53,7 +53,7 @@ router.get(
   function (req, res) {
     // Successful authentication, redirect home.
     console.log(`Current Login User ${req.user.username}`);
-    res.redirect(`/${req.user.username}`);
+    res.redirect(`/`);
   }
 );
 
