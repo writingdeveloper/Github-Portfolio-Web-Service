@@ -81,7 +81,7 @@ router.get(`/:userId`, function (req, res, next) {
     User.find({
       'login': userId
     }, function (err, userData) {
-      if (err) console.log(err);
+      if (err) throw err;
       if (userData.length == 0) { // If user data is Null([])
         res.render('customError', { // User Missing Error Handling
           userId: userId, // Entered User ID
