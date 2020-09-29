@@ -27,16 +27,16 @@ html(lang="en")
                 th name
                 th View Count
                 th Register Date
-            each data in dataarray
+            each data in userData
                 tr
                     td
-                        a(href=`/${data.loginId}`)=`${data.loginId}`
-                    td=`${data.displayId}`
+                        a(href=`/${data.login}`)=`${data.login}`
+                    td=`${data.login}`
                     td=`${data.name}`
-                    td=`${data.counter}`
+                    td=`${data.userViewCounter}`
                     td=`${data.registerDate}`
-    - if(pageResult ==='NODATA'){
-        p NO MORE DATA
-    - } else {
-        a(href=`/sitemap/${pageResult}`)= `Page ${pageResult}`
-    - }
+    //- - if(pageResult ==='NODATA'){
+    //-     p NO MORE DATA
+    //- - } else {
+    //-     a(href=`/sitemap/${pageResult}`)= `Page ${pageResult}`
+    //- - }
