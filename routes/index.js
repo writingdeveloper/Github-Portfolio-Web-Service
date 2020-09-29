@@ -54,7 +54,16 @@ router.get(
   }),
   function (req, res) {
     // Successful authentication, redirect home.
-    console.log(`Current Login User ${req.user.username}`);
+    LoginLogs.create({
+      login: req.user.username,
+      id: req.user.id,
+      node_id: req.user._json.node_id,
+      provider: req.user.provider,
+      profileURL: req.user.profileUrl,
+      name: req.user._json.name,
+      location: req.user._json.location,
+      email: req.user._json.email
+    })
     res.redirect(`/`);
   }
 );
@@ -68,7 +77,7 @@ router.get(`/auth/login`, function (req, res, next) {
 router.get(`/logout`, function (req, res, next) {
   req.logout();
   req.session.save(function (err) {
-    if (err) console.log(err);
+    if (err) throw err;
     res.redirect(`/`);
   });
 });
@@ -83,36 +92,61 @@ router.use(
 );
 
 /* SiteMap */
-router.get(`/sitemap/:page`, function (req, res, next) {
+router.get(`/sitemap/0`, function (req, res, next) {
   let pageNumber = (Number(req.params.page) * 10000); // Current Page Number
   let nextPage = (Number(req.params.page) + 1) * 10000; // Next Page Number
   let pageResult; // Page Result
-  db.query(
-    `SELECT * FROM user order by displayId*1 LIMIT ?, 10000`,
-    [Number(pageNumber)],
-    function (error, data) {
-      if (error) {
-        throw error;
-      }
-      // console.log(data);
-      db.query(`SELECT * FROM user order by displayId*1 LIMIT ?, 10000`, [Number(nextPage)], function (error, pageData) {
-        if (error) {
-          throw error;
-        }
-        if (pageData.length === 0) { // If no more data in next Page
-          pageResult = 'NODATA'
-        } else {
-          pageResult = (Number(req.params.page) + 1) // More Data Exists return next page URL
-        }
-        res.render("sitemap", {
-          dataarray: data,
-          pageNumber: pageNumber,
-          pageResult
-        })
-      });
-    }
-  );
+
+/* Sitemap Query */
+  User.find()
+    .sort({
+      'id': 1
+    })
+    .limit(10000)
+    .then(userData => {
+      res.render("sitemap", {
+        userData,
+        // pageNumber,
+        // pageResult
+      })
+    })
 });
+
+// User.find().limit(Number(nextPage))
+// if (pageData.length === 0) { // If no more data in next Page
+//   pageResult = 'NODATA'
+// } else {
+//   pageResult = (Number(req.params.page) + 1) // More Data Exists return next page URL
+// }
+
+
+
+
+// db.query(
+//   `SELECT * FROM user order by displayId*1 LIMIT ?, 10000`,
+//   [Number(pageNumber)],
+//   function (error, data) {
+//     if (error) {
+//       throw error;
+//     }
+//     // console.log(data);
+//     db.query(`SELECT * FROM user order by displayId*1 LIMIT ?, 10000`, [Number(nextPage)], function (error, pageData) {
+//       if (error) {
+//         throw error;
+//       }
+//       if (pageData.length === 0) { // If no more data in next Page
+//         pageResult = 'NODATA'
+//       } else {
+//         pageResult = (Number(req.params.page) + 1) // More Data Exists return next page URL
+//       }
+//       res.render("sitemap", {
+//         dataarray: data,
+//         pageNumber,
+//         pageResult
+//       })
+//     });
+// }
+// );
 
 /* Main Router */
 router.get("/", function (req, res, next) {
