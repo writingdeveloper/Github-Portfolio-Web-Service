@@ -13,7 +13,7 @@ router.get("*", function (req, res, next) {
     req.headers["x-forwarded-proto"] != "https" &&
     process.env.NODE_ENV === "production"
   )
-    res.redirect("https://" + req.hostname + req.url);
+    res.redirect(`https://"${req.hostname}${req.url}`);
   else next(); /* Continue to other routes if we're not redirecting */
 });
 
@@ -39,11 +39,13 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 /* Import Database Settings */
 const db = require("../lib/db");
 let User = require('../lib/models/userModel');
+let LoginLogs = require('../lib/models/loginLogsModel');
 /* Import Authentication Setting (Passport.js) */
 const passport = require("../lib/passport")(router, db, request, shortid);
 
 /* Github Auth Router */
 router.get("/auth/github", passport.authenticate("github"));
+
 /* Github Auth Callback Router */
 router.get(
   "/auth/github/callback",
