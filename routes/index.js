@@ -3,7 +3,6 @@ const router = express.Router();
 const bodyParser = require("body-parser");
 const path = require("path");
 const request = require("request");
-const shortid = require("shortid");
 let session = require("express-session");
 let FileStore = require("session-file-store")(session);
 
@@ -41,32 +40,26 @@ const db = require("../lib/db");
 let User = require('../lib/models/userModel');
 let LoginLogs = require('../lib/models/loginLogsModel');
 /* Import Authentication Setting (Passport.js) */
-const passport = require("../lib/passport")(router, db, request, shortid);
+const passport = require("../lib/passport")(router, db, request);
 
 /* Github Auth Router */
 router.get("/auth/github", passport.authenticate("github"));
+
+const authenticateUser = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.status(301).redirect('/auth/login');
+  }
+};
 
 /* Github Auth Callback Router */
 router.get(
   "/auth/github/callback",
   passport.authenticate("github", {
-    failureRedirect: "/auth/login"
-  }),
-  function (req, res) {
-    // Successful authentication, redirect home.
-    LoginLogs.create({
-      login: req.user.username,
-      id: req.user.id,
-      node_id: req.user._json.node_id,
-      provider: req.user.provider,
-      profileURL: req.user.profileUrl,
-      name: req.user._json.name,
-      location: req.user._json.location,
-      email: req.user._json.email
-    })
-    res.redirect(`/`);
-  }
-);
+    failureRedirect: "/auth/login",
+    successRedirect: '/'
+  }));
 
 /* Login Page Router */
 router.get(`/auth/login`, function (req, res, next) {
@@ -97,7 +90,7 @@ router.get(`/sitemap/0`, function (req, res, next) {
   let nextPage = (Number(req.params.page) + 1) * 10000; // Next Page Number
   let pageResult; // Page Result
 
-/* Sitemap Query */
+  /* Sitemap Query */
   User.find()
     .sort({
       'id': 1
@@ -152,10 +145,9 @@ router.get(`/sitemap/0`, function (req, res, next) {
 router.get("/", function (req, res, next) {
 
   let ownerCheck;
-  if (req.user === undefined) {
+  if (req.user == undefined) {
     ownerCheck = null;
   } else {
-    console.log(req.user)
     ownerCheck = req.user.username;
   }
   User.find({}, 'login bio avatar_url', { // Main profile db query

@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const db = require("../lib/db");
 const request = require("request");
-const shortid = require("shortid");
 const bodyParser = require("body-parser");
 const path = require("path");
 

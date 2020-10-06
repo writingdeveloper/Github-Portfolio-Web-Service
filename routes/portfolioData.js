@@ -1,6 +1,5 @@
 const express = require('express');
 const path = require("path");
-const shortid = require("shortid"); // Short ID Module
 const bodyParser = require("body-parser");
 const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
