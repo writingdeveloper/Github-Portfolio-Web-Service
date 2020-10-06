@@ -380,7 +380,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
     } else {
       repoData = repoData[0]; // To use easier
 
-      let imageNullCheck = repo.imageURL;
+      let imageNullCheck = repoData.imageURL;
       if (!imageNullCheck.startsWith('/images/app/')) {
         repo.imageURL = `${awsImageURL}${repo.owner.id}-${userId}/${repo.id}-${userId}-${repo.name}${imageExt}`
       }
