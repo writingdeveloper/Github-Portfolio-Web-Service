@@ -380,8 +380,9 @@ router.get("/:userId/:pageId", function (req, res, next) {
       });
     } else {
       repoData = repoData[0]; // To use easier
-
+      
       let imageNullCheck = repoData.imageURL;
+      let imageExt = path.extname(imageNullCheck); // AWS S3 image file extention
       if (!imageNullCheck.startsWith('/images/app/')) {
         repoData.imageURL = `${awsImageURL}${repoData.owner.id}-${userId}/${repoData.id}-${userId}-${repoData.name}${imageExt}`
       }
