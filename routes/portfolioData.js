@@ -2,35 +2,23 @@ const express = require('express');
 const path = require("path");
 const shortid = require("shortid"); // Short ID Module
 const bodyParser = require("body-parser");
-const db = require("../lib/db"); // DB Connection Module
 const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
 const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
-const base64 = require('js-base64').Base64;
-const showdown = require('showdown')
-// const devicon = require
+const showdown = require('showdown')  // Markdown Module
 const router = express.Router();
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
 /* Database Schema */
+const db = require("../lib/db"); // DB Connection Module
 const User = require('../lib/models/userModel');
 const Repo = require('../lib/models/repoModel');
 
 // Parsing Dependency
-const cheerio = require("cheerio"); // Parsing Module
 const request = require("request"); // Request Module
-const {
-  isNull
-} = require('lodash');
-const {
-  fn
-} = require('moment');
-const {
-  json
-} = require('express');
 
 /* Amazon Webservice S3 Storage Settings */
 aws.config.update({
@@ -64,9 +52,8 @@ function loginCheck(req) {
 /* GET home page. */
 router.get(`/:userId`, function (req, res, next) {
   let userId = req.params.userId;
-  // console.log(req.user)
-  // Check Owner of this page
   let ownerCheck;
+  let awsImageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/members/`
 
   if (req.user === undefined) {
     ownerCheck = null;
@@ -74,9 +61,10 @@ router.get(`/:userId`, function (req, res, next) {
     ownerCheck = req.user.username;
   }
 
+  /* QR Code Process */
   let fullUrl = `${req.protocol}'://'${req.get('host')}${req.originalURL}`;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageURL) {
-    if (err) console.log(err);
+    if (err) throw err;
 
     User.find({
       'login': userId
@@ -102,36 +90,40 @@ router.get(`/:userId`, function (req, res, next) {
         }
         Repo.find({
           'owner.login': userId
-        }, 'projectType login name language description', function (err, repoData) {
-          if (err) console.log(err);
+        }, 'projectType login id owner.id name imageURL language description', function (err, repoData) {
+          if (err) throw err;
 
           for (repo of repoData) {
             let result_url;
             let lowercase_language;
+            let imageNullCheck = repo.imageURL;
+            let imageExt = path.extname(imageNullCheck); // AWS S3 image file extention
 
-            if (repo.language == 'Null' || repo.language == null) { // If null use default image
-              result_url = `/images/app/${repo.projectType}.png` // default null image path
+            /* If image file exists in AWS S3 Storage */
+            if (!imageNullCheck.startsWith('/images/app/')) {
+              repo.imageURL = `${awsImageURL}${repo.owner.id}-${userId}/${repo.id}-${userId}-${repo.name}${imageExt}`
             } else {
-              lowercase_language = repo.language.toLowerCase();
-            }
-
-            let url = (language_list.filter(function (item) {
-              if (repo.language == null || repo.language == 'null') {
-                result_url = `/images/app/${repo.projectType}.png`
-              } else if (item.name === lowercase_language) {
-                result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+              if (repo.language == 'Null' || repo.language == null) { // If null use default image
+                result_url = `/images/app/${repo.projectType}.png` // default null image path
+              } else {
+                lowercase_language = repo.language.toLowerCase();
               }
-            }))
-
-            if (languages.hasOwnProperty(lowercase_language) == true) {
-              lowercase_language = languages[lowercase_language];
-              result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-            } else if (url === false) {
-              result_url = `/images/app/${repo.projectType}.png`
+              let url = (language_list.filter(function (item) {
+                if (repo.language == null || repo.language == 'null') {
+                  result_url = `/images/app/${repo.projectType}.png`
+                } else if (item.name === lowercase_language) {
+                  result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+                }
+              }))
+              if (languages.hasOwnProperty(lowercase_language) == true) {
+                lowercase_language = languages[lowercase_language];
+                result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+              } else if (url === false) {
+                result_url = `/images/app/${repo.projectType}.png`
+              }
+              repo.imageURL = result_url
             }
-            repo.imageURL = result_url
           }
-
           /* Keyword Null Check */
           for (let i of repoData) {
             if (i.language === null || i.language === 'null') {
@@ -147,65 +139,6 @@ router.get(`/:userId`, function (req, res, next) {
         })
       }
     })
-    // db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
-    //   if (error) {
-    //     throw `${error} in /:userId Page`
-    //   } else {
-    //     if (data[0] === undefined) {
-    //       res.render('customError', { // User Missing Error Handling
-    //         userId: userId, // Entered User ID
-    //         loginedId: ownerCheck, // Logined User ID
-    //         error: 'USER MISSING',
-    //         description: 'Report Please'
-    //       })
-    //     } else {
-    //       db.query(
-    //         `SELECT * FROM project WHERE userId='${userId}' ORDER BY projectDate2 DESC`,
-    //         function (error, data) {
-    //           if (error) {
-    //             throw `${error} in userId Page`;
-    //           }
-    //           /* image URL Null Check */
-    //           for (let i = 0; i < data.length; i++) {
-    //             if (data[i].imageUrl === null) {
-    //               data[i].imageUrl = `/images/app/${data[i].type}.png`;
-    //             } else {
-    //               data[i].imageUrl = data[i].imageUrl;
-    //             }
-    //           }
-    /* Keyword Null Check*/
-    // for (let i = 0; i < data.length; i++) {
-    //   if (data[i].keyword === null) {
-    //     data[i].keyword = '';
-    //   }
-    // }
-    // for (let i = 0; i < data.length; i++) {
-    //   if (data[i].keyword.substring(0, 5) === `{"lan`) {
-    //     let keywordData = data[i].keyword.substring(14).slice(0, -2);
-    //     console.log(`${keywordData}`)
-    //     if (keywordData === 'null') {
-    //       data[i].keyword = `{" " : "language"}`
-    //     } else {
-    //       data[i].keyword = `{"${keywordData}" : "language"}`
-    //     }
-    //   }
-    // }
-    /* Summary Null Check*/
-    // for (let i = 0; i < data.length; i++) {
-    //   if (data[i].summary === null) {
-    //     data[i].summary = '';
-    //   }
-    // }
-    // res.render("portfolioItems", {
-    //   dataarray: data,
-    //   userId: userId,
-    //   qrCodeImageUrl: qrCodeImageUrl,
-    //   ownerCheck: ownerCheck
-    // });
-    // });
-    // }
-    // }
-    // })
   });
 });
 
@@ -420,54 +353,73 @@ router.post(
 
 /* GET Detail View Page */
 router.get("/:userId/:pageId", function (req, res, next) {
-  // GET URL params and put it into :pageId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-
-  let date = new Date().toISOString().substr(0, 10).replace('T', ' '); // Today Date
-  console.log(date);
-  // // let date = new Date();
-  // let dd = date.getDate();
-  // let mm = date.getMonth() + 1; //January is 0!
-  // let yyyy = date.getFullYear();
-  // if (dd < 10) {
-  //   dd = '0' + dd
-  // }
-  // if (mm < 10) {
-  //   mm = '0' + mm
-  // }
-  // date = `${yyyy}-${mm}-${dd}`;
   let ownerCheck;
-  let imageNullCheck;
+
   // Owner Check
-  if (req.user === undefined) {
+  if (req.user == undefined) {
     ownerCheck = null;
   } else {
-    ownerCheck = req.user.loginId;
+    ownerCheck = req.user.username;
   }
-  let detailViewCounter;
 
+  /* Invalid user page */
   Repo.find({
     'owner.login': userId,
     'name': pageId
   }, function (err, repoData) {
-    if (err) console.log(err);
+    if (err) throw err;
     if (repoData.length == 0) {
-      console.log('Wrong Page or unvalid user or repo Page')
+      console.log('Wrong Page or invalid user or repo Page')
       res.render('customError', { // User Missing Error Handling
         userId: userId, // Entered User ID
         loginedId: ownerCheck, // Logined User ID
         errorMessage: 'USER MISSING',
         description: 'Report Please'
-      })
+      });
     } else {
       repoData = repoData[0]; // To use easier
 
+      if (repoData.imageURL !== '/images/app/Project.png') {
+
+      }
+
+
       /* Detail View Counter Prcoess */
-      detailViewCounter = repoData.detailViewCounter;
-      if (detailViewCounter == 0) {
-        console.log(detailViewCounter)
-        detailViewCounter = repoData.detailViewCounter;
+      if (repoData.detailViewCounter == undefined) {
+        repoData.detailViewCounter = 0; // Not to show 'undefined' in pug view
+        /* Create detailViewCounter in document process */
+        Repo.findOneAndUpdate({
+          'owner.login': userId,
+          'name': pageId
+        }, {
+          $set: {
+            detailViewCounter: 0
+          }
+        }, {
+          new: true,
+          upsert: false,
+          useFindAndModify: false
+        }, (err, doc) => {
+          if (err) throw err;
+        });
+
+      } else {
+        Repo.findOneAndUpdate({
+          'owner.login': userId,
+          'name': pageId
+        }, {
+          $inc: {
+            detailViewCounter: +1
+          }
+        }, {
+          new: true,
+          upsert: false,
+          useFindAndModify: false
+        }, (err, doc) => {
+          if (err) throw err;
+        });
       }
 
       /* Project Term Process */
@@ -479,37 +431,34 @@ router.get("/:userId/:pageId", function (req, res, next) {
           headers: {
             'User-Agent': 'request',
             'accept': 'application/vnd.github.VERSION.raw',
+            'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
             'charset': 'UTF-8'
           },
           json: true,
-          uri: `https://api.github.com/repos/${userId}/${pageId}/readme`
+          url: `https://api.github.com/repos/${userId}/${pageId}/readme`
         },
-        function (error, response, data) {
-          let readmeHTML;
-          if (error) {
-            console.log(error);
+        function (error, response, readmeData) {
+          if (response.statusCode == 404) {
+            console.log('Error');
+            readmeHTML = 'No Readme.MD file';
           } else {
+            if (error) throw error;
             converter = new showdown.Converter(),
-              text = data;
-            readmeHTML = converter.makeHtml(text);
-            // console.log(readmeHTML)
+              readmeHTML = converter.makeHtml(readmeData);
           }
           /* Language List API Process */
           request({
               headers: {
-                'User-Agent': 'request'
+                'User-Agent': 'request',
+                'accept': 'application/vnd.github.VERSION.raw',
+                'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+                'charset': 'UTF-8'
               },
               json: true,
-              uri: repoData.languages_url
+              url: repoData.languages_url
             },
-            function (error, response, data) {
-              let keywordData;
-              if (error) {
-                console.log(error);
-              } else {
-                keywordData = data;
-                // console.log(keywordData)
-              }
+            function (error, response, keywordData) {
+              if (error) throw error;
               res.render("detail", {
                 userId: userId,
                 pageId: pageId,
@@ -522,91 +471,17 @@ router.get("/:userId/:pageId", function (req, res, next) {
                 description: repoData.description,
                 projectDemoURL: repoData.homepage,
                 githubURL: repoData.html_url,
-                detailViewCounter,
+                detailViewCounter: repoData.detailViewCounter,
                 markdown: readmeHTML,
                 // email: repoData.email,
                 // phoneNumber: repoData.phoneNumber,
-                // ownerCheck: repoData.ownerCheck
+                ownerCheck
               })
             });
         })
     }
   });
 });
-
-// project Table Counter SET
-// db.query(`UPDATE project SET counter=counter+1 WHERE sid=?`, [pageId]);
-// // User Table Total Counter SET
-// db.query(`UPDATE user SET counter=counter+1 WHERE loginId=?`, [userId]);
-// db.query(`SELECT * from counter WHERE userId=? AND date=?`, [userId, date], function (error, dayDateResult) {
-//   if (error) {
-//     console.log(`Error From Router Detail Page, Counter \n ${error}`);
-//   }
-//   if (dayDateResult[0] === undefined) {
-//     db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, date, 1])
-//   } else {
-//     // Counter Table Day Counter SET
-//     db.query(`UPDATE counter SET counter = counter+1 WHERE userId=?`, [userId]);
-//   }
-// })
-// GET Data from Personal Data
-// db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
-//   error,
-//   data
-// ) {
-//   if (error) {
-//     throw error;
-//   }
-//   // If wrong request from Client (Tried Not Exist Portfolio Page), Redirect user page
-//   if (data[0] === undefined) {
-//     res.redirect(`/${userId}`);
-//   } else {
-//     let results = data[0];
-//     // Get github URL
-//     let url = results.githubUrl;
-//     if (results.imageUrl === null) {
-//       console.log('NO IMAGE');
-//       imageNullCheck = `/images/app/${results.type}.png`
-//       console.log(imageNullCheck);
-//     } else {
-//       imageNullCheck = results.imageUrl;
-//     }
-//     // Use Request Module to parsing Web page
-//     request(url, function (error, response, html) {
-//       let readme;
-//       // If Error with parsing Github README.md
-//       if (error) {
-//         console.log("Have Some problem with Reading Github README.md file!");
-//         console.log(error);
-//         readme =
-//           "<div>This Page has no Github README.md or if there are Error Check the server Console</div>";
-//         console.log(readme + "ERROR");
-//       } else {
-//         // Parsing readme ID in github page
-//         let $ = cheerio.load(html);
-//         $(".Box-body").each(function () {
-//           // save to readme Variable
-//           readme = $(this).html().replace(/<img src="\//gi, `<img src="https://github.com/`);
-//           // console.log(readme);
-//         });
-//       }
-//       if (readme === undefined) { // If readme is undefined
-//         readme = '<div>This Page has no Github README.md or if there are Error Check the server Console</div>'
-//       }
-//       db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, data) {
-//         if (error) {
-//           throw (`Error from Detail Router GET USER DATA SQL ${error}`)
-//         }
-//         let userResults = data[0];
-//         let email = userResults.email;
-//         let phoneNumber = userResults.phoneNumber;
-//         console.log(results.pjdate1);
-//         // console.log(results.pjdate1.toISOString().substr(0,7));
-
-//       });
-// })
-// }
-// });
 
 
 module.exports = router;
