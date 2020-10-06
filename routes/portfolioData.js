@@ -355,6 +355,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   let ownerCheck;
+  let awsImageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/members/`
 
   // Owner Check
   if (req.user == undefined) {
@@ -382,7 +383,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
 
       let imageNullCheck = repoData.imageURL;
       if (!imageNullCheck.startsWith('/images/app/')) {
-        repo.imageURL = `${awsImageURL}${repo.owner.id}-${userId}/${repo.id}-${userId}-${repo.name}${imageExt}`
+        repoData.imageURL = `${awsImageURL}${repoData.owner.id}-${userId}/${repoData.id}-${userId}-${repoData.name}${imageExt}`
       }
 
 
