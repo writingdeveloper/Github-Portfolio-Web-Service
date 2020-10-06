@@ -160,7 +160,7 @@ router.post("/:userId/create_process", upload.single("imageUrl"), function (
 ) {
   console.log('This' + req.file.location);
 
-  let sid = shortid.generate();
+
   let userId = req.params.userId;
   let projectName = req.body.projectName;
   let type = req.body.type;
@@ -380,8 +380,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
     } else {
       repoData = repoData[0]; // To use easier
 
-      if (repoData.imageURL !== '/images/app/Project.png') {
-
+      if (!imageNullCheck.startsWith('/images/app/')) {
+        repo.imageURL = `${awsImageURL}${repo.owner.id}-${userId}/${repo.id}-${userId}-${repo.name}${imageExt}`
       }
 
 
