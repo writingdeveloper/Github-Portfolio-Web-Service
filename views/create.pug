@@ -23,7 +23,7 @@ form(method='post', action=`/${userId}/create_process` enctype="multipart/form-d
             .gallery-image
               img.gallery-image-thumb(src=`${imageUrl}`)
             figcaption.gallery-caption
-              select#portfolio-type-select(name='type' class="create_form")
+              select#portfolio-type-select(name='projectType' class="create_form")
                 option(value="" selected disabled hidden) Choose Type
                 option(value='Project') Projects
                 option(value='Certificate') Certifications
@@ -37,16 +37,16 @@ form(method='post', action=`/${userId}/create_process` enctype="multipart/form-d
                   input(type="month" id="pjdate1" name="projectDate1" class="create_form")
                   p(id="create_p") ~
                   input(type="month" id="pjdate2" name="projectDate2" class="create_form")
-              strong.gallery-spec-key Summary
+              strong.gallery-spec-key Description
               #work1Description
-                textarea(cols="30", rows="10" id="projectExplanation" name="summary" class="create_form")
+                textarea(cols="30", rows="10" id="projectExplanation" name="description" class="create_form")
                 strong.gallery-spec-key Demo Link
-                input(type="text" id="projectUrl" name="projectDemoUrl" class="create_form")
+                input(type="text" id="projectUrl" name="projectDemoURL" class="create_form")
                 br
                 strong.gallery-spec-key Github repository Link
-                input(type="text" id="githuburl" name="githubUrl" class="create_form" placeholder="This form will get Github Repos README.md file")
+                input(type="text" id="githuburl" name="githubURL" class="create_form" placeholder="This form will get Github Repos README.md file")
                 strong.gallery-spec-key Image Upload
-                input(type="file" id="projectImg" name="imageUrl" class="create_form" accept="image/*")
+                input(type="file" id="projectImg" name="imageURL" class="create_form" accept="image/*")
                 input(type="submit" id="submit")
         #readme.Box.Box--condensed.instapaper_body.md
         .Box-header.px-2.clearfix
