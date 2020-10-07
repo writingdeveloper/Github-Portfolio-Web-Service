@@ -5,7 +5,7 @@ const aws = require('aws-sdk') // Amazon SDK Module
 const multer = require("multer"); // File Upload Module
 const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
-const showdown = require('showdown')  // Markdown Module
+const showdown = require('showdown') // Markdown Module
 const router = express.Router();
 
 router.use(bodyParser.json());
@@ -25,16 +25,24 @@ aws.config.update({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   region: 'ap-northeast-2'
 });
+
 let s3 = new aws.S3();
 let upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: process.env.AWS_S3_BUCKET,
     key: function (req, file, cb) {
-      console.log(req);
-      let newFileName = Date.now() + "-" + file.originalname;
-      let fullPath = `public/images/member/${req.params.userId}/${newFileName}`;
-      cb(null, fullPath); //use Date.now() for unique file keys
+      let userId = req.params.userId
+      console.log('------------------')
+      User.find({
+          'login': userId
+        },
+        function (err, userData) {
+          if (err) throw err;
+          userData = userData[0];
+          let fullPath = `members/${userData.id}-${userData.login}/${userData.id}-${file.originalname}`;
+          cb(null, fullPath);
+        })
     }
   })
 });
@@ -96,11 +104,9 @@ router.get(`/:userId`, function (req, res, next) {
             let result_url;
             let lowercase_language;
             let imageNullCheck = repo.imageURL;
-            let imageExt = path.extname(imageNullCheck); // AWS S3 image file extention
-
             /* If image file exists in AWS S3 Storage */
             if (!imageNullCheck.startsWith('/images/app/')) {
-              repo.imageURL = `${awsImageURL}${repo.owner.id}-${userId}/${repo.id}-${userId}-${repo.name}${imageExt}`
+              repo.imageURL;
             } else {
               if (repo.language == 'Null' || repo.language == null) { // If null use default image
                 result_url = `/images/app/${repo.projectType}.png` // default null image path
@@ -153,43 +159,30 @@ router.get(`/:userId/create`, function (req, res, next) {
 });
 
 /* POST Create_Process Page */
-router.post("/:userId/create_process", upload.single("imageUrl"), function (
+router.post("/:userId/create_process", upload.single("imageURL"), function (
   req,
-  res,
-  next
+  res
 ) {
-  console.log('This' + req.file.location);
-
-
   let userId = req.params.userId;
-  let projectName = req.body.projectName;
-  let type = req.body.type;
-  let projectDemoUrl = req.body.projectDemoUrl;
-  let summary = req.body.summary;
-  // files information are in req.file object
-  // Check Image Process
-  let imageUrl = req.file.location;
-  let keyword = req.body.keyword;
-  let projectDate1 = req.body.projectDate1;
-  let projectDate2 = req.body.projectDate2;
-  let githubUrl = req.body.githubUrl;
+  let id = Math.floor(Math.random() * 10) * 1412433 + 5
 
-  db.query(
-    "INSERT INTO project (sid, userId, projectName, type, projectDemoUrl, summary, imageUrl, keyword, projectDate1, projectDate2, githubUrl) VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-    [
-      sid,
-      userId,
-      projectName,
-      type,
-      projectDemoUrl,
-      summary,
-      imageUrl,
-      keyword,
-      projectDate1,
-      projectDate2,
-      githubUrl
-    ]
-  );
+  Repo.create({
+    id: id,
+    owner: {
+      login: userId,
+      html_url: req.body.githubURL
+    },
+    name: req.body.projectName,
+    projectType: req.body.projectType,
+    language: req.body.keyword,
+    imageURL: req.file.location,
+    created_at: req.body.projectDate1,
+    updated_at: req.body.projectDate2,
+    homepage: req.body.projectDemoURL,
+    description: req.body.description,
+  }, function (err, data) {
+    if (err) throw err;
+  })
   res.redirect(`/${userId}`);
 });
 
@@ -380,22 +373,21 @@ router.get("/:userId/:pageId", function (req, res, next) {
       });
     } else {
       repoData = repoData[0]; // To use easier
-      
+
       let language_list = require('../config/devicon.json'); // official devicon json data
-        let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
-        /* special variable */
-        const languages = {
-          'html': 'html5',
-          'css': 'css3',
-          'c#': 'csharp',
-          'c++': 'cplusplus'
-        }
+      let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
+      /* special variable */
+      const languages = {
+        'html': 'html5',
+        'css': 'css3',
+        'c#': 'csharp',
+        'c++': 'cplusplus'
+      }
       let result_url;
-            let lowercase_language;
+      let lowercase_language;
       let imageNullCheck = repoData.imageURL;
-      let imageExt = path.extname(imageNullCheck); // AWS S3 image file extention
       if (!imageNullCheck.startsWith('/images/app/')) {
-        repoData.imageURL = `${awsImageURL}${repoData.owner.id}-${userId}/${repoData.id}-${userId}-${repoData.name}${imageExt}`
+        repoData.imageURL;
       } else {
         if (repoData.language == 'Null' || repoData.language == null) { // If null use default image
           result_url = `/images/app/${repoData.projectType}.png` // default null image path
@@ -417,7 +409,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
         }
         repoData.imageURL = result_url
       }
-
 
       /* Detail View Counter Prcoess */
       if (repoData.detailViewCounter == undefined) {
@@ -472,48 +463,69 @@ router.get("/:userId/:pageId", function (req, res, next) {
         },
         function (error, response, readmeData) {
           if (response.statusCode == 404) {
-            console.log('Error');
             readmeHTML = 'No Readme.MD file';
           } else {
             if (error) throw error;
             converter = new showdown.Converter(),
               readmeHTML = converter.makeHtml(readmeData);
           }
-          /* Language List API Process */
-          request({
-              headers: {
-                'User-Agent': 'request',
-                'accept': 'application/vnd.github.VERSION.raw',
-                'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
-                'charset': 'UTF-8'
+          if (repoData.languages_url == undefined) {
+            res.render("detail", {
+              userId: userId,
+              pageId: pageId,
+              projectName: repoData.name,
+              imageURL: repoData.imageURL,
+              projectType: repoData.projectType,
+              keyword: '',
+              created_at,
+              updated_at,
+              description: repoData.description,
+              projectDemoURL: repoData.homepage,
+              githubURL: repoData.html_url,
+              detailViewCounter: repoData.detailViewCounter,
+              markdown: readmeHTML,
+              // email: repoData.email,
+              // phoneNumber: repoData.phoneNumber,
+              ownerCheck
+            })
+          } else {
+            /* Language List API Process */
+            request({
+                headers: {
+                  'User-Agent': 'request',
+                  'accept': 'application/vnd.github.VERSION.raw',
+                  'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+                  'charset': 'UTF-8'
+                },
+                json: true,
+                url: repoData.languages_url
               },
-              json: true,
-              url: repoData.languages_url
-            },
-            function (error, response, keywordData) {
-              if (error) throw error;
-              res.render("detail", {
-                userId: userId,
-                pageId: pageId,
-                projectName: repoData.name,
-                imageURL: repoData.imageURL,
-                projectType: repoData.projectType,
-                keyword: keywordData,
-                created_at,
-                updated_at,
-                description: repoData.description,
-                projectDemoURL: repoData.homepage,
-                githubURL: repoData.html_url,
-                detailViewCounter: repoData.detailViewCounter,
-                markdown: readmeHTML,
-                // email: repoData.email,
-                // phoneNumber: repoData.phoneNumber,
-                ownerCheck
-              })
-            });
+              function (error, response, keywordData) {
+                if (error) throw error;
+                res.render("detail", {
+                  userId: userId,
+                  pageId: pageId,
+                  projectName: repoData.name,
+                  imageURL: repoData.imageURL,
+                  projectType: repoData.projectType,
+                  keyword: keywordData,
+                  created_at,
+                  updated_at,
+                  description: repoData.description,
+                  projectDemoURL: repoData.homepage,
+                  githubURL: repoData.html_url,
+                  detailViewCounter: repoData.detailViewCounter,
+                  markdown: readmeHTML,
+                  // email: repoData.email,
+                  // phoneNumber: repoData.phoneNumber,
+                  ownerCheck
+                })
+              });
+          }
         })
     }
   });
+
 });
 
 
