@@ -381,10 +381,41 @@ router.get("/:userId/:pageId", function (req, res, next) {
     } else {
       repoData = repoData[0]; // To use easier
       
+      let language_list = require('../config/devicon.json'); // official devicon json data
+        let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
+        /* special variable */
+        const languages = {
+          'html': 'html5',
+          'css': 'css3',
+          'c#': 'csharp',
+          'c++': 'cplusplus'
+        }
+      let result_url;
+            let lowercase_language;
       let imageNullCheck = repoData.imageURL;
       let imageExt = path.extname(imageNullCheck); // AWS S3 image file extention
       if (!imageNullCheck.startsWith('/images/app/')) {
         repoData.imageURL = `${awsImageURL}${repoData.owner.id}-${userId}/${repoData.id}-${userId}-${repoData.name}${imageExt}`
+      } else {
+        if (repoData.language == 'Null' || repoData.language == null) { // If null use default image
+          result_url = `/images/app/${repoData.projectType}.png` // default null image path
+        } else {
+          lowercase_language = repoData.language.toLowerCase();
+        }
+        let url = (language_list.filter(function (item) {
+          if (repoData.language == null || repoData.language == 'null') {
+            result_url = `/images/app/${repoData.projectType}.png`
+          } else if (item.name === lowercase_language) {
+            result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+          }
+        }))
+        if (languages.hasOwnProperty(lowercase_language) == true) {
+          lowercase_language = languages[lowercase_language];
+          result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+        } else if (url === false) {
+          result_url = `/images/app/${repoData.projectType}.png`
+        }
+        repoData.imageURL = result_url
       }
 
 

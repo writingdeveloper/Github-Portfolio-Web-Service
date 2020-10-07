@@ -30,7 +30,7 @@
 }
 
 .gallery-caption {
-  margin-left: 2rem;
+
   -webkit-box-flex: 1;
   -webkit-flex: 1;
   -ms-flex: 1;
@@ -43,7 +43,7 @@
 }
 
 .gallery-image {
-  max-width: 50%;
+  width: 40%;
 }
 
 .gallery-image-thumb {
@@ -307,7 +307,7 @@ pre {
   }
 
   .gallery-image {
-    max-width: 100%;
+    width: 100%;
   }
 
   .gallery-image-thumb {
