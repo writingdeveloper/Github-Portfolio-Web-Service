@@ -65,4 +65,4 @@ typings/
 public/images/member/*
 !public/images/member/sangumee
 sessions/*
-userParser/*
+userParser.js
