@@ -164,25 +164,32 @@ router.post("/:userId/create_process", upload.single("imageURL"), function (
   res
 ) {
   let userId = req.params.userId;
+  let githubURL = req.body.githubURL
   let id = Math.floor(Math.random() * 10) * 1412433 + 5
 
-  Repo.create({
-    id: id,
-    owner: {
-      login: userId,
-      html_url: req.body.githubURL
-    },
-    name: req.body.projectName,
-    projectType: req.body.projectType,
-    language: req.body.keyword,
-    imageURL: req.file.location,
-    created_at: req.body.projectDate1,
-    updated_at: req.body.projectDate2,
-    homepage: req.body.projectDemoURL,
-    description: req.body.description,
-  }, function (err, data) {
-    if (err) throw err;
-  })
+  console.log(githubURL.startsWith(userId, 19))
+  if (!githubURL.startsWith(userId, 19)) {
+    console.log(`Its not your repository!`)
+    res.redirect(`/${userId}`)
+  } else {
+    Repo.create({
+      id: id,
+      owner: {
+        login: userId
+      },
+      html_url: req.body.githubURL,
+      name: req.body.projectName,
+      projectType: req.body.projectType,
+      language: req.body.keyword,
+      imageURL: req.file.location,
+      created_at: req.body.projectDate1,
+      updated_at: req.body.projectDate2,
+      homepage: req.body.projectDemoURL,
+      description: req.body.description,
+    }, function (err, data) {
+      if (err) throw err;
+    })
+  }
   res.redirect(`/${userId}`);
 });
 
@@ -191,36 +198,32 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   // GET userId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  console.log(userId + " and " + pageId);
-  db.query(`SELECT imageUrl FROM project WHERE sid='${pageId}'`, function (error, data) {
-    if (error) {
-      console.log(`Error Message From UPDATE: ${error}`);
-    } else {
-      console.log(data);
+
+  /* Remove AWS S3 Image */
+  Repo.findOne({
+    'owner.login': userId,
+    'name': pageId
+  }, function (err, pageData) {
+    if (err) throw err;
+    if (!pageData.imageURL.startsWith('/images/app/')) {
       let params = {
         Bucket: 'portfolioworld',
-        Key: data[0].imageUrl.substr(55)
+        Key: pageData.imageURL.substr(55)
       };
-      console.log(data[0].imageUrl.substr(55));
-      s3.deleteObject(params, function (error, data) {
-        if (error) {
-          console.log(`Error Message From UPDATE : ${error}`);
-        } else {
-          console.log(`Delete Previous Image complete`);
-        }
+      s3.deleteObject(params, function (err, data) {
+        if (err) throw err;
       })
     }
-  });
-  db.query(`DELETE FROM project WHERE sid='${pageId}'`, function (
-    error,
-    data
-  ) {
-    if (error) {
-      throw error;
-    }
-    console.log(data);
-  });
-  /* TODO :: ERROR IN userID*/
+  })
+
+  /* Remove MongoDB Documnet */
+  Repo.deleteOne({
+    'owner.login': userId,
+    'name': pageId
+  }, function (err, result) {
+    if (err) throw err;
+  })
+  
   res.redirect(`/${userId}`);
 });
 
@@ -449,6 +452,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
       /* Project Term Process */
       let created_at = repoData.created_at.toISOString().substr(0, 10).replace('T', ' ');;
       let updated_at = repoData.updated_at.toISOString().substr(0, 10).replace('T', ' ');
+      let fullName = repoData.html_url.replace(/^\/\/|^https?:\/\/github.com\//g, '') // Get real README.md file
 
       /* README.md API Process */
       request({
@@ -459,7 +463,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
             'charset': 'UTF-8'
           },
           json: true,
-          url: `https://api.github.com/repos/${userId}/${pageId}/readme`
+          url: `https://api.github.com/repos/${fullName}/readme`
         },
         function (error, response, readmeData) {
           if (response.statusCode == 404) {
