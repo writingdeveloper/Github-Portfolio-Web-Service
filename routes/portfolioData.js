@@ -214,16 +214,15 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
         if (err) throw err;
       })
     }
+    /* Remove MongoDB Documnet */
+    Repo.deleteOne({
+      'owner.login': userId,
+      'name': pageId
+    }, function (err, result) {
+      if (err) throw err;
+    })
   })
 
-  /* Remove MongoDB Documnet */
-  Repo.deleteOne({
-    'owner.login': userId,
-    'name': pageId
-  }, function (err, result) {
-    if (err) throw err;
-  })
-  
   res.redirect(`/${userId}`);
 });
 
