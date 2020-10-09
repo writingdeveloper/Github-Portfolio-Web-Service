@@ -149,5 +149,5 @@ app.io.on('connection', function (socket) {
   });
 });
 
-console.log('Now It Works Fine in Port 3000');
+console.log(`Now It Works Fine in Port ${process.env.PORT}`);
 module.exports = app;
