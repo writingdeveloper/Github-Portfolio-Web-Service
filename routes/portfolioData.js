@@ -247,38 +247,42 @@ router.get("/:userId/:pageId/update", function (req, res) {
   }, function (err, updatePageData) {
     if (err) throw err;
 
-    // Image NULL Check
     let lowercase_language;
-    let imageNullCheck = updatePageData.imageURL;
-    /* If image file exists in AWS S3 Storage */
-    if (imageNullCheck.startsWith('/images/app/') && updatePageData.language) {
+    if (updatePageData.imageURL.startsWith('https://portfolioworld.s3.ap-northeast-2.amazonaws.com')) {
+      updatePageData.imageURL;
+    } else if (updatePageData.imageURL.startsWith('/images/app/') && updatePageData.language) {
       lowercase_language = updatePageData.language.toLowerCase();
       if (languages.hasOwnProperty(lowercase_language) == true) {
         lowercase_language = languages[lowercase_language];
-        result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
       }
-      imageNullCheck = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+      if(languages.hasOwnProperty(lowercase_language) == false) {
+        updatePageData.imageURL='/images/app/Project.png';
+      }
+      updatePageData.imageURL = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
     }
 
     if (updatePageData.homepage == null) {
       updatePageData.homepage = '';
     }
-    if (updatePageData.language = 'null') {
-      updatePageData.language = '';
-    }
+    // if (updatePageData.language = 'null') {
+    //   updatePageData.language = '';
+    // }
+    // if(req.body.imageURL==null){
+    //   console.log('No File')
+    // }
 
     res.render("update", {
       userId: userId,
       pageId: pageId,
       projectName: updatePageData.name,
       projectType: updatePageData.projectType,
+      keywords: updatePageData.language,
       projectDemoURL: updatePageData.homepage,
       description: updatePageData.description,
-      imageURL: imageNullCheck,
+      imageURL: updatePageData.imageURL,
       created_at: moment(updatePageData.created_at).format('YYYY-MM'),
       updated_at: moment(updatePageData.updated_at).format('YYYY-MM'),
-      githubURL: updatePageData.html_url,
-      keywords: updatePageData.language
+      githubURL: updatePageData.html_url
     })
   });
 });
@@ -286,85 +290,152 @@ router.get("/:userId/:pageId/update", function (req, res) {
 /* POST Update Page */
 router.post(
   "/:userId/:pageId/update_process",
-  upload.single("imageUrl"),
+  upload.single("imageURL"),
   function (req, res) {
     let userId = req.params.userId;
     let pageId = req.params.pageId;
-    db.query(`SELECT imageUrl FROM project WHERE sid=?`, [pageId], function (
-      error,
-      data
-    ) {
-      if (error) {
-        throw error;
+
+    function imageNullCheck() {
+      if (!req.file) {
+        console.log('No Image')
+        return '/images/app/Project.png'
+      } else if (req.file.location) {
+        Repo.create({
+          imageURL: req.file.location
+        }, function (err, result) {
+          if (err) throw err;
+        })
+        return req.file.location
       }
-      console.log(data[0]);
-      let projectName = req.body.projectName;
-      let type = req.body.type;
-      let projectDemoUrl = req.body.projectDemoUrl;
-      let summary = req.body.summary;
-      let imageUrl = req.file ? req.file.location : undefined;
-      let keyword = req.body.keyword;
-      let projectDate1 = req.body.projectDate1;
-      let projectDate2 = req.body.projectDate2;
-      let githubUrl = req.body.githubUrl;
-      // If imageUrl is undefined
-      if (imageUrl === undefined) {
-        db.query(
-          `UPDATE project SET projectName=?, type=?, projectDemoUrl=?, summary=?, keyword=?, projectDate1=?, projectDate2=?, githubUrl=? WHERE sid=?`,
-          [
-            projectName,
-            type,
-            projectDemoUrl,
-            summary,
-            keyword,
-            projectDate1,
-            projectDate2,
-            githubUrl,
-            pageId
-          ]
-        );
-        // If imageUrl is exist
-      } else {
-        db.query(`SELECT imageUrl FROM project WHERE sid='${pageId}'`, function (error, data) {
-          if (error) {
-            console.log(`Error Message From UPDATE: ${error}`);
-          } else {
-            console.log(data);
-            if (data[0].imageUrl === null) {
-              console.log('NO PREVIOUS IMAGE DATA');
-            } else {
-              let params = {
-                Bucket: 'portfolioworld',
-                Key: data[0].imageUrl.substr(55)
-              };
-              s3.deleteObject(params, function (error, data) {
-                if (error) {
-                  console.log(`Error Message From UPDATE : ${error}`);
-                } else {
-                  console.log(`Delete Previous Image complete`);
-                }
-              })
-            }
-          }
-        });
-        db.query(
-          `UPDATE project SET projectName=?, type=?, projectDemoUrl=?, summary=?, imageUrl=?, keyword=?, projectDate1=?, projectDate2=?, githubUrl=? WHERE sid=?`,
-          [
-            projectName,
-            type,
-            projectDemoUrl,
-            summary,
-            imageUrl,
-            keyword,
-            projectDate1,
-            projectDate2,
-            githubUrl,
-            pageId
-          ]
-        );
+    }
+
+    Repo.findOneAndUpdate({
+      'owner.login': userId,
+      'name': pageId
+    }, {
+      $set: {
+        name: req.body.projectName,
+        projectType: req.body.projectType,
+        projectDemoURL: req.body.projectDemoURL,
+        description: req.body.description,
+        imageURL: imageNullCheck(),
+        language: req.body.keywords,
+        created_at: req.body.created_at,
+        updated_at: req.body.updated_at,
+        githubURL: req.body.githubURL,
+
       }
-    });
-    res.redirect(`/${userId}/${pageId}`);
+    }, {
+      returnNewDocument: true
+    }, function (err, doc) {
+      if (err) throw err;
+      // console.log(doc);
+    })
+
+
+
+
+
+
+
+    // Repo.findOneAndUpdate({
+    //   'owner.login': userId,
+    //   'name': pageId
+    // }, {
+    //   $set: {
+    //     name: req.body.projectName,
+    //     projectType: req.body.projectType,
+    //     projectDemoURL: req.body.projectDemoURL,
+    //     description: req.body.description,
+    //     imageURL: req.file.location && imageURL ? 
+    //     : '/images/app/Project.png',
+    //     language: req.body.keyword,
+    //     created_at: req.body.created_at,
+    //     updated_at: req.body.updated_at,
+    //     githubURL: req.body.githubURL,
+
+    //   }
+    // }, {
+    //   returnNewDocument: true
+    // }, function (err, doc) {
+    //   if (err) throw err;
+    //   console.log(doc);
+    // });
+    // db.query(`SELECT imageUrl FROM project WHERE sid=?`, [pageId], function (
+    //   error,
+    //   data
+    // ) {
+    //   if (error) {
+    //     throw error;
+    //   }
+    //   console.log(data[0]);
+    //   let projectName = req.body.projectName;
+    //   let type = req.body.type;
+    //   let projectDemoUrl = req.body.projectDemoUrl;
+    //   let summary = req.body.summary;
+    //   let imageUrl = req.file ? req.file.location : undefined;
+    //   let keyword = req.body.keyword;
+    //   let projectDate1 = req.body.projectDate1;
+    //   let projectDate2 = req.body.projectDate2;
+    //   let githubUrl = req.body.githubUrl;
+    //   // If imageUrl is undefined
+    //   if (imageUrl === undefined) {
+    //     db.query(
+    //       `UPDATE project SET projectName=?, type=?, projectDemoUrl=?, summary=?, keyword=?, projectDate1=?, projectDate2=?, githubUrl=? WHERE sid=?`,
+    //       [
+    //         projectName,
+    //         type,
+    //         projectDemoUrl,
+    //         summary,
+    //         keyword,
+    //         projectDate1,
+    //         projectDate2,
+    //         githubUrl,
+    //         pageId
+    //       ]
+    //     );
+    //     // If imageUrl is exist
+    //   } else {
+    //     db.query(`SELECT imageUrl FROM project WHERE sid='${pageId}'`, function (error, data) {
+    //       if (error) {
+    //         console.log(`Error Message From UPDATE: ${error}`);
+    //       } else {
+    //         console.log(data);
+    //         if (data[0].imageUrl === null) {
+    //           console.log('NO PREVIOUS IMAGE DATA');
+    //         } else {
+    //           let params = {
+    //             Bucket: 'portfolioworld',
+    //             Key: data[0].imageUrl.substr(55)
+    //           };
+    //           s3.deleteObject(params, function (error, data) {
+    //             if (error) {
+    //               console.log(`Error Message From UPDATE : ${error}`);
+    //             } else {
+    //               console.log(`Delete Previous Image complete`);
+    //             }
+    //           })
+    //         }
+    //       }
+    //     });
+    //     db.query(
+    //       `UPDATE project SET projectName=?, type=?, projectDemoUrl=?, summary=?, imageUrl=?, keyword=?, projectDate1=?, projectDate2=?, githubUrl=? WHERE sid=?`,
+    //       [
+    //         projectName,
+    //         type,
+    //         projectDemoUrl,
+    //         summary,
+    //         imageUrl,
+    //         keyword,
+    //         projectDate1,
+    //         projectDate2,
+    //         githubUrl,
+    //         pageId
+    //       ]
+    //     );
+    //   }
+    // });
+    res.redirect(`/${userId}`);
   }
 );
 
@@ -429,7 +500,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
         if (languages.hasOwnProperty(lowercase_language) == true) {
           lowercase_language = languages[lowercase_language];
           result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-        } else if (url === false) {
+        } else if (languages.hasOwnProperty(lowercase_language) == false) {
           result_url = `/images/app/${repoData.projectType}.png`
         }
         repoData.imageURL = result_url
