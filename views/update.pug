@@ -19,32 +19,32 @@ form(method='post', action=`/${userId}/${pageId}/update_process` enctype="multip
         article#work1.gallery-item(role='article')
           figure.gallery-figure(role='group')
             .gallery-image
-              img.gallery-image-thumb(src=`${imageUrl}`)
+              img.gallery-image-thumb(src=`${imageURL}`)
             figcaption.gallery-caption
               select#portfolio-type-select(name='type' class="create_form")
-                  option(value=`${type}` selected hidden)= `${type}`
+                  option(value=`${type}` selected hidden)= `${projectType}`
                   option(value='Project') Project
                   option(value='Certificate') Certification
                   option(value='Education') Education
               ul.gallery-spec
                 li.gallery-spec-item
                   strong.gallery-spec-key Project Keywords
-                  input(type="text" id="sumLang" name="keyword" class="create_form" value=`${keyword}`)
+                  input(type="text" id="sumLang" name="keyword" class="create_form" value=`${keywords}`)
                 li.gallery-spec-item
                   strong.gallery-spec-key Term
-                  input(type="month" id="pjdate1" name="projectDate1" class="create_form" value=`${projectDate1}`)
+                  input(type="month" id="pjdate1" name="projectDate1" class="create_form" value=`${created_at}`)
                   p(id="create_p") ~
-                  input(type="month" id="pjdate2" name="projectDate2" class="create_form" value=`${projectDate2}`)
-              strong.gallery-spec-key Summary
+                  input(type="month" id="pjdate2" name="projectDate2" class="create_form" value=`${updated_at}`)
+              strong.gallery-spec-key Description
               #work1Description
-                textarea(cols="30", rows="10" id="projectExplanation" name="summary" class="create_form")= `${summary}`
+                textarea(cols="30", rows="10" id="projectExplanation" name="description" class="create_form")= `${description}`
                 strong.gallery-spec-key Demo Link
-                input(type="text" id="projectUrl" name="projectDemoUrl" class="create_form" value=`${projectDemoUrl}`)
+                input(type="text" id="projectUrl" name="projectDemoUrl" class="create_form" value=`${projectDemoURL}`)
                 br
                 strong.gallery-spec-key Github repository Link
-                input(type="text" id="githuburl" name="githubUrl" class="create_form" placeholder="This form will get Github Repos README.md file" value=`${githubUrl}`)
+                input(type="text" id="githuburl" name="githubUrl" class="create_form" placeholder="This form will get Github Repos README.md file" value=`${githubURL}`)
                 strong.gallery-spec-key Image Upload
-                input(type="file" id="projectImg" name="imageUrl" class="create_form" accept="image/*" value=`${imageUrl}`)
+                input(type="file" id="projectImg" name="imageUrl" class="create_form" accept="image/*" value=`${imageURL}`)
                 input(type="submit")
         #readme.Box.Box--condensed.instapaper_body.md
         .Box-header.px-2.clearfix
