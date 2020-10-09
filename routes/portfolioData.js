@@ -6,6 +6,7 @@ const multer = require("multer"); // File Upload Module
 const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
 const showdown = require('showdown') // Markdown Module
+const moment = require('moment');
 const router = express.Router();
 
 router.use(bodyParser.json());
@@ -108,13 +109,13 @@ router.get(`/:userId`, function (req, res, next) {
             if (!imageNullCheck.startsWith('/images/app/')) {
               repo.imageURL;
             } else {
-              if (repo.language == 'Null' || repo.language == null) { // If null use default image
+              if (repo.language == null) { // If null use default image
                 result_url = `/images/app/${repo.projectType}.png` // default null image path
               } else {
                 lowercase_language = repo.language.toLowerCase();
               }
               let url = (language_list.filter(function (item) {
-                if (repo.language == null || repo.language == 'null') {
+                if (repo.language == null) {
                   result_url = `/images/app/${repo.projectType}.png`
                 } else if (item.name === lowercase_language) {
                   result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
@@ -230,33 +231,55 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
 router.get("/:userId/:pageId/update", function (req, res) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  db.query(`SELECT * FROM project WHERE sid=?`, [pageId], function (
-    error,
-    data
-  ) {
-    if (error) {
-      throw error;
-    }
-    let results = data[0];
+  let language_list = require('../config/devicon.json'); // official devicon json data
+  let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
+  /* special variable */
+  const languages = {
+    'html': 'html5',
+    'css': 'css3',
+    'c#': 'csharp',
+    'c++': 'cplusplus'
+  }
+
+  Repo.findOne({
+    'owner.login': userId,
+    'name': pageId
+  }, function (err, updatePageData) {
+    if (err) throw err;
+
     // Image NULL Check
-    if (results.imageUrl === null) {
-      imageNullCheck = `/images/app/${results.type}.png` // If image data not exists, return default tpye image
-    } else {
-      imageNullCheck = results.imageUrl; // Image file Exists
+    let lowercase_language;
+    let imageNullCheck = updatePageData.imageURL;
+    /* If image file exists in AWS S3 Storage */
+    if (imageNullCheck.startsWith('/images/app/') && updatePageData.language) {
+      lowercase_language = updatePageData.language.toLowerCase();
+      if (languages.hasOwnProperty(lowercase_language) == true) {
+        lowercase_language = languages[lowercase_language];
+        result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
+      }
+      imageNullCheck = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
     }
+
+    if (updatePageData.homepage == null) {
+      updatePageData.homepage = '';
+    }
+    if (updatePageData.language = 'null') {
+      updatePageData.language = '';
+    }
+
     res.render("update", {
       userId: userId,
       pageId: pageId,
-      projectName: results.projectName,
-      type: results.type,
-      projectDemoUrl: results.projectDemoUrl,
-      summary: results.summary,
-      imageUrl: imageNullCheck,
-      projectDate1: results.projectDate1.substr(0, 7),
-      projectDate2: results.projectDate2.substr(0, 7),
-      githubUrl: results.githubUrl,
-      keyword: results.keyword
-    });
+      projectName: updatePageData.name,
+      projectType: updatePageData.projectType,
+      projectDemoURL: updatePageData.homepage,
+      description: updatePageData.description,
+      imageURL: imageNullCheck,
+      created_at: moment(updatePageData.created_at).format('YYYY-MM'),
+      updated_at: moment(updatePageData.updated_at).format('YYYY-MM'),
+      githubURL: updatePageData.html_url,
+      keywords: updatePageData.language
+    })
   });
 });
 
