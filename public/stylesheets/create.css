@@ -39,12 +39,13 @@
 }
 
 .gallery-image {
-    max-width: 50%;
+    width: 40%;
 }
 
 .gallery-image-thumb {
-    max-width: 100%;
-    max-height: 100%;
+    width: 100%;
+    max-width: 765px;
+    height: 444px;
 }
 
 .gallery-item {
