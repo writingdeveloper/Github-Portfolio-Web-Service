@@ -7,6 +7,8 @@ const multerS3 = require('multer-s3'); // Amazon S3 Storage Upload Module
 const QRCode = require('qrcode'); // QR Code Generator Module
 const showdown = require('showdown') // Markdown Module
 const moment = require('moment');
+let fs = require('fs')
+
 const router = express.Router();
 
 router.use(bodyParser.json());
@@ -61,9 +63,9 @@ function loginCheck(req) {
 router.get(`/:userId`, function (req, res, next) {
   let userId = req.params.userId;
   let ownerCheck;
-  let awsImageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/members/`
 
-  if (req.user === undefined) {
+  /* User Login Check  */
+  if (req.user == undefined) {
     ownerCheck = null;
   } else {
     ownerCheck = req.user.username;
@@ -73,7 +75,7 @@ router.get(`/:userId`, function (req, res, next) {
   let fullUrl = `${req.protocol}'://'${req.get('host')}${req.originalURL}`;
   QRCode.toDataURL(fullUrl, function (err, qrCodeImageURL) {
     if (err) throw err;
-
+    /* User Data not Exists */
     User.find({
       'login': userId
     }, function (err, userData) {
@@ -82,62 +84,53 @@ router.get(`/:userId`, function (req, res, next) {
         res.render('customError', { // User Missing Error Handling
           userId: userId, // Entered User ID
           loginedId: ownerCheck, // Logined User ID
-          errorMessage: 'USER MISSING',
+          errorMessage: 'USER NOT EXIXTS',
           description: 'Report Please'
         })
       } else {
-
-        let language_list = require('../config/devicon.json'); // official devicon json data
-        let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
-        /* special variable */
-        const languages = {
-          'html': 'html5',
-          'css': 'css3',
-          'c#': 'csharp',
-          'c++': 'cplusplus'
-        }
+        /* User Data Exists */
         Repo.find({
           'owner.login': userId
-        }, 'projectType login id owner.id name imageURL language description', function (err, repoData) {
+        }, function (err, repoData) {
           if (err) throw err;
+          let repo = repoData;
 
-          for (repo of repoData) {
-            let result_url;
-            let lowercase_language;
-            let imageNullCheck = repo.imageURL;
-            /* If image file exists in AWS S3 Storage */
-            if (!imageNullCheck.startsWith('/images/app/')) {
-              repo.imageURL;
-            } else {
-              if (repo.language == null) { // If null use default image
-                result_url = `/images/app/${repo.projectType}.png` // default null image path
-              } else {
-                lowercase_language = repo.language.toLowerCase();
-              }
-              let url = (language_list.filter(function (item) {
-                if (repo.language == null) {
-                  result_url = `/images/app/${repo.projectType}.png`
-                } else if (item.name === lowercase_language) {
-                  result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-                }
-              }))
-              if (languages.hasOwnProperty(lowercase_language) == true) {
-                lowercase_language = languages[lowercase_language];
-                result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-              } else if (url === false) {
-                result_url = `/images/app/${repo.projectType}.png`
-              }
-              repo.imageURL = result_url
+          let languageNameArray = require('../config/languageNames')
+          repo.forEach(function (repo) {
+            let imageName = (repo.language || '').toLowerCase();
+            /* If AWS Image Exists */
+            if (repo.imageURL) {
+              console.log(`AWS Image Exist : ${repo.imageURL}`)
+            } else if (languageNameArray.includes(imageName) == false) {
+              repo.imageURL = `/images/app/${repo.projectType}.png`
+            } else if (languageNameArray.includes(imageName) == true) {
+              let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
+              repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
+            } else if (repo.language == null && repo.imageURL == null) {
+              repo.imageURL = `/images/app/${repo.projectType}.png`
             }
-          }
-          /* Keyword Null Check */
-          for (let i of repoData) {
-            if (i.language === null || i.language === 'null') {
-              i.language = 'Keyword not set';
-            }
-          }
+          })
+          // var params = { 
+          //   Bucket: 'portfolioworld',
+          //   Delimiter: '/',
+          //   Prefix: 'devicon/' 
+          // }
+          // s3.listObjects(params, function (err, data) {
+          //   if(err)throw err;
+          //   let languageArray =[];
+
+          //   for(let i=0; i<data.CommonPrefixes.length; i++){
+          //     console.log(data.CommonPrefixes[i].Prefix);
+          //     languageArray.push(`'${data.CommonPrefixes[i].Prefix.replace(/devicon/g,'').replace(/\//g,'')}'`)
+          //   }
+          //   console.log(languageArray)
+          //   fs.writeFile('wow.js',languageArray, function (err) {
+          //     if (err) throw err;
+          //     console.log('Saved!');
+          //   });
+          //  });
           res.render("portfolioItems", {
-            dataarray: repoData,
+            dataarray: repo,
             userId: userId,
             qrCodeImageURL,
             ownerCheck
@@ -255,8 +248,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       if (languages.hasOwnProperty(lowercase_language) == true) {
         lowercase_language = languages[lowercase_language];
       }
-      if(languages.hasOwnProperty(lowercase_language) == false) {
-        updatePageData.imageURL='/images/app/Project.png';
+      if (languages.hasOwnProperty(lowercase_language) == false) {
+        updatePageData.imageURL = '/images/app/Project.png';
       }
       updatePageData.imageURL = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
     }
@@ -444,7 +437,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   let ownerCheck;
-  let awsImageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/members/`
+  let awsImageURL;
 
   // Owner Check
   if (req.user == undefined) {
@@ -452,6 +445,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
   } else {
     ownerCheck = req.user.username;
   }
+
+
 
   /* Invalid user page */
   Repo.find({
@@ -470,41 +465,36 @@ router.get("/:userId/:pageId", function (req, res, next) {
     } else {
       repoData = repoData[0]; // To use easier
 
-      let language_list = require('../config/devicon.json'); // official devicon json data
-      let base_url = 'https://cdn.rawgit.com/konpa/devicon/master/icons/';
-      /* special variable */
-      const languages = {
-        'html': 'html5',
-        'css': 'css3',
-        'c#': 'csharp',
-        'c++': 'cplusplus'
+      let awsURL = 'https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/';
+      let lowercaseLanguage;
+      let imageURL = repoData.imageURL;
+
+      /* If language Data Exists */
+      if (imageURL == null && repoData.language) {
+        lowercaseLanguage = repoData.language.toLowerCase();
+        lowercaseLanguage = lowercaseLanguage.replace(/\+/g, '%2B').replace(/\#/g, "%23");
+        awsImageURL = `${awsURL}${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
+        console.log(awsImageURL)
       }
-      let result_url;
-      let lowercase_language;
-      let imageNullCheck = repoData.imageURL;
-      if (!imageNullCheck.startsWith('/images/app/')) {
-        repoData.imageURL;
-      } else {
-        if (repoData.language == 'Null' || repoData.language == null) { // If null use default image
-          result_url = `/images/app/${repoData.projectType}.png` // default null image path
+      /* If both ImageURL and language Data not Exists */
+      if (imageURL == null && repoData.language == null) {
+        repoData.language = `Keyword not set`;
+        awsImageURL = `/images/app/${repoData.projectType}.png`
+      }
+
+      // if(imageURL==null && repo.)
+
+      urlExists(awsImageURL, function (err, result) {
+        if (result == true) {
+          console.log('true')
+          awsImageURL = `${awsURL}${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
         } else {
-          lowercase_language = repoData.language.toLowerCase();
+          console.log('false')
+          awsImageURL = `/images/app/${repoData.projectType}.png`
         }
-        let url = (language_list.filter(function (item) {
-          if (repoData.language == null || repoData.language == 'null') {
-            result_url = `/images/app/${repoData.projectType}.png`
-          } else if (item.name === lowercase_language) {
-            result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-          }
-        }))
-        if (languages.hasOwnProperty(lowercase_language) == true) {
-          lowercase_language = languages[lowercase_language];
-          result_url = `${base_url}${lowercase_language}/${lowercase_language}-original.svg`
-        } else if (languages.hasOwnProperty(lowercase_language) == false) {
-          result_url = `/images/app/${repoData.projectType}.png`
-        }
-        repoData.imageURL = result_url
-      }
+      });
+
+
 
       /* Detail View Counter Prcoess */
       if (repoData.detailViewCounter == undefined) {
@@ -566,59 +556,44 @@ router.get("/:userId/:pageId", function (req, res, next) {
             converter = new showdown.Converter(),
               readmeHTML = converter.makeHtml(readmeData);
           }
-          if (repoData.languages_url == undefined) {
-            res.render("detail", {
-              userId: userId,
-              pageId: pageId,
-              projectName: repoData.name,
-              imageURL: repoData.imageURL,
-              projectType: repoData.projectType,
-              keyword: '',
-              created_at,
-              updated_at,
-              description: repoData.description,
-              projectDemoURL: repoData.homepage,
-              githubURL: repoData.html_url,
-              detailViewCounter: repoData.detailViewCounter,
-              markdown: readmeHTML,
-              // email: repoData.email,
-              // phoneNumber: repoData.phoneNumber,
-              ownerCheck
-            })
-          } else {
-            /* Language List API Process */
-            request({
-                headers: {
-                  'User-Agent': 'request',
-                  'accept': 'application/vnd.github.VERSION.raw',
-                  'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
-                  'charset': 'UTF-8'
-                },
-                json: true,
-                url: repoData.languages_url
+
+          /* Language List API Process */
+          request({
+              headers: {
+                'User-Agent': 'request',
+                'accept': 'application/vnd.github.VERSION.raw',
+                'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+                'charset': 'UTF-8'
               },
-              function (error, response, keywordData) {
-                if (error) throw error;
-                res.render("detail", {
-                  userId: userId,
-                  pageId: pageId,
-                  projectName: repoData.name,
-                  imageURL: repoData.imageURL,
-                  projectType: repoData.projectType,
-                  keyword: keywordData,
-                  created_at,
-                  updated_at,
-                  description: repoData.description,
-                  projectDemoURL: repoData.homepage,
-                  githubURL: repoData.html_url,
-                  detailViewCounter: repoData.detailViewCounter,
-                  markdown: readmeHTML,
-                  // email: repoData.email,
-                  // phoneNumber: repoData.phoneNumber,
-                  ownerCheck
-                })
-              });
-          }
+              json: true,
+              url: repoData.languages_url
+            },
+            function (error, response, keyword) {
+              if (error) throw error;
+              if (Object.keys(keyword).length == 0) {
+                keyword = null;
+              }
+              console.log(keyword)
+              res.render("detail", {
+                userId: userId,
+                pageId: pageId,
+                projectName: repoData.name,
+                imageURL: awsImageURL,
+                projectType: repoData.projectType,
+                keyword,
+                created_at,
+                updated_at,
+                description: repoData.description,
+                projectDemoURL: repoData.homepage,
+                githubURL: repoData.html_url,
+                detailViewCounter: repoData.detailViewCounter,
+                markdown: readmeHTML,
+                // email: repoData.email,
+                // phoneNumber: repoData.phoneNumber,
+                ownerCheck
+
+              })
+            });
         })
     }
   });
