@@ -49,8 +49,8 @@ section#works.l-section(role='region')
                 span.gallery-spec-value= `${projectType}`
               li.gallery-spec-item
                 strong.gallery-spec-key Project Keywords
-                - if (keyword==''){
-                  span.gallery-spec-value= ``
+                - if (keyword== ''){
+                  span.gallery-spec-value= `None`
                 - } else {
                   span.gallery-spec-value= `${Object.keys(keyword)}`
                 - }
