@@ -197,7 +197,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
       console.log(params.Key)
       s3.deleteObject(params, function (err, data) {
         if (err) throw err;
-        console.log(data);
       })
     }
     /* Remove MongoDB Documnet */
@@ -209,6 +208,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
     })
   })
   res.redirect(`/${userId}`);
+  return false;
 });
 
 /* GET Update Page */
@@ -233,6 +233,9 @@ router.get("/:userId/:pageId/update", function (req, res) {
       repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
     } else if (repo.language == null && repo.imageURL == null) {
       repo.imageURL = `/images/app/${repo.projectType}.png`
+    }
+    if(repo.homepage==null){
+      repo.homepage='';
     }
 
     res.render("update", {
