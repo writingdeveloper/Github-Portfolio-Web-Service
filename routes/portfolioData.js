@@ -64,7 +64,7 @@ function loginCheck(req) {
 
 /* DB Data Null Check */
 function dataNullCheck(data) {
-  if (data == null) {
+  if (data === null) {
     return '';
   }
 }
@@ -110,7 +110,7 @@ router.get(`/:userId`, function (req, res, next) {
             let imageName = (repo.language || '').toLowerCase();
             /* If AWS Image Exists */
             if (repo.imageURL) {
-              console.log(`AWS Image Exist : ${repo.imageURL}`)
+            // console.log('Use AWS Image')
             } else if (languageNameArray.includes(imageName) == false) {
               repo.imageURL = `/images/app/${repo.projectType}.png`
             } else if (languageNameArray.includes(imageName) == true) {
@@ -186,15 +186,18 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   Repo.findOne({
     'owner.login': userId,
     'name': pageId
-  }, function (err, pageData) {
+  }, function (err, repo) {
     if (err) throw err;
-    if (pageData.imageURL.startsWith('https://portfolioworld')) {
+    console.log(repo.imageURL)
+    if (repo.imageURL == null) {} else if (repo.imageURL.startsWith('https://portfolioworld')) {
       let params = {
         Bucket: 'portfolioworld',
-        Key: pageData.imageURL.substr(55)
+        Key: repo.imageURL.substr(55)
       };
+      console.log(params.Key)
       s3.deleteObject(params, function (err, data) {
         if (err) throw err;
+        console.log(data);
       })
     }
     /* Remove MongoDB Documnet */
@@ -205,7 +208,6 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
       if (err) throw err;
     })
   })
-
   res.redirect(`/${userId}`);
 });
 
@@ -214,15 +216,11 @@ router.get("/:userId/:pageId/update", function (req, res) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
 
-
-
   Repo.findOne({
     'owner.login': userId,
     'name': pageId
   }, function (err, repo) {
     if (err) throw err;
-
-
     let languageNameArray = require('../config/languageNames')
     let imageName = (repo.language || '').toLowerCase();
     /* If AWS Image Exists */
@@ -243,8 +241,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
       projectName: repo.name,
       projectType: repo.projectType,
       keywords: repo.language,
-      projectDemoURL: dataNullCheck(repo.homepage),
-      description: dataNullCheck(repo.description),
+      projectDemoURL: repo.homepage,
+      description: repo.description,
       imageURL: repo.imageURL,
       created_at: moment(repo.created_at).format('YYYY-MM'),
       updated_at: moment(repo.updated_at).format('YYYY-MM'),
@@ -429,14 +427,18 @@ router.get("/:userId/:pageId", function (req, res, next) {
                 'charset': 'UTF-8'
               },
               json: true,
-              url: repo.languages_url
+              url: `https://api.github.com/repos/${userId}/${repo.name}/languages`
             },
             function (error, response, keyword) {
-              if (error) throw error;
-              if (Object.keys(keyword).length == 0) {
-                keyword = null;
+              console.log(response.statusCode)
+              if (response.statusCode == 404) {
+                keyword = '';
+              } else {
+                if (error) throw error;
+                if (Object.keys(keyword).length == 0) {
+                  keyword = '';
+                }
               }
-              console.log(keyword)
               res.render("detail", {
                 userId: userId,
                 pageId: pageId,
@@ -446,8 +448,8 @@ router.get("/:userId/:pageId", function (req, res, next) {
                 keyword,
                 created_at,
                 updated_at,
-                description: dataNullCheck(repo.description),
-                projectDemoURL: dataNullCheck(repo.homepage),
+                description: repo.description,
+                projectDemoURL: repo.homepage,
                 githubURL: repo.html_url,
                 detailViewCounter: repo.detailViewCounter,
                 markdown: readmeHTML,
