@@ -8,7 +8,6 @@ const logger = require('morgan');
 const request = require("request");
 const moment = require('moment-timezone');
 const app = express();
-
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
@@ -106,21 +105,21 @@ app.io.on('connection', function (socket) {
   });
 
   // Notice Counter Socket
-  socket.on('counter', function (data) {
-    let counterTo = data.userId;
-    socket.join(`${data.userId}`)
-    // console.log(`COUNTER ${data.userId} ON!`)
-    db.query(`SELECT COUNT(notice) FROM chatData WHERE chatReceiver=? AND notice='0'`, [data.userId], function (error, data) {
-      if (error) {
-        throw error;
-      }
-      let count = data[0]['COUNT(notice)'];
-      // console.log(data[0]['COUNT(notice)']);
-      // console.log(COUNT(notice));
-      app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count)
-      // console.log(`SEND NOTICE TO ${counterTo} NUM : ${count}`)
-    })
-  })
+  // socket.on('counter', function (data) {
+  //   let counterTo = data.userId;
+  //   socket.join(`${data.userId}`)
+  //   // console.log(`COUNTER ${data.userId} ON!`)
+  //   db.query(`SELECT COUNT(notice) FROM chatData WHERE chatReceiver=? AND notice='0'`, [data.userId], function (error, data) {
+  //     if (error) {
+  //       throw error;
+  //     }
+  //     let count = data[0]['COUNT(notice)'];
+  //     // console.log(data[0]['COUNT(notice)']);
+  //     // console.log(COUNT(notice));
+  //     app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count)
+  //     // console.log(`SEND NOTICE TO ${counterTo} NUM : ${count}`)
+  //   })
+  // })
 
   // Quit Typing Socket
   socket.on('quitTyping', function (others) {
