@@ -19,7 +19,7 @@ router.get("*", function (req, res, next) {
 /* Session Settings */
 router.use(
   session({
-    secret: process.env.session_secret,
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: new FileStore(),
