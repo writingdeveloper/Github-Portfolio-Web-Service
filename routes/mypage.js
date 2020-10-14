@@ -40,30 +40,28 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
     // console.log(repo);
 
     let languageNameArray = require('../config/languageNames')
-    repo.forEach(function (repo) {
+    repo.map((repo) => {
+      {
 
-      let imageName = (repo.language || '').toLowerCase();
-      /* If AWS Image Exists */
-      if (repo.imageURL) {
-        // console.log('Use AWS Image')
-      } else if (languageNameArray.includes(imageName) == false) {
-        repo.imageURL = `/images/app/${repo.projectType}.png`
-      } else if (languageNameArray.includes(imageName) == true) {
-        let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
-        repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
-      } else if (repo.language == null && repo.imageURL == null) {
-        repo.imageURL = `/images/app/${repo.projectType}.png`
+        let imageName = (repo.language || '').toLowerCase();
+        /* If AWS Image Exists */
+        if (repo.imageURL) {
+          // console.log('Use AWS Image')
+        } else if (languageNameArray.includes(imageName) == false) {
+          repo.imageURL = `/images/app/${repo.projectType}.png`
+        } else if (languageNameArray.includes(imageName) == true) {
+          let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
+          repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
+        } else if (repo.language == null && repo.imageURL == null) {
+          repo.imageURL = `/images/app/${repo.projectType}.png`
+        }
+
+        if (!repo.homepage) {
+          console.log(repo.homepage)
+          repo.homepage = 'None';
+        }
       }
-
-  
-      
-      // repo.created_at = moment(repo.created_at).format("YYYY-MM");
-      // console.log(repo.created_at)
-      // repo.updated_at = moment(repo.updated_at).format("YYYY-MM");
-      console.log(moment(repo.updated_at).format("YYYY-MM"))
-
     })
-
 
     res.render('mypage/main', {
       userId: userId,
@@ -213,21 +211,21 @@ router.get(`/:userId/admin/getData`, function (req, res, next) {
 /* GET Mypage User Setting Page */
 router.get(`/:userId/admin/user`, function (req, res, next) {
   let userId = req.params.userId;
-  db.query(`SELECT * FROM user WHERE loginId='${userId}'`, function (error, data) {
-    if (error) {
-      throw (`Error From ${userId}/admin/user Router ${error}`);
-    }
-    let results = data[0];
-    let uniqueId = `${results.loginId}-${results.registerType}`;
+  User.find({
+    'login': userId
+  }, function (err, userData) {
+    if (err) throw err;
+    userData = userData[0];
+
     res.render('mypage/user', {
-      userId: userId,
-      uniqueId: uniqueId,
-      avatarUrl: results.avatarUrl,
-      name: results.name,
-      bio: results.bio,
-      email: results.email,
-      phoneNumber: results.phoneNumber,
-      registerDate: results.registerDate
+      userId: userData.login,
+      uniqueId: `${userData._id}-${userData.id}`,
+      avatarUrl: userData.avatar_url,
+      name: userData.name,
+      bio: userData.bio,
+      email: userData.email,
+      // phoneNumber: userData.phoneNumber,
+      registerDate: userData.created_at
     })
   })
 })
