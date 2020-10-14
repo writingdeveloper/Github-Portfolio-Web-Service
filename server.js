@@ -1,15 +1,15 @@
 "use strict";
- 
-var app = require("./app.js");
- 
+
+const app = require("./app.js");
+
 require("greenlock-express")
     .init({
         packageRoot: __dirname,
         configDir: "./greenlock.d",
- 
+
         // contact for security and critical bug notices
-        maintainerEmail: "super2451894@naver.com",
- 
+        maintainerEmail: process.env.EMAIL,
+
         // whether or not to run at cloudscale
         cluster: false
     })
