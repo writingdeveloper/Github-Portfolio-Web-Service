@@ -23,5 +23,5 @@ sudo screen -S awsserver
 cd $PROJECT_ROOT
 
 # 원래 node 프로세스 종료
-sudo pkill -f node `grep 'node ./bin/www' | awk '{print $2}'`
+sudo pkill -f node `grep 'node server.js' | awk '{print $2}'`
 nohup npm start >/home/project/logs 2>&1 </home/project/errors &
