@@ -3,7 +3,7 @@ extends layout.pug
 block customCSS
 	// Datatable CSS CDN
 	link(href='https://cdn.datatables.net/1.10.18/css/dataTables.bootstrap4.min.css', rel='stylesheet')
-		
+
 block content
 	#content-wrapper
 		.container-fluid
@@ -87,24 +87,24 @@ block content
 								each data in dataArray
 									tr
 										td
-											a(href=`/${userId}/${data.sid}`)=`${data.sid}`
-										td= `${data.projectName}`
-										td= `${data.type}`
+											a(href=`/${userId}/${data.name}`)=`${data.id}`
+										td= `${data.name}`
+										td= `${data.projectType}`
 										td
-											a(href=`${data.projectDemoUrl}`)=`${data.projectDemoUrl}`
+											a(href=`${data.homepage}`)=`${data.homepage}`
 										//- td= `${data.explanation}`
 										td
-											img(src=`${data.imageUrl}`)
-										td= `${data.summary}`
-										td= `${data.projectDate1}`
-										td= `${data.projectDate2}`
+											img(src=`${data.imageURL}`)
+										td= `${data.language}`
+										td= `${data.created_at.toISOString().substr(0,7)}`
+										td= `${data.updated_at.toISOString().substr(0,7)}`
 										td
-											a(href=`${data.githubUrl}`)=`${data.githubUrl}`
+											a(href=`${data.html_url}`)=`${data.html_url}`
 				.card-footer.small.text-muted=`Updated at ${updatedTime}`
 			footer.sticky-footer
 				.container.my-auto
 					.copyright.text-center.my-auto
-						span Copyright © Portfolio World 2019
+						span Copyright © Portfolio World 2020
 
 block customJS
 	// ChartJS CDN

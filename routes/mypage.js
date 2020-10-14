@@ -1,9 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../lib/db");
 const request = require("request");
 const bodyParser = require("body-parser");
 const path = require("path");
+const moment = require("moment");
+
+/* Import Database Settings */
+const db = require("../lib/db");
+let User = require('../lib/models/userModel');
+let Repo = require('../lib/models/repoModel');
+let LoginLogs = require('../lib/models/loginLogsModel');
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
@@ -26,62 +32,108 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
     dd = String(dd).length === 1 ? '0' + dd : dd;
     thisWeek[i] = yyyy + '-' + mm + '-' + dd;
   }
-  // Chart Data SQL
-  db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, data) {
-    if (error) {
-      throw (`Error From Router /:userId/mypage \n ${error}`);
-    }
-    for (var i = 0; i < data.length; i++) {
-      if (data[i].imageUrl === null) {
-        data[i].imageUrl = '/images/app/404.png'
+
+  Repo.find({
+    'owner.login': userId
+  }, function (err, repo) {
+    if (err) throw err;
+    // console.log(repo);
+
+    let languageNameArray = require('../config/languageNames')
+    repo.forEach(function (repo) {
+
+      let imageName = (repo.language || '').toLowerCase();
+      /* If AWS Image Exists */
+      if (repo.imageURL) {
+        // console.log('Use AWS Image')
+      } else if (languageNameArray.includes(imageName) == false) {
+        repo.imageURL = `/images/app/${repo.projectType}.png`
+      } else if (languageNameArray.includes(imageName) == true) {
+        let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
+        repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
+      } else if (repo.language == null && repo.imageURL == null) {
+        repo.imageURL = `/images/app/${repo.projectType}.png`
       }
-    }
-    data.forEach(results => {
-      let date1 = results.projectDate1;
-      let date2 = results.projectDate2;
-      results.projectDate1 = date1;
-      results.projectDate2 = date2;
+
+  
+      
+      // repo.created_at = moment(repo.created_at).format("YYYY-MM");
+      // console.log(repo.created_at)
+      // repo.updated_at = moment(repo.updated_at).format("YYYY-MM");
+      console.log(moment(repo.updated_at).format("YYYY-MM"))
+
     })
-    // Total Counter SQL
-    db.query(`SELECT SUM(counter) FROM counter WHERE userId='${userId}'`, function (error, counterSum) {
-      if (error) {
-        throw (`Error FROM Router /:userId/mypage \n ${error}`);
-      }
-      //  This Week visitor Data SQL
-      db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
-        if (error) {
-          throw (`Error From Router /:userId/mypage \n ${error}`);
-        }
-        db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND date=?`, [currentDay.toISOString().split('T')[0]], function (error, todayVisitorData) {
-          if (error) {
-            throw (`Error From Router /:userId/mypage \n ${error}`);
-          }
-          if (todayVisitorData[0] === undefined) {
-            todayVisitorData[0] = 0;
-            db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
-          }
-          let chartData = [];
-          if (visitorData.length < 7) { // If visitor data's length is lower than 7, Push Data 0 to create Array
-            for (let i = 0; i < 7 - visitorData.length; i++) {
-              chartData.push(0);
-            }
-          }
-          for (let i = 0; i < visitorData.length; i++) { // Create Counter Array for chart data
-            chartData.push(visitorData[i].counter)
-          }
-          res.render('mypage/main', {
-            userId: userId,
-            dataArray: data,
-            todayVisitor: todayVisitorData[0].counter,
-            visitorData: chartData,
-            chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
-            totalViews: counterSum[0]['SUM(counter)'],
-            updatedTime: updatedTime.toLocaleString()
-          })
-        })
-      })
+
+
+    res.render('mypage/main', {
+      userId: userId,
+      dataArray: repo,
+      // todayVisitor: todayVisitorData[0].counter,
+      // visitorData: chartData,
+      // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+      // totalViews: counterSum[0]['SUM(counter)'],
+      updatedTime: updatedTime.toLocaleString()
     })
   })
+
+
+
+  // Chart Data SQL
+  // db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, data) {
+  //   if (error) {
+  //     throw (`Error From Router /:userId/mypage \n ${error}`);
+  //   }
+  //   for (var i = 0; i < data.length; i++) {
+  //     if (data[i].imageUrl === null) {
+  //       data[i].imageUrl = '/images/app/404.png'
+  //     }
+  //   }
+  //   data.forEach(results => {
+  //     let date1 = results.projectDate1;
+  //     let date2 = results.projectDate2;
+  //     results.projectDate1 = date1;
+  //     results.projectDate2 = date2;
+  //   })
+  // Total Counter SQL
+  //     db.query(`SELECT SUM(counter) FROM counter WHERE userId='${userId}'`, function (error, counterSum) {
+  //       if (error) {
+  //         throw (`Error FROM Router /:userId/mypage \n ${error}`);
+  //       }
+  //       //  This Week visitor Data SQL
+  //       db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
+  //         if (error) {
+  //           throw (`Error From Router /:userId/mypage \n ${error}`);
+  //         }
+  //         db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND date=?`, [currentDay.toISOString().split('T')[0]], function (error, todayVisitorData) {
+  //           if (error) {
+  //             throw (`Error From Router /:userId/mypage \n ${error}`);
+  //           }
+  //           if (todayVisitorData[0] === undefined) {
+  //             todayVisitorData[0] = 0;
+  //             db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
+  //           }
+  //           let chartData = [];
+  //           if (visitorData.length < 7) { // If visitor data's length is lower than 7, Push Data 0 to create Array
+  //             for (let i = 0; i < 7 - visitorData.length; i++) {
+  //               chartData.push(0);
+  //             }
+  //           }
+  //           for (let i = 0; i < visitorData.length; i++) { // Create Counter Array for chart data
+  //             chartData.push(visitorData[i].counter)
+  //           }
+  // res.render('mypage/main', {
+  //   userId: userId,
+  //   dataArray: data,
+  //   // todayVisitor: todayVisitorData[0].counter,
+  //   // visitorData: chartData,
+  //   // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+  //   // totalViews: counterSum[0]['SUM(counter)'],
+  //   updatedTime: updatedTime.toLocaleString()
+  // })
+  //         })
+  //       })
+  //     })
+  //   })
 })
 
 /* GET Mypage Remove Portfolio Data */
