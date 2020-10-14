@@ -8,7 +8,6 @@ const QRCode = require('qrcode'); // QR Code Generator Module
 const showdown = require('showdown') // Markdown Module
 const moment = require('moment');
 const cryptoRandomString = require('crypto-random-string');
-let fs = require('fs')
 
 const router = express.Router();
 router.use(bodyParser.json());
@@ -397,7 +396,7 @@ router.get("/:userId/:pageId", function (req, res, next) {
       }
 
       /* Project Term Process */
-      let created_at = repo.created_at.toISOString().substr(0, 10).replace('T', ' ');;
+      let created_at = repo.created_at.toISOString().substr(0, 10).replace('T', ' ');
       let updated_at = repo.updated_at.toISOString().substr(0, 10).replace('T', ' ');
       let fullName = repo.html_url.replace(/^\/\/|^https?:\/\/github.com\//g, '') // Get real README.md file
 
