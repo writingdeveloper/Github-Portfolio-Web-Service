@@ -1,5 +1,4 @@
 var express = require("express");
-var parseurl = require("parseurl");
 var session = require("express-session");
 var FileStore = require("session-file-store")(session);
 
@@ -8,7 +7,7 @@ var app = express();
 app.use(
   session({
     // Secret Key Should not upload in any Github Repository!!
-    secret: "raspberrypi",
+    secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: true,
     store: new FileStore()
