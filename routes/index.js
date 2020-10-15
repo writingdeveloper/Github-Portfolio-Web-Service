@@ -7,14 +7,14 @@ let session = require("express-session");
 let FileStore = require("session-file-store")(session);
 
 /* Redirect http to https */
-router.get("*", function (req, res, next) {
-  if (
-    req.headers["x-forwarded-proto"] != "https" &&
-    process.env.NODE_ENV === "production"
-  )
-    res.redirect(`https://"${req.hostname}${req.url}`);
-  else next(); /* Continue to other routes if we're not redirecting */
-});
+// router.get("*", function (req, res, next) {
+//   if (
+//     req.headers["x-forwarded-proto"] != "https" &&
+//     process.env.NODE_ENV === "production"
+//   )
+//     res.redirect(`https://"${req.hostname}${req.url}`);
+//   else next(); /* Continue to other routes if we're not redirecting */
+// });
 
 /* Session Settings */
 router.use(
