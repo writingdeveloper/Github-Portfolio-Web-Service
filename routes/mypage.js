@@ -15,7 +15,7 @@ router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
 /* GET MyPage Page */
-router.get(`/:userId/admin/mypage`, function (req, res, next) {
+router.get(`/:userId/admin/mypage`, (req, res, next) => {
   let userId = req.params.userId; // UserID Variable
   let updatedTime = new Date(); // updated Time Variable
   let currentDay = new Date();
@@ -57,23 +57,24 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
         }
 
         if (!repo.homepage) {
-          console.log(repo.homepage)
           repo.homepage = 'None';
         }
       }
     })
-
+    const sum = repo.reduce(function (prev, next) {
+      return prev + next.detailViewCounter;
+    }, 0);
+    console.log(sum);
     res.render('mypage/main', {
       userId: userId,
       dataArray: repo,
-      // todayVisitor: todayVisitorData[0].counter,
+      todayVisitor: sum,
       // visitorData: chartData,
       // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
       // totalViews: counterSum[0]['SUM(counter)'],
       updatedTime: updatedTime.toLocaleString()
     })
   })
-
 
 
   // Chart Data SQL
@@ -136,77 +137,126 @@ router.get(`/:userId/admin/mypage`, function (req, res, next) {
 
 /* GET Mypage Remove Portfolio Data */
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.get(`/:userId/admin/removeData`, function (req, res, next) {
+router.get(`/:userId/admin/removeData`, (req, res, next) => {
   let userId = req.params.userId;
-  let currentDay = new Date();
-  db.query(`DELETE FROM project WHERE userId='${userId}'`); // Delete project Table
-  db.query(`DELETE FROM counter WHERE userId='${userId}'`); // Delete counter Table
-  db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
-  res.json('removed');
+  Repo.deleteMany({
+    'owner.login': userId
+  }, (err, result) => {
+    if (err) {
+      res.json('{fail}');
+    } else {
+      res.json('{success}');
+    }
+  })
 });
+// router.get(`/:userId/admin/removeData`, function (req, res, next) {
+//   let userId = req.params.userId;
+//   User.findOneAndDelete({'login':userId}, function(err, result){
+//     if(err) throw err;
+//     console.log(result);
+//   })
+//   Repo.deleteMany({'owner.login':userId})
+//   // let currentDay = new Date();
+//   // db.query(`DELETE FROM project WHERE userId='${userId}'`); // Delete project Table
+//   // db.query(`DELETE FROM counter WHERE userId='${userId}'`); // Delete counter Table
+//   // db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
+//   res.json('removed');
+// });
 
 /* GET Mypage Get Github Portfolio Data */
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.get(`/:userId/admin/getData`, function (req, res, next) {
+router.get(`/:userId/admin/getData`, (req, res, next) => {
   let userId = req.params.userId;
 
-  db.query(`SELECT registerType FROM user WHERE loginId=?`, [userId], function (error, data) {
-    if (error) {
-      throw (`Error from Router /:userId/admin/getData Router \n ${error}`)
-    }
-    console.log(data[0].registerType);
-    if (data[0].registerType === 'Google') {
-      res.json('Type:Google')
-    } else {
-      // User Repository API Option Set
-      console.log('GITHUB PROCESS');
-      let repositoryOptions = {
-        url: `https://api.github.com/users/${userId}/repos`,
-        headers: {
-          "User-Agent": "request"
+  if (req.session.sid == userId) {
+    console.log('PASS')
+    request({
+      headers: {
+        'User-Agent': 'request',
+        'accept': 'application/vnd.github.VERSION.raw',
+        'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+        'charset': 'UTF-8'
+      },
+      json: true,
+      url: `https://api.github.com/users/${userId}/repos?per_page=100`,
+    }, (error, response, data) => {
+      let APIResult;
+      console.log(response.statusCode)
+      if (response.statusCode == 200) {
+        res.json('{success}')
+      } else {
+        res.json('{fail}')
+      }
+      if (error) throw error;
+      for (i in data) {
+        if (data.length == 0 || data[i].fork == false) {
+          Repo.insertMany(data[i], (err, result) => {
+            if (err) throw err;
+          })
         }
       }
-      // User Repository Information API Process
-      request(repositoryOptions, function (error, response, data) {
-        if (error) {
-          throw error;
-        }
-        let result = JSON.parse(data);
-        for (let i = 0; i < result.length; i++) {
-          let sid = shortid.generate();
-          let userId = result[i].owner.login;
-          let projectName = result[i].name;
-          let projectDemoUrl = result[i].homepage;
-          let githubUrl = result[i].html_url;
-          let summary = result[i].description;
-          let projectDate1 = result[i].created_at;
-          let projectDate2 = result[i].updated_at;
-          let keyword = result[i].language;
-          let sqlData = [sid, userId, projectName, projectDemoUrl, githubUrl, summary, projectDate1.split('T')[0], projectDate2.split('T')[0], keyword];
-          let sql = `INSERT INTO project (sid, userId , projectName, projectDemoUrl, githubUrl, summary, projectDate1, projectDate2, keyword) VALUES (?,?,?,?,?,?,?,?,?)`;
-          db.query(sql, sqlData);
-        }
-        db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, redrawData) {
-          if (error) {
-            throw (`Error From Router /:userId/mypage \n ${error}`);
-          }
-          for (var i = 0; i < redrawData.length; i++) {
-            if (redrawData[i].imageUrl === null) {
-              redrawData[i].imageUrl = '/images/app/404.png'
-            }
-          }
-          redrawData.forEach(results => {
-            let date1 = results.projectDate1.split('T')[0];
-            let date2 = results.projectDate2.split('T')[0];
-            results.projectDate1 = date1;
-            results.projectDate2 = date2;
-          })
-          res.json(redrawData);
-        })
-      })
-    }
-  })
+    })
+  }
 })
+
+
+// db.query(`SELECT registerType FROM user WHERE loginId=?`, [userId], function (error, data) {
+//   if (error) {
+//     throw (`Error from Router /:userId/admin/getData Router \n ${error}`)
+//   }
+//   console.log(data[0].registerType);
+//   if (data[0].registerType === 'Google') {
+//     res.json('Type:Google')
+//   } else {
+//     // User Repository API Option Set
+//     console.log('GITHUB PROCESS');
+//     let repositoryOptions = {
+//       url: `https://api.github.com/users/${userId}/repos`,
+//       headers: {
+//         "User-Agent": "request"
+//       }
+//     }
+//     // User Repository Information API Process
+//     request(repositoryOptions, function (error, response, data) {
+//       if (error) {
+//         throw error;
+//       }
+//       let result = JSON.parse(data);
+//       for (let i = 0; i < result.length; i++) {
+//         let sid = shortid.generate();
+//         let userId = result[i].owner.login;
+//         let projectName = result[i].name;
+//         let projectDemoUrl = result[i].homepage;
+//         let githubUrl = result[i].html_url;
+//         let summary = result[i].description;
+//         let projectDate1 = result[i].created_at;
+//         let projectDate2 = result[i].updated_at;
+//         let keyword = result[i].language;
+//         let sqlData = [sid, userId, projectName, projectDemoUrl, githubUrl, summary, projectDate1.split('T')[0], projectDate2.split('T')[0], keyword];
+//         let sql = `INSERT INTO project (sid, userId , projectName, projectDemoUrl, githubUrl, summary, projectDate1, projectDate2, keyword) VALUES (?,?,?,?,?,?,?,?,?)`;
+//         db.query(sql, sqlData);
+//       }
+//       db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, redrawData) {
+//         if (error) {
+//           throw (`Error From Router /:userId/mypage \n ${error}`);
+//         }
+//         for (var i = 0; i < redrawData.length; i++) {
+//           if (redrawData[i].imageUrl === null) {
+//             redrawData[i].imageUrl = '/images/app/404.png'
+//           }
+//         }
+//         redrawData.forEach(results => {
+//           let date1 = results.projectDate1.split('T')[0];
+//           let date2 = results.projectDate2.split('T')[0];
+//           results.projectDate1 = date1;
+//           results.projectDate2 = date2;
+//         })
+//         res.json(redrawData);
+//       })
+//     })
+//   }
+// })
+// })
 
 /* GET Mypage User Setting Page */
 router.get(`/:userId/admin/user`, function (req, res, next) {
