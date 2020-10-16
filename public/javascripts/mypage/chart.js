@@ -48,7 +48,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBackgroundColor: "rgba(2,117,216,1)",
       pointHitRadius: 50,
       pointBorderWidth: 2,
-      data: visitorData,
+      data: ['39'],
     }],
   },
   options: {
@@ -67,7 +67,8 @@ var myLineChart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           min: 0,
-          max: chartMaxData + 50,
+          // max: chartMaxData + 50,
+          max: 50,
           maxTicksLimit: 10
         },
         gridLines: {
@@ -85,148 +86,87 @@ var myLineChart = new Chart(ctx, {
 /* Mypage Remove All my Data From Server Function */
 function removeData() {
   Swal.fire({
-    title: 'Are you sure?',
-    text: "You won't be able to revert this!",
-    type: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, delete it!',
-    preConfirm: () => {
-      return fetch(`/${userId}/admin/removeData`) // Fetch Data from server
-        .then(res => res.json()).then(data => {
-          let existTable = $('#dataTable').DataTable();
-          // console.log(data);
-          if (data === 'removed') {
-            existTable
-              .clear()
-              .draw(); // Remove Exist Table to redraw table
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!',
+        preConfirm: () => {
+          return fetch(`/${userId}/admin/removeData`)
+        .then(response => {
+          console.log(response);
+          if (!response.ok) {
+            throw new Error(response.statusText)
           }
-          return data;
-        }).catch(error => {
-          Swal.fire(
-            'ERROR?',
-            `Error Message : ${error}`,
-            'error'
+          return response.json()
+        })
+        .catch(error => {
+          Swal.showValidationMessage(
+            `Request failed: ${error}`
           )
-          console.log(error);
         })
     },
     allowOutsideClick: () => !Swal.isLoading()
   }).then((result) => {
-    // console.log(result);
-    if (result.value === 'removed') {
-      Swal.fire(
-        'Remove Data Success',
-        'There is no problem from server',
-        'success'
-      )
-    } else if (result.dismiss === 'cancel') {
-      // console.log('Canceled : DO NOTHING');
-    } else {
-      Swal.fire(
-        'ERROR?',
-        'SOMETHING IS NOT WOKRING',
-        'error'
-      )
+    console.log(result)
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: 'Remove Data Success!',
+        text: "Your personal information has been safely removed from DB.",
+        icon: 'success',
+        confirmButtonText: `Ok`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          location.reload();
+        }
+      })
     }
   })
 }
 
 /* Mypage GET Github Data Function */
-let registerType;
-
 function getData() {
   Swal.fire({
     title: 'Do you want to get data from Github?',
     text: "You won't be able to revert this!",
-    type: 'info',
+    icon: 'info',
+    inputAttributes: {
+      autocapitalize: 'off'
+    },
     showCancelButton: true,
-    allowOutsideClick: false,
-    confirmButtonColor: '#3085d6',
-    cancelButtonColor: '#d33',
-    confirmButtonText: 'Yes, Get DATA!',
+    confirmButtonText: 'Get Data',
     showLoaderOnConfirm: true,
     preConfirm: () => {
-      return fetch(`/${userId}/admin/getData`) // Fetch Data from server
-        .then(res => res.json()).then(data => {
-          if (data === 'Type:Google') {
-            registerType = 'Google';
-          } else {
-            let existTable = $('#dataTable').DataTable();
-            // console.log(data);
-            existTable.destroy(); // Remove Exist Table to redraw table
-            $('#dataTable').DataTable({
-              aaData: data, // Returned Data from Server
-              aoColumns: [{
-                  mData: 'sid',
-                  "render": function (value, type, row) {
-                    return `<a href="/${userId}/${row.sid}">${row.sid}</a>`;
-                  }
-                },
-                {
-                  mData: 'projectName'
-                },
-                {
-                  mData: 'type'
-                },
-                {
-                  mData: 'projectDemoUrl'
-                },
-                {
-                  mData: 'imageUrl',
-                  "render": function (value, type, row) {
-                    return `<img src="${row.imageUrl}">`;
-                  }
-                },
-                {
-                  mData: 'keyword'
-                },
-                {
-                  mData: 'projectDate1'
-                },
-                {
-                  mData: 'projectDate2'
-                },
-                {
-                  mData: 'githubUrl'
-                }
-              ]
-            })
-            return data;
+      return fetch(`/${userId}/admin/getData`)
+        .then(response => {
+          console.log(response);
+          if (!response.ok) {
+            throw new Error(response.statusText)
           }
-        }).catch(error => {
-          Swal.fire(
-            'ERROR?',
-            'SOMETHING IS NOT WOKRING',
-            'error'
-          )
-          console.log(error);
+          return response.json()
         })
-
+        .catch(error => {
+          Swal.showValidationMessage(
+            `Request failed: ${error}`
+          )
+        })
     },
     allowOutsideClick: () => !Swal.isLoading()
   }).then((result) => {
-    if (result.value && registerType != 'Google') { // Register Type : Github
-      Swal.fire(
-        'Get Data Success',
-        'There is no problem from server',
-        'success'
-      )
-    } else if (result.value && registerType === 'Google') { // Register Type : Google
-      Swal.fire(
-        'Google Account!',
-        'Your Account is connected with Google NO DATA!!',
-        'success'
-      )
-    } else if (result.dismiss === 'cancel') { // Clicks Cancel
-      console.log('Canceled : DO NOTHING');
-    } else { // Error Handling
-      Swal.fire(
-        'ERROR?',
-        'SOMETHING IS NOT WOKRING',
-        'error'
-      )
+    console.log(result)
+    if (result.isConfirmed) {
+      Swal.fire({
+        title: 'Get Data Success!',
+        text: "Your personal information has been safely stored in DB.",
+        icon: 'success',
+        confirmButtonText: `Ok`
+      }).then((result) => {
+        if (result.isConfirmed) {
+          location.reload();
+        }
+      })
     }
   })
 }
