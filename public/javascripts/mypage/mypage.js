@@ -53,7 +53,7 @@ function logout() {
     Swal.fire({
         title: 'Ready to Leave?',
         text: `Select "Logout" below if you are ready to end your current session.`,
-        type: 'info',
+        icon: 'info',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
