@@ -9,14 +9,29 @@ const moment = require("moment");
 const db = require("../lib/db");
 let User = require('../lib/models/userModel');
 let Repo = require('../lib/models/repoModel');
-let LoginLogs = require('../lib/models/loginLogsModel');
+let Counter = require('../lib/models/counterModel');
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
 
+/* Session Check Function */
+let sessionCheck = (req, res, next) => {
+  if ((Object.keys(req.session.passport).length === 0 && req.session.passport.constructor === Object || req.session.passport.user.username !== req.params.userId)) {
+    res.render('customError', {
+      errorExplain: `You cannot access this page or perform tasks. Login data and Session data mismatching`,
+      errorMessage: 'Invalid Access Error',
+    });
+  } else if ((Object.keys(req.session.passport).length !== 0 && req.session.passport.constructor !== Object) || req.session.passport.user.username === req.params.userId) {
+    next();
+  }
+}
+
 /* GET MyPage Page */
 router.get(`/:userId/admin/mypage`, (req, res, next) => {
-  let userId = req.params.userId; // UserID Variable
+  let userId = req.params.userId;
+  let today = new Date().toISOString().substr(0, 10).replace('T', '')
+  let userNumber;
+
   let updatedTime = new Date(); // updated Time Variable
   let currentDay = new Date();
   let theYear = currentDay.getFullYear();
@@ -32,17 +47,32 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
     dd = String(dd).length === 1 ? '0' + dd : dd;
     thisWeek[i] = yyyy + '-' + mm + '-' + dd;
   }
-
   Repo.find({
     'owner.login': userId
   }, function (err, repo) {
     if (err) throw err;
-    // console.log(repo);
+    userNumber = repo[0].owner.id;
 
+    // function isNull(obj, key) {
+    //   return (obj[key] === null || obj[key] === undefined || obj[key] === "null");
+    // }
+
+    // function validate(obj) {
+    //   var objKeys = Object.keys(obj);
+    //   // console.log(objKeys)
+    //   objKeys.forEach((key) => {
+    //     if (isNull(obj, key)) {
+    //       obj[key] = "";
+    //     }
+    //     if (typeof (obj[key]) == "object") {
+    //       validate(obj[key]);
+    //     }
+    //   });
+    // }
+    // validate(repo);
     let languageNameArray = require('../config/languageNames')
     repo.map((repo) => {
       {
-
         let imageName = (repo.language || '').toLowerCase();
         /* If AWS Image Exists */
         if (repo.imageURL) {
@@ -57,24 +87,64 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
         }
 
         if (!repo.homepage) {
-          repo.homepage = 'None';
+          repo.homepage = 'None'
+        }
+        if (!repo.language) {
+          repo.language = 'None'
         }
       }
     })
-    const sum = repo.reduce(function (prev, next) {
-      return prev + next.detailViewCounter;
-    }, 0);
-    console.log(sum);
-    res.render('mypage/main', {
-      userId: userId,
-      dataArray: repo,
-      todayVisitor: sum,
-      // visitorData: chartData,
-      // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
-      // totalViews: counterSum[0]['SUM(counter)'],
-      updatedTime: updatedTime.toLocaleString()
+
+    Counter.aggregate([{
+        $match: {
+          userName: userId,
+          userNumber: userNumber
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          count: {
+            $sum: "$count"
+          }
+        }
+      }
+    ], function (err, totalViews) {
+      if (err) throw err;
+      totalViews = totalViews[0].count;
+    
+
+    Counter.aggregate([{
+        $match: {
+          userName: userId,
+          userNumber : userNumber,
+          viewDate: today,
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          count: {
+            $sum: "$count"
+          }
+        }
+      }
+    ], function (err, todayVisitor) {
+      if (err) throw err;
+      todayVisitor = todayVisitor[0].count;
+
+      res.render('mypage/main', {
+        userId: userId,
+        dataArray: repo,
+        todayVisitor: todayVisitor,
+        // visitorData: chartData,
+        // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+        totalViews: totalViews,
+        updatedTime: updatedTime.toLocaleString()
+      })
     })
   })
+})
 
 
   // Chart Data SQL
@@ -136,40 +206,32 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
 })
 
 /* GET Mypage Remove Portfolio Data */
-// TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.get(`/:userId/admin/removeData`, (req, res, next) => {
+router.get(`/:userId/admin/removeData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
-  Repo.deleteMany({
-    'owner.login': userId
-  }, (err, result) => {
-    if (err) {
-      res.json('{fail}');
-    } else {
-      res.json('{success}');
-    }
-  })
+  let sessionData = req.session.passport;
+  if (sessionData.user.username === userId) {
+    Repo.deleteMany({
+      'owner.login': userId
+    }, (err, result) => {
+      if (err) {
+        res.json('{fail}');
+      } else {
+        res.json('{success}');
+      }
+    })
+
+  } else {
+    sessionCheck(res, userId, sessionData);
+  }
 });
-// router.get(`/:userId/admin/removeData`, function (req, res, next) {
-//   let userId = req.params.userId;
-//   User.findOneAndDelete({'login':userId}, function(err, result){
-//     if(err) throw err;
-//     console.log(result);
-//   })
-//   Repo.deleteMany({'owner.login':userId})
-//   // let currentDay = new Date();
-//   // db.query(`DELETE FROM project WHERE userId='${userId}'`); // Delete project Table
-//   // db.query(`DELETE FROM counter WHERE userId='${userId}'`); // Delete counter Table
-//   // db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0]); // Reset Counter SQL to use INIT
-//   res.json('removed');
-// });
+
 
 /* GET Mypage Get Github Portfolio Data */
 // TODO :: Needs to check the owner of the mypage and if not, avoid this job
-router.get(`/:userId/admin/getData`, (req, res, next) => {
+router.get(`/:userId/admin/getData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
-
-  if (req.session.sid == userId) {
-    console.log('PASS')
+  let sessionData = req.session.passport;
+  if (sessionData.user.username === userId) {
     request({
       headers: {
         'User-Agent': 'request',
@@ -180,7 +242,6 @@ router.get(`/:userId/admin/getData`, (req, res, next) => {
       json: true,
       url: `https://api.github.com/users/${userId}/repos?per_page=100`,
     }, (error, response, data) => {
-      let APIResult;
       console.log(response.statusCode)
       if (response.statusCode == 200) {
         res.json('{success}')
@@ -196,6 +257,9 @@ router.get(`/:userId/admin/getData`, (req, res, next) => {
         }
       }
     })
+
+  } else {
+    sessionCheck(res, userId, sessionData);
   }
 })
 
@@ -259,14 +323,13 @@ router.get(`/:userId/admin/getData`, (req, res, next) => {
 // })
 
 /* GET Mypage User Setting Page */
-router.get(`/:userId/admin/user`, function (req, res, next) {
+router.get(`/:userId/admin/user`, sessionCheck, function (req, res, next) {
   let userId = req.params.userId;
   User.find({
     'login': userId
   }, function (err, userData) {
     if (err) throw err;
     userData = userData[0];
-
     res.render('mypage/user', {
       userId: userData.login,
       uniqueId: `${userData._id}-${userData.id}`,
@@ -279,6 +342,10 @@ router.get(`/:userId/admin/user`, function (req, res, next) {
     })
   })
 })
+
+
+//-------------------------------------------------------------------------------------------------------------
+
 
 /* POST Mypage User Setting Page */
 router.post(`/:userId/admin/submit`, function (req, res, next) {
