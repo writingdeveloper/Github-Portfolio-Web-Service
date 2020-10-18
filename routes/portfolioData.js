@@ -17,6 +17,7 @@ router.use(express.static(path.join(__dirname, "public")));
 const db = require("../lib/db"); // DB Connection Module
 const User = require('../lib/models/userModel');
 const Repo = require('../lib/models/repoModel');
+const Counter = require('../lib/models/counterModel');
 
 // Parsing Dependency
 const request = require("request"); // Request Module
@@ -51,22 +52,6 @@ let upload = multer({
     }
   })
 });
-
-function loginCheck(req) {
-  // Owner Check
-  if (req.user === undefined) {
-    ownerCheck = null;
-  } else {
-    return req.user.username;
-  }
-}
-
-/* DB Data Null Check */
-function dataNullCheck(data) {
-  if (data === null) {
-    return '';
-  }
-}
 
 /* GET home page. */
 router.get(`/:userId`, function (req, res, next) {
@@ -109,7 +94,7 @@ router.get(`/:userId`, function (req, res, next) {
             let imageName = (repo.language || '').toLowerCase();
             /* If AWS Image Exists */
             if (repo.imageURL) {
-            // console.log('Use AWS Image')
+              // console.log('Use AWS Image')
             } else if (languageNameArray.includes(imageName) == false) {
               repo.imageURL = `/images/app/${repo.projectType}.png`
             } else if (languageNameArray.includes(imageName) == true) {
@@ -233,8 +218,8 @@ router.get("/:userId/:pageId/update", function (req, res) {
     } else if (repo.language == null && repo.imageURL == null) {
       repo.imageURL = `/images/app/${repo.projectType}.png`
     }
-    if(repo.homepage==null){
-      repo.homepage='';
+    if (repo.homepage == null) {
+      repo.homepage = '';
     }
 
     res.render("update", {
@@ -310,6 +295,7 @@ router.post(
     }
 
     res.redirect(`/${userId}`);
+    return false;
   }
 );
 
@@ -317,6 +303,9 @@ router.post(
 router.get("/:userId/:pageId", function (req, res, next) {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
+  let todayDate = new Date().toISOString().substr(0, 10).replace('T', '');
+  let repoNumber;
+  let userNumber;
   let ownerCheck;
 
   // Owner Check
@@ -342,9 +331,10 @@ router.get("/:userId/:pageId", function (req, res, next) {
       });
     } else {
       repo = repoData[0]; // To use easier
+      repoNumber = repo.id;
+      userNumber = repo.owner.id;
 
       let languageNameArray = require('../config/languageNames')
-
       let imageName = (repo.language || '').toLowerCase();
       /* If AWS Image Exists */
       if (repo.imageURL) {
@@ -358,42 +348,44 @@ router.get("/:userId/:pageId", function (req, res, next) {
         repo.imageURL = `/images/app/${repo.projectType}.png`
       }
 
-
-      /* Detail View Counter Prcoess */
-      if (repo.detailViewCounter == undefined) {
-        repo.detailViewCounter = 0; // Not to show 'undefined' in pug view
-        /* Create detailViewCounter in document process */
-        Repo.findOneAndUpdate({
-          'owner.login': userId,
-          'name': pageId
-        }, {
-          $set: {
-            detailViewCounter: 0
-          }
-        }, {
-          new: true,
-          upsert: false,
-          useFindAndModify: false
-        }, (err, doc) => {
-          if (err) throw err;
-        });
-
-      } else {
-        Repo.findOneAndUpdate({
-          'owner.login': userId,
-          'name': pageId
-        }, {
-          $inc: {
-            detailViewCounter: +1
-          }
-        }, {
-          new: true,
-          upsert: false,
-          useFindAndModify: false
-        }, (err, doc) => {
-          if (err) throw err;
-        });
-      }
+      Counter.find({
+        'userName': userId,
+        'userNumber': userNumber,
+        'repoName': pageId,
+        'repoNumber': repoNumber,
+        'viewDate': todayDate
+      }, function (err, data) {
+        if (err) throw err;
+        data = data[0];
+        if (!data) {
+          Counter.create({
+            userName: userId,
+            userNumber: userNumber,
+            repoName : pageId,
+            repoNumber: repoNumber
+          }, function (err, data) {
+            if (err) throw err;
+          });
+        } else {
+          Counter.findOneAndUpdate({
+            'userName': userId,
+            'userNumber': userNumber,
+            'repoName': pageId,
+            'repoNumber': repoNumber,
+            'viewDate': todayDate
+          }, {
+            $inc: {
+              count: +1
+            }
+          }, {
+            new: true,
+            upsert: false,
+            useFindAndModify: false
+          }, (err, result) => {
+            if (err) throw err;
+          })
+        }
+      })
 
       /* Project Term Process */
       let created_at = repo.created_at.toISOString().substr(0, 10).replace('T', ' ');
@@ -432,7 +424,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
               url: `https://api.github.com/repos/${userId}/${repo.name}/languages`
             },
             function (error, response, keyword) {
-              console.log(response.statusCode)
               if (response.statusCode == 404) {
                 keyword = '';
               } else {
@@ -463,7 +454,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
         })
     }
   });
-
 });
 
 
