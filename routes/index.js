@@ -45,14 +45,6 @@ const passport = require("../lib/passport")(router, db, request);
 /* Github Auth Router */
 router.get("/auth/github", passport.authenticate("github"));
 
-const authenticateUser = (req, res, next) => {
-  if (req.isAuthenticated()) {
-    next();
-  } else {
-    res.status(301).redirect('/auth/login');
-  }
-};
-
 /* Github Auth Callback Router */
 router.get(
   "/auth/github/callback",
