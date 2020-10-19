@@ -86,12 +86,8 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
           repo.imageURL = `/images/app/${repo.projectType}.png`
         }
 
-        if (!repo.homepage) {
-          repo.homepage = 'None'
-        }
-        if (!repo.language) {
-          repo.language = 'None'
-        }
+        repo.homepage = repo.homepage || 'None'
+        repo.language = repo.language || 'None'
       }
     })
 
@@ -111,40 +107,44 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
       }
     ], function (err, totalViews) {
       if (err) throw err;
-      totalViews = totalViews[0].count;
-    
+      totalViews = totalViews[0].count || 0;
 
-    Counter.aggregate([{
-        $match: {
-          userName: userId,
-          userNumber : userNumber,
-          viewDate: today,
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          count: {
-            $sum: "$count"
+      Counter.aggregate([{
+          $match: {
+            userName: userId,
+            userNumber: userNumber,
+            viewDate: today,
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            count: {
+              $sum: "$count"
+            }
           }
         }
-      }
-    ], function (err, todayVisitor) {
-      if (err) throw err;
-      todayVisitor = todayVisitor[0].count;
+      ], (err, todayVisitors) => {
+        if (err) throw err;
+        if (todayVisitors.length == 0) {
+          todayVisitors = 0;
+        } else {
+          todayVisitors = todayVisitors[0].count
+        }
 
-      res.render('mypage/main', {
-        userId: userId,
-        dataArray: repo,
-        todayVisitor: todayVisitor,
-        // visitorData: chartData,
-        // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
-        totalViews: totalViews,
-        updatedTime: updatedTime.toLocaleString()
+
+        res.render('mypage/main', {
+          userId: userId,
+          dataArray: repo,
+          todayVisitors: todayVisitors,
+          // visitorData: chartData,
+          // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+          totalViews: totalViews,
+          updatedTime: updatedTime.toLocaleString()
+        })
       })
     })
   })
-})
 
 
   // Chart Data SQL
