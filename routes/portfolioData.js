@@ -34,7 +34,7 @@ let upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: process.env.AWS_S3_BUCKET,
-    key: function (req, file, cb) {
+    key: (req, file, cb) => {
       let userId = req.params.userId;
       let uniqueNumber = cryptoRandomString({
         length: 10,
@@ -43,7 +43,7 @@ let upload = multer({
       User.find({
           'login': userId
         },
-        function (err, userData) {
+        (err, userData) => {
           if (err) throw err;
           userData = userData[0];
           let fullPath = `members/${userData.id}-${userData.login}/${uniqueNumber}-${req.body.projectName}-${file.originalname}`;
@@ -54,7 +54,7 @@ let upload = multer({
 });
 
 /* GET home page. */
-router.get(`/:userId`, function (req, res, next) {
+router.get(`/:userId`, (req, res, next) => {
   let userId = req.params.userId;
   let ownerCheck;
 
@@ -67,12 +67,12 @@ router.get(`/:userId`, function (req, res, next) {
 
   /* QR Code Process */
   let fullUrl = `${req.protocol}'://'${req.get('host')}${req.originalURL}`;
-  QRCode.toDataURL(fullUrl, function (err, qrCodeImageURL) {
+  QRCode.toDataURL(fullUrl, (err, qrCodeImageURL) => {
     if (err) throw err;
     /* User Data not Exists */
     User.find({
       'login': userId
-    }, function (err, userData) {
+    }, (err, userData) => {
       if (err) throw err;
       if (userData.length == 0) { // If user data is Null([])
         res.render('customError', { // User Missing Error Handling
@@ -85,16 +85,15 @@ router.get(`/:userId`, function (req, res, next) {
         /* User Data Exists */
         Repo.find({
           'owner.login': userId
-        }, function (err, repoData) {
+        }, (err, repoData) => {
           if (err) throw err;
           let repo = repoData;
 
           let languageNameArray = require('../config/languageNames')
-          repo.forEach(function (repo) {
+          repo.forEach((repo) => {
             let imageName = (repo.language || '').toLowerCase();
             /* If AWS Image Exists */
             if (repo.imageURL) {
-              // console.log('Use AWS Image')
             } else if (languageNameArray.includes(imageName) == false) {
               repo.imageURL = `/images/app/${repo.projectType}.png`
             } else if (languageNameArray.includes(imageName) == true) {
@@ -118,7 +117,7 @@ router.get(`/:userId`, function (req, res, next) {
 
 
 /* GET Create Page */
-router.get(`/:userId/create`, function (req, res, next) {
+router.get(`/:userId/create`, (req, res, next) => {
   let userId = req.params.userId;
   res.render("create", {
     // Sample Image
@@ -128,10 +127,7 @@ router.get(`/:userId/create`, function (req, res, next) {
 });
 
 /* POST Create_Process Page */
-router.post("/:userId/create_process", upload.single("imageURL"), function (
-  req,
-  res
-) {
+router.post("/:userId/create_process", upload.single("imageURL"), (req, res) => {
   let userId = req.params.userId;
   let githubURL = req.body.githubURL
 
@@ -153,7 +149,7 @@ router.post("/:userId/create_process", upload.single("imageURL"), function (
       updated_at: req.body.projectDate2,
       homepage: req.body.projectDemoURL,
       description: req.body.description,
-    }, function (err, data) {
+    }, (err, data) => {
       if (err) throw err;
     })
   }
@@ -161,7 +157,7 @@ router.post("/:userId/create_process", upload.single("imageURL"), function (
 });
 
 /* Delete Process */
-router.post("/:userId/:pageId/delete_process", function (req, res, next) {
+router.post("/:userId/:pageId/delete_process", (req, res, next) => {
   // GET userId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
@@ -170,16 +166,15 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
   Repo.findOne({
     'owner.login': userId,
     'name': pageId
-  }, function (err, repo) {
+  }, (err, repo) => {
     if (err) throw err;
-    console.log(repo.imageURL)
     if (repo.imageURL == null) {} else if (repo.imageURL.startsWith('https://portfolioworld')) {
       let params = {
         Bucket: 'portfolioworld',
         Key: repo.imageURL.substr(55)
       };
       console.log(params.Key)
-      s3.deleteObject(params, function (err, data) {
+      s3.deleteObject(params, (err, data) => {
         if (err) throw err;
       })
     }
@@ -187,7 +182,7 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
     Repo.deleteOne({
       'owner.login': userId,
       'name': pageId
-    }, function (err, result) {
+    }, (err, result) => {
       if (err) throw err;
     })
   })
@@ -196,20 +191,19 @@ router.post("/:userId/:pageId/delete_process", function (req, res, next) {
 });
 
 /* GET Update Page */
-router.get("/:userId/:pageId/update", function (req, res) {
+router.get("/:userId/:pageId/update", (req, res) => {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
 
   Repo.findOne({
     'owner.login': userId,
     'name': pageId
-  }, function (err, repo) {
+  }, (err, repo) => {
     if (err) throw err;
     let languageNameArray = require('../config/languageNames')
     let imageName = (repo.language || '').toLowerCase();
     /* If AWS Image Exists */
     if (repo.imageURL) {
-      console.log(`AWS Image Exist : ${repo.imageURL}`)
     } else if (languageNameArray.includes(imageName) == false) {
       repo.imageURL = `/images/app/${repo.projectType}.png`
     } else if (languageNameArray.includes(imageName) == true) {
@@ -242,7 +236,7 @@ router.get("/:userId/:pageId/update", function (req, res) {
 router.post(
   "/:userId/:pageId/update_process",
   upload.single("imageURL"),
-  function (req, res) {
+  (req, res) => {
     let userId = req.params.userId;
     let pageId = req.params.pageId;
 
@@ -263,7 +257,7 @@ router.post(
         }
       }, {
         returnNewDocument: true
-      }, function (err, doc) {
+      }, (err, doc) => {
         if (err) throw err;
         // console.log(doc);
       })
@@ -288,7 +282,7 @@ router.post(
         }
       }, {
         returnNewDocument: true
-      }, function (err, doc) {
+      }, (err, doc) => {
         if (err) throw err;
         // console.log(doc);
       })
@@ -300,7 +294,7 @@ router.post(
 );
 
 /* GET Detail View Page */
-router.get("/:userId/:pageId", function (req, res, next) {
+router.get("/:userId/:pageId", (req, res, next) => {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
   let todayDate = new Date().toISOString().substr(0, 10).replace('T', '');
@@ -319,10 +313,9 @@ router.get("/:userId/:pageId", function (req, res, next) {
   Repo.find({
     'owner.login': userId,
     'name': pageId
-  }, function (err, repoData) {
+  }, (err, repoData) => {
     if (err) throw err;
     if (repoData.length == 0) {
-      console.log('Wrong Page or invalid user or repo Page')
       res.render('customError', { // User Missing Error Handling
         userId: userId, // Entered User ID
         loginedId: ownerCheck, // Logined User ID
@@ -338,7 +331,6 @@ router.get("/:userId/:pageId", function (req, res, next) {
       let imageName = (repo.language || '').toLowerCase();
       /* If AWS Image Exists */
       if (repo.imageURL) {
-        console.log(`AWS Image Exist : ${repo.imageURL}`)
       } else if (languageNameArray.includes(imageName) == false) {
         repo.imageURL = `/images/app/${repo.projectType}.png`
       } else if (languageNameArray.includes(imageName) == true) {
@@ -348,113 +340,93 @@ router.get("/:userId/:pageId", function (req, res, next) {
         repo.imageURL = `/images/app/${repo.projectType}.png`
       }
 
-      Counter.find({
+      Counter.findOneAndUpdate({
         'userName': userId,
         'userNumber': userNumber,
         'repoName': pageId,
         'repoNumber': repoNumber,
-        'viewDate': todayDate
-      }, function (err, data) {
-        if (err) throw err;
-        data = data[0];
-        if (!data) {
-          Counter.create({
-            userName: userId,
-            userNumber: userNumber,
-            repoName : pageId,
-            repoNumber: repoNumber
-          }, function (err, data) {
-            if (err) throw err;
-          });
-        } else {
-          Counter.findOneAndUpdate({
-            'userName': userId,
-            'userNumber': userNumber,
-            'repoName': pageId,
-            'repoNumber': repoNumber,
-            'viewDate': todayDate
-          }, {
-            $inc: {
-              count: +1
-            }
-          }, {
-            new: true,
-            upsert: false,
-            useFindAndModify: false
-          }, (err, result) => {
-            if (err) throw err;
-          })
+        'viewDate': todayDate,
+      }, {
+        $inc: {
+          count: +1
         }
-      })
+      }, {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+        useFindAndModify: false
+      }, (err, counterData) => {
+        if (err) throw err;
 
-      /* Project Term Process */
-      let created_at = repo.created_at.toISOString().substr(0, 10).replace('T', ' ');
-      let updated_at = repo.updated_at.toISOString().substr(0, 10).replace('T', ' ');
-      let fullName = repo.html_url.replace(/^\/\/|^https?:\/\/github.com\//g, '') // Get real README.md file
+        /* Project Term Process */
+        let created_at = repo.created_at.toISOString().substr(0, 10).replace('T', ' ');
+        let updated_at = repo.updated_at.toISOString().substr(0, 10).replace('T', ' ');
+        let fullName = repo.html_url.replace(/^\/\/|^https?:\/\/github.com\//g, '') // Get real README.md file
 
-      /* README.md API Process */
-      request({
-          headers: {
-            'User-Agent': 'request',
-            'accept': 'application/vnd.github.VERSION.raw',
-            'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
-            'charset': 'UTF-8'
-          },
-          json: true,
-          url: `https://api.github.com/repos/${fullName}/readme`
-        },
-        function (error, response, readmeData) {
-          if (response.statusCode == 404) {
-            readmeHTML = 'No Readme.MD file';
-          } else {
-            if (error) throw error;
-            converter = new showdown.Converter(),
-              readmeHTML = converter.makeHtml(readmeData);
-          }
-
-          /* Language List API Process */
-          request({
-              headers: {
-                'User-Agent': 'request',
-                'accept': 'application/vnd.github.VERSION.raw',
-                'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
-                'charset': 'UTF-8'
-              },
-              json: true,
-              url: `https://api.github.com/repos/${userId}/${repo.name}/languages`
+        /* README.md API Process */
+        request({
+            headers: {
+              'User-Agent': 'request',
+              'accept': 'application/vnd.github.VERSION.raw',
+              'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+              'charset': 'UTF-8'
             },
-            function (error, response, keyword) {
-              if (response.statusCode == 404) {
-                keyword = '';
-              } else {
-                if (error) throw error;
-                if (Object.keys(keyword).length == 0) {
-                  keyword = '';
-                }
-              }
-              res.render("detail", {
-                userId: userId,
-                pageId: pageId,
-                projectName: repo.name,
-                imageURL: repo.imageURL,
-                projectType: repo.projectType,
-                keyword,
-                created_at,
-                updated_at,
-                description: repo.description,
-                projectDemoURL: repo.homepage,
-                githubURL: repo.html_url,
-                detailViewCounter: repo.detailViewCounter,
-                markdown: readmeHTML,
-                // email: repoData.email,
-                // phoneNumber: repoData.phoneNumber,
-                ownerCheck
-              })
-            });
-        })
-    }
-  });
-});
+            json: true,
+            url: `https://api.github.com/repos/${fullName}/readme`
+          },
+          (error, response, readmeData) => {
+            if (response.statusCode == 404) {
+              readmeHTML = 'No Readme.MD file';
+            } else {
+              if (error) throw error;
+              converter = new showdown.Converter(),
+                readmeHTML = converter.makeHtml(readmeData);
+            }
 
+            /* Language List API Process */
+            request({
+                headers: {
+                  'User-Agent': 'request',
+                  'accept': 'application/vnd.github.VERSION.raw',
+                  'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+                  'charset': 'UTF-8'
+                },
+                json: true,
+                url: `https://api.github.com/repos/${userId}/${repo.name}/languages`
+              },
+              (error, response, keyword) => {
+                if (response.statusCode == 404) {
+                  keyword = '';
+                } else {
+                  if (error) throw error;
+                  if (Object.keys(keyword).length == 0) {
+                    keyword = '';
+                  }
+                }
+                res.render("detail", {
+                  userId: userId,
+                  pageId: pageId,
+                  projectName: repo.name,
+                  imageURL: repo.imageURL,
+                  projectType: repo.projectType,
+                  keyword,
+                  created_at,
+                  updated_at,
+                  description: repo.description,
+                  projectDemoURL: repo.homepage,
+                  githubURL: repo.html_url,
+                  detailCountData: counterData.count,
+                  markdown: readmeHTML,
+                  // email: repoData.email,
+                  // phoneNumber: repoData.phoneNumber,
+                  ownerCheck
+                })
+              });
+          })
+      });
+    }
+
+  });
+})
 
 module.exports = router;
