@@ -297,7 +297,7 @@ router.post(
 router.get("/:userId/:pageId", (req, res, next) => {
   let userId = req.params.userId;
   let pageId = req.params.pageId;
-  let todayDate = new Date().toISOString().substr(0, 10).replace('T', '');
+  let todayDate = new Date()
   let repoNumber;
   let userNumber;
   let ownerCheck;
@@ -345,7 +345,7 @@ router.get("/:userId/:pageId", (req, res, next) => {
         'userNumber': userNumber,
         'repoName': pageId,
         'repoNumber': repoNumber,
-        'viewDate': todayDate,
+        'viewDate': todayDate.toISOString().substr(0, 10).replace('T', ''),
       }, {
         $inc: {
           count: +1
@@ -425,7 +425,6 @@ router.get("/:userId/:pageId", (req, res, next) => {
           })
       });
     }
-
   });
 })
 
