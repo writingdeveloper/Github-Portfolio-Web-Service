@@ -2,31 +2,34 @@
 Chart.defaults.global.defaultFontFamily = '-apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif';
 Chart.defaults.global.defaultFontColor = '#292b2c';
 
+var urlParams = new URLSearchParams(window.location.search);
+if (urlParams.has('success') && urlParams.get('success')) {
+  swal({
+    title: "Failed",
+    text: `${message}`,
+    icon: "error",
+    button: "Okay",
+  }).then(() => {
+    console.log(window.location.hostname)
+    window.location.replace(window.location.origin);
+
+  })
+}
+
+
 // CUSTOM Function
 // Call the dataTables jQuery plugin
 $(document).ready(function () {
   $('#dataTable').DataTable();
 });
 
-var currentDay = new Date();
-var theYear = currentDay.getFullYear();
-var theMonth = currentDay.getMonth();
-var theDate = currentDay.getDate();
-var theDayOfWeek = currentDay.getDay();
-
-var thisWeek = [];
-
-for (var i = 0; i < 7; i++) {
-  var resultDay = new Date(theYear, theMonth, theDate - i);
-  var yyyy = resultDay.getFullYear();
-  var mm = Number(resultDay.getMonth()) + 1;
-  var dd = resultDay.getDate();
-
-  mm = String(mm).length === 1 ? '0' + mm : mm;
-  dd = String(dd).length === 1 ? '0' + dd : dd;
-
-  thisWeek[i] = yyyy + '-' + mm + '-' + dd;
+let chartArray =[];
+for (i=0; i<7; i++){
+  let d = new Date();
+  d.setDate(d.getDate()-i);
+  chartArray.push(d.toISOString().substr(0, 10).replace('T', ''));
 }
+console.log(chartArray)
 
 // console.log(thisWeek);
 
@@ -35,7 +38,7 @@ var ctx = document.getElementById("myAreaChart");
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: thisWeek.reverse(),
+    labels: chartArray.reverse(),
     datasets: [{
       label: "Visitors",
       lineTension: 0.3,
@@ -48,7 +51,7 @@ var myLineChart = new Chart(ctx, {
       pointHoverBackgroundColor: "rgba(2,117,216,1)",
       pointHitRadius: 50,
       pointBorderWidth: 2,
-      data: ['39'],
+      data: chartData,
     }],
   },
   options: {
@@ -67,8 +70,8 @@ var myLineChart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           min: 0,
-          // max: chartMaxData + 50,
-          max: 50,
+          max: chartMaxData,
+          // max: 50,
           maxTicksLimit: 10
         },
         gridLines: {
@@ -82,19 +85,20 @@ var myLineChart = new Chart(ctx, {
   }
 });
 
+
 /* Data Process */
 /* Mypage Remove All my Data From Server Function */
 function removeData() {
   Swal.fire({
-        title: 'Are you sure?',
-        text: "You won't be able to revert this!",
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes, delete it!',
-        preConfirm: () => {
-          return fetch(`/${userId}/admin/removeData`)
+    title: 'Are you sure?',
+    text: "You won't be able to revert this!",
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, delete it!',
+    preConfirm: () => {
+      return fetch(`/${userId}/admin/removeData`)
         .then(response => {
           console.log(response);
           if (!response.ok) {
