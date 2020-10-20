@@ -29,47 +29,19 @@ let sessionCheck = (req, res, next) => {
 /* GET MyPage Page */
 router.get(`/:userId/admin/mypage`, (req, res, next) => {
   let userId = req.params.userId;
-  let today = new Date().toISOString().substr(0, 10).replace('T', '')
+  let todayDate = new Date().toISOString().substr(0, 10).replace('T', '')
+  let chartArray = [];
+  let chartData = [];
   let userNumber;
 
   let updatedTime = new Date(); // updated Time Variable
-  let currentDay = new Date();
-  let theYear = currentDay.getFullYear();
-  let theMonth = currentDay.getMonth();
-  let theDate = currentDay.getDate();
-  let thisWeek = [];
-  for (let i = 0; i < 7; i++) {
-    let resultDay = new Date(theYear, theMonth, theDate - i);
-    let yyyy = resultDay.getFullYear();
-    let mm = Number(resultDay.getMonth()) + 1;
-    let dd = resultDay.getDate();
-    mm = String(mm).length === 1 ? '0' + mm : mm;
-    dd = String(dd).length === 1 ? '0' + dd : dd;
-    thisWeek[i] = yyyy + '-' + mm + '-' + dd;
-  }
+
   Repo.find({
     'owner.login': userId
-  }, function (err, repo) {
+  }, (err, repo) => {
     if (err) throw err;
     userNumber = repo[0].owner.id;
 
-    // function isNull(obj, key) {
-    //   return (obj[key] === null || obj[key] === undefined || obj[key] === "null");
-    // }
-
-    // function validate(obj) {
-    //   var objKeys = Object.keys(obj);
-    //   // console.log(objKeys)
-    //   objKeys.forEach((key) => {
-    //     if (isNull(obj, key)) {
-    //       obj[key] = "";
-    //     }
-    //     if (typeof (obj[key]) == "object") {
-    //       validate(obj[key]);
-    //     }
-    //   });
-    // }
-    // validate(repo);
     let languageNameArray = require('../config/languageNames')
     repo.map((repo) => {
       {
@@ -91,6 +63,41 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
       }
     })
 
+
+    /* Chart Data Process */
+    for (let i = 0; i < 7; i++) {
+      let d = new Date();
+
+      d.setDate(d.getDate() - i);
+      chartArray.push(d.toISOString().substr(0, 10).replace('T', ''));
+      console.log(chartArray[i])
+      Counter.aggregate([{
+          $match: {
+            userName: userId,
+            userNumber: userNumber,
+            viewDate: chartArray[i],
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            count: {
+              $sum: "$count"
+            }
+          }
+        }
+      ], (err, viewData) => {
+        if (err) throw err;
+        if (viewData.length == 0) {
+          viewData = 0;
+        } else {
+          viewData = viewData[0].count
+        }
+        chartData.push(viewData)
+      })
+    }
+
+    /* Total Views Count Process */
     Counter.aggregate([{
         $match: {
           userName: userId,
@@ -105,15 +112,20 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
           }
         }
       }
-    ], function (err, totalViews) {
+    ], (err, totalViews) => {
       if (err) throw err;
-      totalViews = totalViews[0].count || 0;
+      if (totalViews.length == 0) {
+        totalViews = 0;
+      } else {
+        totalViews = totalViews[0].count || 0;
+      }
 
+      /* Today Visitors Count Process */
       Counter.aggregate([{
           $match: {
             userName: userId,
             userNumber: userNumber,
-            viewDate: today,
+            viewDate: todayDate,
           }
         },
         {
@@ -126,201 +138,69 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
         }
       ], (err, todayVisitors) => {
         if (err) throw err;
-        if (todayVisitors.length == 0) {
+        if (todayVisitors.length === 0) {
           todayVisitors = 0;
         } else {
           todayVisitors = todayVisitors[0].count
         }
 
-
         res.render('mypage/main', {
           userId: userId,
           dataArray: repo,
           todayVisitors: todayVisitors,
-          // visitorData: chartData,
-          // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+          chartData: chartData,
+          chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
           totalViews: totalViews,
           updatedTime: updatedTime.toLocaleString()
         })
       })
     })
   })
-
-
-  // Chart Data SQL
-  // db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, data) {
-  //   if (error) {
-  //     throw (`Error From Router /:userId/mypage \n ${error}`);
-  //   }
-  //   for (var i = 0; i < data.length; i++) {
-  //     if (data[i].imageUrl === null) {
-  //       data[i].imageUrl = '/images/app/404.png'
-  //     }
-  //   }
-  //   data.forEach(results => {
-  //     let date1 = results.projectDate1;
-  //     let date2 = results.projectDate2;
-  //     results.projectDate1 = date1;
-  //     results.projectDate2 = date2;
-  //   })
-  // Total Counter SQL
-  //     db.query(`SELECT SUM(counter) FROM counter WHERE userId='${userId}'`, function (error, counterSum) {
-  //       if (error) {
-  //         throw (`Error FROM Router /:userId/mypage \n ${error}`);
-  //       }
-  //       //  This Week visitor Data SQL
-  //       db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND (date=? OR date=? OR date=? OR date=? OR date=? OR date=? OR date=?)`, thisWeek, function (error, visitorData) {
-  //         if (error) {
-  //           throw (`Error From Router /:userId/mypage \n ${error}`);
-  //         }
-  //         db.query(`SELECT counter FROM counter WHERE userId='${userId}' AND date=?`, [currentDay.toISOString().split('T')[0]], function (error, todayVisitorData) {
-  //           if (error) {
-  //             throw (`Error From Router /:userId/mypage \n ${error}`);
-  //           }
-  //           if (todayVisitorData[0] === undefined) {
-  //             todayVisitorData[0] = 0;
-  //             db.query(`INSERT INTO counter (userId, date, counter) VALUES (?,?,?)`, [userId, currentDay.toISOString().split('T')[0], 0])
-  //           }
-  //           let chartData = [];
-  //           if (visitorData.length < 7) { // If visitor data's length is lower than 7, Push Data 0 to create Array
-  //             for (let i = 0; i < 7 - visitorData.length; i++) {
-  //               chartData.push(0);
-  //             }
-  //           }
-  //           for (let i = 0; i < visitorData.length; i++) { // Create Counter Array for chart data
-  //             chartData.push(visitorData[i].counter)
-  //           }
-  // res.render('mypage/main', {
-  //   userId: userId,
-  //   dataArray: data,
-  //   // todayVisitor: todayVisitorData[0].counter,
-  //   // visitorData: chartData,
-  //   // chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
-  //   // totalViews: counterSum[0]['SUM(counter)'],
-  //   updatedTime: updatedTime.toLocaleString()
-  // })
-  //         })
-  //       })
-  //     })
-  //   })
 })
 
 /* GET Mypage Remove Portfolio Data */
 router.get(`/:userId/admin/removeData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
-  let sessionData = req.session.passport;
-  if (sessionData.user.username === userId) {
-    Repo.deleteMany({
-      'owner.login': userId
-    }, (err, result) => {
-      if (err) {
-        res.json('{fail}');
-      } else {
-        res.json('{success}');
-      }
-    })
-
-  } else {
-    sessionCheck(res, userId, sessionData);
-  }
+  Repo.deleteMany({
+    'owner.login': userId
+  }, (err, result) => {
+    if (err) {
+      res.json('{fail}');
+    } else {
+      res.json('{success}');
+    }
+  })
 });
 
-
 /* GET Mypage Get Github Portfolio Data */
-// TODO :: Needs to check the owner of the mypage and if not, avoid this job
 router.get(`/:userId/admin/getData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
-  let sessionData = req.session.passport;
-  if (sessionData.user.username === userId) {
-    request({
-      headers: {
-        'User-Agent': 'request',
-        'accept': 'application/vnd.github.VERSION.raw',
-        'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
-        'charset': 'UTF-8'
-      },
-      json: true,
-      url: `https://api.github.com/users/${userId}/repos?per_page=100`,
-    }, (error, response, data) => {
-      console.log(response.statusCode)
-      if (response.statusCode == 200) {
-        res.json('{success}')
-      } else {
-        res.json('{fail}')
+  request({
+    headers: {
+      'User-Agent': 'request',
+      'accept': 'application/vnd.github.VERSION.raw',
+      'Authorization': `token ${process.env.GITHUB_DATA_ACCESS_TOKEN}`,
+      'charset': 'UTF-8'
+    },
+    json: true,
+    url: `https://api.github.com/users/${userId}/repos?per_page=100`,
+  }, (error, response, data) => {
+    console.log(response.statusCode)
+    if (response.statusCode == 200) {
+      res.json('{success}')
+    } else {
+      res.json('{fail}')
+    }
+    if (error) throw error;
+    for (i in data) {
+      if (data.length == 0 || data[i].fork == false) {
+        Repo.insertMany(data[i], (err, result) => {
+          if (err) throw err;
+        })
       }
-      if (error) throw error;
-      for (i in data) {
-        if (data.length == 0 || data[i].fork == false) {
-          Repo.insertMany(data[i], (err, result) => {
-            if (err) throw err;
-          })
-        }
-      }
-    })
-
-  } else {
-    sessionCheck(res, userId, sessionData);
-  }
+    }
+  })
 })
-
-
-// db.query(`SELECT registerType FROM user WHERE loginId=?`, [userId], function (error, data) {
-//   if (error) {
-//     throw (`Error from Router /:userId/admin/getData Router \n ${error}`)
-//   }
-//   console.log(data[0].registerType);
-//   if (data[0].registerType === 'Google') {
-//     res.json('Type:Google')
-//   } else {
-//     // User Repository API Option Set
-//     console.log('GITHUB PROCESS');
-//     let repositoryOptions = {
-//       url: `https://api.github.com/users/${userId}/repos`,
-//       headers: {
-//         "User-Agent": "request"
-//       }
-//     }
-//     // User Repository Information API Process
-//     request(repositoryOptions, function (error, response, data) {
-//       if (error) {
-//         throw error;
-//       }
-//       let result = JSON.parse(data);
-//       for (let i = 0; i < result.length; i++) {
-//         let sid = shortid.generate();
-//         let userId = result[i].owner.login;
-//         let projectName = result[i].name;
-//         let projectDemoUrl = result[i].homepage;
-//         let githubUrl = result[i].html_url;
-//         let summary = result[i].description;
-//         let projectDate1 = result[i].created_at;
-//         let projectDate2 = result[i].updated_at;
-//         let keyword = result[i].language;
-//         let sqlData = [sid, userId, projectName, projectDemoUrl, githubUrl, summary, projectDate1.split('T')[0], projectDate2.split('T')[0], keyword];
-//         let sql = `INSERT INTO project (sid, userId , projectName, projectDemoUrl, githubUrl, summary, projectDate1, projectDate2, keyword) VALUES (?,?,?,?,?,?,?,?,?)`;
-//         db.query(sql, sqlData);
-//       }
-//       db.query(`SELECT * FROM project WHERE userId='${userId}'`, function (error, redrawData) {
-//         if (error) {
-//           throw (`Error From Router /:userId/mypage \n ${error}`);
-//         }
-//         for (var i = 0; i < redrawData.length; i++) {
-//           if (redrawData[i].imageUrl === null) {
-//             redrawData[i].imageUrl = '/images/app/404.png'
-//           }
-//         }
-//         redrawData.forEach(results => {
-//           let date1 = results.projectDate1.split('T')[0];
-//           let date2 = results.projectDate2.split('T')[0];
-//           results.projectDate1 = date1;
-//           results.projectDate2 = date2;
-//         })
-//         res.json(redrawData);
-//       })
-//     })
-//   }
-// })
-// })
 
 /* GET Mypage User Setting Page */
 router.get(`/:userId/admin/user`, sessionCheck, function (req, res, next) {
