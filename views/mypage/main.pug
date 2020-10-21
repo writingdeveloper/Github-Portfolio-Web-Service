@@ -59,7 +59,7 @@ block content
 					| Recent 7 Days Visitors
 				.card-body
 					script.
-						let chartData=!{JSON.stringify(chartData.reverse())})
+						let chartData=!{JSON.stringify(chartData.reverse())};
 						let chartMaxData=!{JSON.stringify(chartMaxData)}
 					canvas#myAreaChart(width='100%', height='30')
 				.card-footer.small.text-muted=`Updated at ${updatedTime}`
