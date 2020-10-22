@@ -16,29 +16,20 @@ if (urlParams.has('success') && urlParams.get('success')) {
   })
 }
 
+/* Chart Data Process */
+let recentSevenDaysArray = [];
 
-// CUSTOM Function
-// Call the dataTables jQuery plugin
-$(document).ready(function () {
-  $('#dataTable').DataTable();
-});
-
-let chartArray =[];
-for (i=0; i<7; i++){
+for (i = 0; i < 7; i++) {
   let d = new Date();
-  d.setDate(d.getDate()-i);
-  chartArray.push(d.toISOString().substr(0, 10).replace('T', ''));
+  d.setDate(d.getDate() - i);
+  recentSevenDaysArray.push(d.toISOString().substr(0, 10).replace('T', ''));
 }
-console.log(chartArray)
 
-// console.log(thisWeek);
-
-// Area Chart Example
 var ctx = document.getElementById("myAreaChart");
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
-    labels: chartArray.reverse(),
+    labels: recentSevenDaysArray.reverse(),
     datasets: [{
       label: "Visitors",
       lineTension: 0.3,
@@ -70,7 +61,7 @@ var myLineChart = new Chart(ctx, {
       yAxes: [{
         ticks: {
           min: 0,
-          max: chartMaxData,
+          max: chartMaxData * 2,
           // max: 50,
           maxTicksLimit: 10
         },
@@ -84,7 +75,11 @@ var myLineChart = new Chart(ctx, {
     }
   }
 });
-
+// CUSTOM Function
+// Call the dataTables jQuery plugin
+$(document).ready(function () {
+  $('#dataTable').DataTable();
+});
 
 /* Data Process */
 /* Mypage Remove All my Data From Server Function */
