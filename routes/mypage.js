@@ -27,15 +27,58 @@ let sessionCheck = (req, res, next) => {
 }
 
 /* GET MyPage Page */
-router.get(`/:userId/admin/mypage`, (req, res, next) => {
+router.get(`/:userId/admin/mypage`, async (req, res, next) => {
   let userId = req.params.userId;
-  let todayDate = new Date().toISOString().substr(0, 10).replace('T', '')
-  let chartArray = [];
-  let chartData = [];
-  let userNumber;
+  let finalArray;
 
+/* Chart Data Process */
+  try {
+    let chartArray = [];
+    let chartData = [];
+
+    for (let i = 0; i < 7; i++) {
+      let d = new Date();
+      d.setDate(d.getDate() - i);
+      chartArray.push(d.toISOString().substr(0, 10).replace('T', ''));
+      // console.log(chartArray[i])
+
+      await Counter.aggregate([{
+          $match: {
+            userName: userId,
+            viewDate: chartArray[i],
+          }
+        },
+        {
+          $group: {
+            _id: null,
+            count: {
+              $sum: "$count"
+            }
+          }
+        }
+      ], (err, viewData) => {
+        if (err) throw err;
+        if (viewData.length == 0) {
+          viewData = 0;
+        } else {
+          viewData = viewData[0].count;
+        }
+        chartData.push(viewData);
+        console.log(chartData);
+      });
+    }
+    finalArray = chartData;
+    console.log('After all the queries: ', chartData);
+  } catch (e) {
+    // throw an error
+    throw e;
+  }
+
+  let todayDate = new Date().toISOString().substr(0, 10).replace('T', '')
+  let userNumber;
   let updatedTime = new Date(); // updated Time Variable
 
+  /* DataTables Data Process*/
   Repo.find({
     'owner.login': userId
   }, (err, repo) => {
@@ -57,45 +100,10 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
         } else if (repo.language == null && repo.imageURL == null) {
           repo.imageURL = `/images/app/${repo.projectType}.png`
         }
-
         repo.homepage = repo.homepage || 'None'
         repo.language = repo.language || 'None'
       }
     })
-
-
-    /* Chart Data Process */
-    for (let i = 0; i < 7; i++) {
-      let d = new Date();
-
-      d.setDate(d.getDate() - i);
-      chartArray.push(d.toISOString().substr(0, 10).replace('T', ''));
-      console.log(chartArray[i])
-      Counter.aggregate([{
-          $match: {
-            userName: userId,
-            userNumber: userNumber,
-            viewDate: chartArray[i],
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            count: {
-              $sum: "$count"
-            }
-          }
-        }
-      ], (err, viewData) => {
-        if (err) throw err;
-        if (viewData.length == 0) {
-          viewData = 0;
-        } else {
-          viewData = viewData[0].count
-        }
-        chartData.push(viewData)
-      })
-    }
 
     /* Total Views Count Process */
     Counter.aggregate([{
@@ -143,13 +151,12 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
         } else {
           todayVisitors = todayVisitors[0].count
         }
-
         res.render('mypage/main', {
           userId: userId,
           dataArray: repo,
           todayVisitors: todayVisitors,
-          chartData: chartData,
-          chartMaxData: Math.max.apply(null, chartData), // Use in Chart Max line
+          chartData: finalArray,
+          chartMaxData: Math.max.apply(null, finalArray), // Use in Chart Max line
           totalViews: totalViews,
           updatedTime: updatedTime.toLocaleString()
         })
@@ -161,8 +168,20 @@ router.get(`/:userId/admin/mypage`, (req, res, next) => {
 /* GET Mypage Remove Portfolio Data */
 router.get(`/:userId/admin/removeData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
+
+  /* Remove Repository Process */
   Repo.deleteMany({
     'owner.login': userId
+  }, (err, result) => {
+    if (err) {
+      res.json('{fail}');
+    } else {
+      res.json('{success}');
+    }
+  })
+  /* Remove Counter Data Process */
+  Counter.deleteMany({
+    'userName': userId
   }, (err, result) => {
     if (err) {
       res.json('{fail}');
@@ -222,7 +241,6 @@ router.get(`/:userId/admin/user`, sessionCheck, function (req, res, next) {
     })
   })
 })
-
 
 //-------------------------------------------------------------------------------------------------------------
 
