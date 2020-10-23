@@ -78,7 +78,7 @@ router.get(`/find-users/moreuser/:page`, function (req, res, next) {
     `SELECT * FROM user ORDER BY registerDate DESC LIMIT ${req.params.page}, 8`,
     function (error, data) {
       if (error) {
-        console.log(error);
+        if(error) throw error;
       }
       if (data.length === 0) {
         res.json("NODATA"); // If no more data return string "NODATA" to process in client script
