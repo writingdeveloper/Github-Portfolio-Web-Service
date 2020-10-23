@@ -3,10 +3,10 @@ const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
 const cookieParser = require('cookie-parser');
-const logger = require('morgan');
-// const db = require("./lib/db");
 const request = require("request");
 const moment = require('moment-timezone');
+const morgan = require('morgan');
+const rfs = require('rotating-file-stream')
 const app = express();
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
@@ -27,8 +27,16 @@ const errorRouter = require('./routes/error.js');
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-/* Logger & Path Set */
-app.use(logger('dev'));
+/* Logger Setting */
+app.use(morgan('dev'));
+let accessLogStream = rfs.createStream('access.log', {
+  size: "10M",
+  path: path.join('../')
+})
+/* Logger Format */
+app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url" :status :res[content-length] :referrer', {
+  stream: accessLogStream
+}));
 app.use(express.json());
 app.use(express.urlencoded({
   extended: false
