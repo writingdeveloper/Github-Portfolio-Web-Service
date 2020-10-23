@@ -65,12 +65,16 @@ app.use(function (err, req, res, next) {
   let sender = req.connection.remoteAddress.split(`:`).pop();
   let errorMessage = err.message;
   let userAgent = req.get('User-Agent');
-  let errorFrom = req.header('Referer');
+  let errorFrom = req.header('Referer')
   // Error Report SQL
   // db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
-  const telegramKey = process.env.telegramKey;
+  const telegramKey = process.env.TELEGRAM_KEY;
   let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
-  let coreMessage = `ERROR TIME : ${timeData} ERROR MESSAGE : ${errorMessage} ERROR FROM : ${errorFrom} ERROR SENDER : ${sender}`;
+  let coreMessage = 
+  `ERROR TIME : ${timeData}%0A
+   ERROR MESSAGE : ${errorMessage}%0A
+   ERROR FROM : ${errorFrom}%0A
+   ERROR SENDER : ${sender}`;
   request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
   // render the error page
   res.status(err.status || 500);
