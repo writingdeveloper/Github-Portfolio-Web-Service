@@ -27,16 +27,20 @@ html(lang="en")
                 th name
                 th View Count
                 th Register Date
-            each data in userData
-                tr
-                    td
-                        a(href=`/${data.login}`)=`${data.login}`
-                    td=`${data.login}`
-                    td=`${data.name}`
-                    td=`${data.userViewCounter}`
-                    td=`${data.registerDate}`
-    //- - if(pageResult ==='NODATA'){
-    //-     p NO MORE DATA
-    //- - } else {
-    //-     a(href=`/sitemap/${pageResult}`)= `Page ${pageResult}`
-    //- - }
+                each user in users    
+                    tr
+                        td
+                            a(href=`/${user.login}`)=`${user.login}`
+                        td=`${user.login}`
+                        td=`${user.name}`
+                        td=`${user.count}`
+                        td=`${user.registerDate}`
+    if(pageNumber ===0)
+        a(href=`/sitemap/${pageNumber+1}`)= `Next Page > ${pageNumber+1}`
+    else if(pageNumber !==0 && users.length==0)
+        a(href=`${pageNumber-1}` style="margin-right: 50px;")= `${pageNumber-1} < Previous Page`    
+        p='No Data'
+    else if(pageNumber !==0)
+        a(href=`${pageNumber-1}` style="margin-right: 50px;")= `${pageNumber-1} < Previous Page`
+        a(href=`/sitemap/${pageNumber+1}`)= `Next Page > ${pageNumber+1}`
+    
