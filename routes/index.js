@@ -38,7 +38,8 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 /* Import Database Settings */
 const db = require("../lib/db");
 let User = require('../lib/models/userModel');
-let LoginLogs = require('../lib/models/loginLogsModel');
+let Counter = require('../lib/models/counterModel');
+
 /* Import Authentication Setting (Passport.js) */
 const passport = require("../lib/passport")(router, db, request);
 
@@ -77,61 +78,66 @@ router.use(
 );
 
 /* SiteMap */
-router.get(`/sitemap/0`, function (req, res, next) {
-  let pageNumber = (Number(req.params.page) * 10000); // Current Page Number
-  let nextPage = (Number(req.params.page) + 1) * 10000; // Next Page Number
-  let pageResult; // Page Result
-
-  /* Sitemap Query */
-  User.find()
-    .sort({
-      'id': 1
+router.get(`/sitemap/:pageNumber`, async (req, res, next) => {
+  try {
+    let pageNumber = Number(req.params.pageNumber); // start pagination from first
+    let limit = 100;
+    let skip = (pageNumber ) * limit;
+    let users = await User.aggregate([{
+        $lookup: {
+          from: "counters",
+          let: {
+            id: "$id",
+            login: "$login"
+          },
+          pipeline: [{
+            $match: {
+              $expr: {
+                $eq: [
+                  "$userName",
+                  "$$login"
+                ],
+                $eq: [
+                  "$userNumber",
+                  "$$id"
+                ]
+              }
+            }
+          }],
+          as: "count"
+        }
+      },
+      {
+        $addFields: {
+          count: {
+            $reduce: {
+              input: "$count",
+              initialValue: 0,
+              in: {
+                $add: [
+                  "$$value",
+                  "$$this.count"
+                ]
+              }
+            }
+          }
+        }
+      },
+      {
+        $skip: skip
+      },
+      {
+        $limit: 100
+      }
+    ])
+    res.render("sitemap", {
+      pageNumber,
+      users
     })
-    .limit(10000)
-    .then(userData => {
-      res.render("sitemap", {
-        userData,
-        // pageNumber,
-        // pageResult
-      })
-    })
+  } catch (e) {
+    throw e;
+  }
 });
-
-// User.find().limit(Number(nextPage))
-// if (pageData.length === 0) { // If no more data in next Page
-//   pageResult = 'NODATA'
-// } else {
-//   pageResult = (Number(req.params.page) + 1) // More Data Exists return next page URL
-// }
-
-
-
-
-// db.query(
-//   `SELECT * FROM user order by displayId*1 LIMIT ?, 10000`,
-//   [Number(pageNumber)],
-//   function (error, data) {
-//     if (error) {
-//       throw error;
-//     }
-//     // console.log(data);
-//     db.query(`SELECT * FROM user order by displayId*1 LIMIT ?, 10000`, [Number(nextPage)], function (error, pageData) {
-//       if (error) {
-//         throw error;
-//       }
-//       if (pageData.length === 0) { // If no more data in next Page
-//         pageResult = 'NODATA'
-//       } else {
-//         pageResult = (Number(req.params.page) + 1) // More Data Exists return next page URL
-//       }
-//       res.render("sitemap", {
-//         dataarray: data,
-//         pageNumber,
-//         pageResult
-//       })
-//     });
-// }
-// );
 
 /* Main Router */
 router.get("/", function (req, res, next) {
