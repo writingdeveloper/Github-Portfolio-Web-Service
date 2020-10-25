@@ -57,25 +57,35 @@ app.use(function (req, res, next) {
   next(createError(404));
 });
 
+const errorMessageLog=require('./lib/models/errorMessageLogsModel')
+
 /* Error Handler */
-app.use(function (err, req, res, next) {
-  // set locals, only providing error in development
+app.use(async function (err, req, res, next) {
+  try{
   res.locals.message = err.message;
   res.locals.error = req.app.get('env') === 'development' ? err : {};
-  let sender = req.connection.remoteAddress.split(`:`).pop();
-  let errorMessage = err.message;
-  let userAgent = req.get('User-Agent');
-  let errorFrom = req.header('Referer')
-  // Error Report SQL
-  // db.query(`INSERT INTO error (sender, userAgent, vendor, language, errorMessage, errorFrom) VALUES (?,?,?,?,?,?)`, [sender, userAgent, 'SYSTEM', 'SYSTEM', errorMessage, errorFrom]);
   const telegramKey = process.env.TELEGRAM_KEY;
+  let SenderIPAdress = req.connection.remoteAddress.split(`:`).pop();
+  let errorMessage = err;
+  let userAgent = req.get('User-Agent');
+  let errorURL = req.header('Referer')
   let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
+
+  await errorMessageLog.create({
+    SenderIPAdress, errorMessage, userAgent, errorURL, timeData
+  }, (err, result) => {
+    if(err) throw err;
+  })
   let coreMessage = 
   `ERROR TIME : ${timeData}%0A
    ERROR MESSAGE : ${errorMessage}%0A
-   ERROR FROM : ${errorFrom}%0A
-   ERROR SENDER : ${sender}`;
+   ERROR FROM : ${errorURL}%0A
+   ERROR SENDER : ${SenderIPAdress}`;
+   /* Report to Admin */
   request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
+} catch (e) {
+  throw e;
+}
   // render the error page
   res.status(err.status || 500);
   res.render('error');
