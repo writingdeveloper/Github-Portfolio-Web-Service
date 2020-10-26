@@ -15,9 +15,9 @@ setInterval(counter, 3000);
 socket.on('noticeAlarm', function (count) {
     // console.log(count);
     if (count == 0) {
-        document.getElementById('counter').innerHTML = '';  // If no counter Data SET NULL
+        document.getElementById('counter').innerHTML = ''; // If no counter Data SET NULL
     } else {
-        document.getElementById('counter').innerHTML = count;   // Data Exists SET to count Data
+        document.getElementById('counter').innerHTML = count; // Data Exists SET to count Data
     }
 });
 
@@ -53,7 +53,7 @@ function logout() {
     Swal.fire({
         title: 'Ready to Leave?',
         text: `Select "Logout" below if you are ready to end your current session.`,
-        icon: 'info',
+        type: 'info',
         showCancelButton: true,
         confirmButtonColor: '#3085d6',
         cancelButtonColor: '#d33',
@@ -66,7 +66,6 @@ function logout() {
                         `Error Message : ${error}`,
                         'error'
                     )
-                    console.log(error);
                 })
         },
     }).then((result) => {
