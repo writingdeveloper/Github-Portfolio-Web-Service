@@ -3,7 +3,6 @@ const router = express.Router();
 const request = require("request");
 const bodyParser = require("body-parser");
 const path = require("path");
-const moment = require("moment");
 
 /* Import Database Settings */
 const db = require("../lib/db");
@@ -31,7 +30,7 @@ router.get(`/:userId/admin/mypage`, async (req, res, next) => {
   let userId = req.params.userId;
   let finalArray;
 
-/* Chart Data Process */
+  /* Chart Data Process */
   try {
     let chartArray = [];
     let chartData = [];
@@ -222,7 +221,7 @@ router.get(`/:userId/admin/getData`, sessionCheck, (req, res, next) => {
 })
 
 /* GET Mypage User Setting Page */
-router.get(`/:userId/admin/user`, sessionCheck, function (req, res, next) {
+router.get(`/:userId/admin/user`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
   User.find({
     'login': userId
@@ -236,7 +235,7 @@ router.get(`/:userId/admin/user`, sessionCheck, function (req, res, next) {
       name: userData.name,
       bio: userData.bio,
       email: userData.email,
-      // phoneNumber: userData.phoneNumber,
+      phoneNumber: userData.phoneNumber,
       registerDate: userData.created_at
     })
   })
@@ -251,19 +250,25 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
   let email = req.body.email;
   let phoneNumber = req.body.phoneNumber;
   let bio = req.body.bio;
-  // Update User Data SQL
-  db.query(`UPDATE user SET email=?, phoneNumber=?, bio=? WHERE loginId=?`, [email, phoneNumber, bio, userId]);
-  // Check Data From DB SQL
-  db.query(`SELECT * FROM user WHERE loginId=?`, [userId], function (error, AjaxData) {
-    if (error) {
-      throw (`Error FROM /:userId/admin/user POST ROUTER : ${error}`);
-    }
-    res.json(AjaxData); // Return Data
+  console.log(email + phoneNumber + bio)
+  User.findOneAndUpdate({
+    'login': userId,
+  }, {
+    $set: {
+      email: email,
+      phoneNumber: phoneNumber,
+      bio: bio
+    },
+  }, {
+    useFindAndModify: false
+  }, (err, result) => {
+    if (err) throw err;
+    res.json(result);
   })
 })
 
 /* MyPage User Chat Room */
-router.get(`/:userId/admin/contact`, function (req, res, next) {
+router.get(`/:userId/admin/contact`, (req, res, next) => {
   let userId = req.params.userId;
   // let loginedId = req.user.loginId;
   let chatListImageArray = [];
