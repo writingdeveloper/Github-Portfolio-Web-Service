@@ -52,44 +52,52 @@ app.use('/', mypageRouter);
 app.use('/', portfolioRouter);
 app.use('/reportError', errorRouter); // Error Page Router
 
-// catch 404 and forward to error handler
+/* catch 404 and forward to error handler */
 app.use(function (req, res, next) {
   next(createError(404));
 });
 
-const errorMessageLog=require('./lib/models/errorMessageLogsModel')
+/* Database Setting */
+const errorMessageLog = require('./lib/models/errorMessageLogsModel')
 
 /* Error Handler */
-app.use(async function (err, req, res, next) {
-  try{
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  const telegramKey = process.env.TELEGRAM_KEY;
-  let SenderIPAdress = req.connection.remoteAddress.split(`:`).pop();
-  let errorMessage = err;
-  let userAgent = req.get('User-Agent');
-  let errorURL = req.header('Referer')
-  let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
+app.use(async function (err, req, res) {
+  try {
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+    const telegramKey = process.env.TELEGRAM_KEY;
+    let SenderIPAdress = req.connection.remoteAddress.split(`:`).pop();
+    let errorMessage = err;
+    let userAgent = req.get('User-Agent');
+    let errorURL = req.header('Referer')
+    let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
 
-  await errorMessageLog.create({
-    SenderIPAdress, errorMessage, userAgent, errorURL, timeData
-  }, (err, result) => {
-    if(err) throw err;
-  })
-  let coreMessage = 
-  `ERROR TIME : ${timeData}%0A
+    await errorMessageLog.create({
+      SenderIPAdress,
+      errorMessage,
+      userAgent,
+      errorURL,
+      timeData
+    }, (err, result) => {
+      if (err) throw err;
+    })
+    let coreMessage =
+      `ERROR TIME : ${timeData}%0A
    ERROR MESSAGE : ${errorMessage}%0A
    ERROR FROM : ${errorURL}%0A
    ERROR SENDER : ${SenderIPAdress}`;
-   /* Report to Admin */
-  request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
-} catch (e) {
-  throw e;
-}
+    /* Report to Admin */
+    request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
+  } catch (e) {
+    throw e;
+  }
   // render the error page
   res.status(err.status || 500);
   res.render('error');
 });
+
+
+/*-----------------------------------------------------------------------*/
 
 /* Socket IO Functions */
 app.io.on('connection', function (socket) {
