@@ -15,7 +15,6 @@ function userInformationSend() {
             'Content-type': 'application/json'
         })
     }).then(res => res.json()).then(data => {
-        // console.log(data);
         Swal.fire(
             'Modification completed',
             '',
