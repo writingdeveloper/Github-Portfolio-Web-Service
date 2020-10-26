@@ -38,7 +38,6 @@ router.use(favicon(path.join(__dirname, "../public/images", "favicon.ico")));
 /* Import Database Settings */
 const db = require("../lib/db");
 let User = require('../lib/models/userModel');
-let Counter = require('../lib/models/counterModel');
 
 /* Import Authentication Setting (Passport.js) */
 const passport = require("../lib/passport")(router, db, request);
@@ -78,11 +77,11 @@ router.use(
 );
 
 /* SiteMap */
-router.get(`/sitemap/:pageNumber`, async (req, res, next) => {
+router.get(`/sitemap/:pageNumber`, async (req, res) => {
   try {
     let pageNumber = Number(req.params.pageNumber); // start pagination from first
     let limit = 100;
-    let skip = (pageNumber ) * limit;
+    let skip = (pageNumber) * limit;
     let users = await User.aggregate([{
         $lookup: {
           from: "counters",
