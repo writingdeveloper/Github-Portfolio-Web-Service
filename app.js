@@ -66,7 +66,7 @@ app.use(async function (err, req, res) {
     res.locals.message = err.message;
     res.locals.error = req.app.get('env') === 'development' ? err : {};
     const telegramKey = process.env.TELEGRAM_KEY;
-    let SenderIPAdress = req.connection.remoteAddress.split(`:`).pop();
+    let SenderIPAdress = req.headers['x-forwarded-for'] || req.connection.remoteAddress.split(`:`).pop();
     let errorMessage = err;
     let userAgent = req.get('User-Agent');
     let errorURL = req.header('Referer')
