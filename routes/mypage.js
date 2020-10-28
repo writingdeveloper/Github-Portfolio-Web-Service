@@ -9,6 +9,7 @@ const db = require("../lib/db");
 let User = require('../lib/models/userModel');
 let Repo = require('../lib/models/repoModel');
 let Counter = require('../lib/models/counterModel');
+let ChatRoom = require('../lib/models/chatRoomsModel');
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
@@ -241,9 +242,6 @@ router.get(`/:userId/admin/user`, sessionCheck, (req, res, next) => {
   })
 })
 
-//-------------------------------------------------------------------------------------------------------------
-
-
 /* POST Mypage User Setting Page */
 router.post(`/:userId/admin/submit`, function (req, res, next) {
   let userId = req.params.userId;
@@ -267,24 +265,38 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
   })
 })
 
+//-------------------------------------------------------------------------------------------------------------
+
 /* MyPage User Chat Room */
 router.get(`/:userId/admin/contact`, (req, res, next) => {
   let userId = req.params.userId;
-  // let loginedId = req.user.loginId;
-  let chatListImageArray = [];
-  let profileImageArray = [];
-  db.query(`SELECT * FROM chatroom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
-    if (error) {
-      throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
-    }
-    res.render('mypage/contact', {
-      userId: userId,
-      // loginedId: loginedId,
-      room: room
-      // profileImage: profileImageArray
-      // })
-    })
+  // let loginedId = req.user;
+  // console.log(loginedId)
+
+  ChatRoom.find({
+    'chatReceiver': userId
+  }, (err, roomData) => {
+    if (err) throw err;
+    console.log(roomData);
+
+    // // let loginedId = req.user.loginId;
+    // let chatListImageArray = [];
+    // let profileImageArray = [];
+    // db.query(`SELECT * FROM chatroom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
+    //   if (error) {
+    //     throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
+    //   }
+    
+ 
+  res.render('mypage/contact', {
+    userId: userId,
+    // loginedId: loginedId,
+    roomData
+    // profileImage: profileImageArray
+    // })
+    // })
   });
+  })
 });
 
 /* GET Privious Chat Data Router */
