@@ -6,7 +6,7 @@ function checkDelete() {
 }
 
 /* Copy URL */
-let clipboard = new Clipboard('#btn-copy', {
+let clipboard = new ClipboardJS('#btn-copy', {
   text: function () {
     return document.querySelector('input[type=hidden]').value;
   }
