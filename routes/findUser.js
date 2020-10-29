@@ -40,7 +40,7 @@ router.get("/find-users", function (req, res, next) {
 });
 
 /* Search User Router */
-router.get(`/find-users/:queryString`, async function (req, res, next) {
+router.get(`/find-users/:queryString`, async function (req, res) {
   const query = promisify(db.query).bind(db);
   let queryString = req.params.queryString;
   const data = await query(
@@ -73,7 +73,7 @@ router.get(`/find-users/:queryString`, async function (req, res, next) {
 });
 
 /* More Users Button Router */
-router.get(`/find-users/moreuser/:page`, function (req, res, next) {
+router.get(`/find-users/moreuser/:page`, function (req, res) {
   db.query(
     `SELECT * FROM user ORDER BY registerDate DESC LIMIT ${req.params.page}, 8`,
     function (error, data) {
