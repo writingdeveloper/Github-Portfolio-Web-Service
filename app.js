@@ -7,10 +7,17 @@ const request = require("request");
 const moment = require('moment-timezone');
 const morgan = require('morgan');
 const rfs = require('rotating-file-stream')
+const rateLimit = require("express-rate-limit");
 const app = express();
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+app.use(limiter);
 
 /* Socket IO */
 app.io = require('socket.io')();
