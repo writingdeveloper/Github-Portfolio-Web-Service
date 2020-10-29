@@ -157,7 +157,7 @@ router.post("/:userId/create_process", upload.single("imageURL"), (req, res) => 
 });
 
 /* Delete Process */
-router.post("/:userId/:pageId/delete_process", (req, res, next) => {
+router.post("/:userId/:pageId/delete_process", (req, res) => {
   // GET userId
   let userId = req.params.userId;
   let pageId = req.params.pageId;
