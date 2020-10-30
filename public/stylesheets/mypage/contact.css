@@ -124,9 +124,9 @@ img {
 }
 
 .chat_ib h5 {
-    font-size: 15px;
-    color: #464646;
-    margin: 0 0 8px 0;
+    font-size: 20px;
+    color: #4daae0;
+    margin: 2px 0 0 40px;
 }
 
 .chat_ib h5 span {
@@ -134,10 +134,16 @@ img {
     float: right;
 }
 
-#chatData {
-    font-size: 14px;
+.chat_date {
+    float: right;
+    font-size: 13px;
+    margin: -20px 0 0 0;
+}
+
+.chatData {
+    font-size: 15px;
     color: #989898;
-    margin: auto
+    margin: 5px 0 0 37px;
 }
 
 .chat_img {
@@ -179,7 +185,8 @@ img {
 }
 
 .listImage {
-    max-width: 100%;
+    width: 5em;
+    border-radius: 100%;
 }
 
 .received_withd_msg p {
@@ -308,7 +315,7 @@ img {
         display: none;
     }
 
-    .type_msg{
+    .type_msg {
         display: none;
     }
 }
