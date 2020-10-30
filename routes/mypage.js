@@ -268,35 +268,61 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
 //-------------------------------------------------------------------------------------------------------------
 
 /* MyPage User Chat Room */
-router.get(`/:userId/admin/contact`, (req, res, next) => {
-  let userId = req.params.userId;
-  // let loginedId = req.user;
+router.get(`/:userId/admin/contact`, async (req, res) => {
+  try {
+    let userId = req.params.userId;
+
+
+
+    let chatRoomData = await ChatRoom.find({
+      'participant': userId
+    })
+    let userData = await User.find({
+      'login': chatRoomData[0].participant
+    })
+    console.log(delete userData)
+
+
+    res.render('mypage/contact', {
+      userId: userId,
+      userData,
+    })
+
+  } catch (err) {
+    throw err;
+  }
+
+
   // console.log(loginedId)
 
-  ChatRoom.find({
-    'chatReceiver': userId
-  }, (err, roomData) => {
-    if (err) throw err;
-    console.log(roomData);
+  //   let roomData = await ChatRoom.find({}).or([{
+  //     'chatSender': userId
+  //   }, {
+  //     'chatReceiver': userId
+  //   }])
+  //   console.log(roomData)
+  //   // console.log(good)
+  //   let chatUserData = [];
 
-    // // let loginedId = req.user.loginId;
-    // let chatListImageArray = [];
-    // let profileImageArray = [];
-    // db.query(`SELECT * FROM chatroom WHERE chatReceiver=? OR chatSender=?`, [userId, userId], function (error, room) {
-    //   if (error) {
-    //     throw `Error From /:userId/admin/contact ROUTER \n ERROR : ${error}`;
-    //   }
-    
- 
-  res.render('mypage/contact', {
-    userId: userId,
-    // loginedId: loginedId,
-    roomData
-    // profileImage: profileImageArray
-    // })
-    // })
-  });
-  })
+  // roomData.forEach((roomData) => {
+  //   chatUserData.push(roomData.chatReceiver)
+  // })
+  // console.log(chatUserData.reverse())
+  //   let profileImageData = await User.find({'login':chatUserData}, 'id login avatar_url')
+  //   // console.log(profileImageData)
+
+
+  //   console.log(roomData.concat(profileImageData))
+
+  // res.render('mypage/contact', {
+  // userId: userId,
+  // loginedId: loginedId,
+  // roomData,
+  // profileImageData
+  // })
+  // })
+  // })
+
 });
 
 /* GET Privious Chat Data Router */
@@ -317,27 +343,74 @@ router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res,
 });
 
 /* MyPage User Chat Room */
-router.get(`/:userId/contact`, function (req, res, next) {
-  let userId = req.params.userId; // Contacted user ID
-  let loginId;
-  if (!req.user) {
-    res.redirect(`/auth/login`)
-  } else {
-    loginId = req.user.loginId;
-    let roomName = `${loginId}-${userId}`;
-    db.query(`SELECT * FROM chatroom WHERE roomName=?`, [roomName], function (err, roomCheck) {
-      if (err) {
-        throw `Error from /:userId/contact Router \n${err}`
-      }
-      // Checks Room Exist
-      if (roomCheck[0] === undefined) {
-        // Create Room
-        db.query(`INSERT INTO chatroom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginId])
-        res.redirect(`/${loginId}/admin/contact`)
-      } else {
-        res.redirect(`/${loginId}/admin/contact`)
-      }
+router.get(`/:userId/contact`, async (req, res) => {
+  try {
+    let userId = req.params.userId;
+    let loginedId = req.user.username;
+    let roomName = '';
+
+    let userNumber = await User.find({
+      'login': [loginedId, userId]
+    }, 'id login')
+
+    userNumber.forEach((userNumber) => {
+      roomName += `${userNumber.id}/`
     })
+    console.log(roomName);
+
+    let roomExistCheck = await ChatRoom.find({
+      'roomName': roomName
+    })
+    console.log(roomExistCheck)
+
+    if (roomExistCheck.length === 0) {
+      await ChatRoom.create({
+        'roomName': roomName,
+        'participant': [loginedId, userId],
+        'chatSender': loginedId,
+        'chatReceiver': userId
+      })
+    }
+    res.redirect(`/${loginedId}/admin/contact`)
+
+
+    // res.redirect(`/${loginedId}/admin/contact`)
+    // let possibleRoomName = [loginedId, userId];
+    // let possibleRoomNameSecond = [userId, loginedId];
+
+    // console.log(possibleRoomName)
+    // console.log(possibleRoomNameSecond)
+    // let roomExistCheck = await ChatRoom.find({}).or([{
+    //   'roomName': possibleRoomName
+    // }, {
+    //   'roomName': possibleRoomNameSecond
+    // }])
+    // console.log(roomExistCheck.roomName)
+    // if (roomExistCheck.length === 0) {
+    //   await ChatRoom.create({
+    //     'roomName': new Array(possibleRoomName),
+    //     'chatSender': loginedId,
+    //     'chatReceiver': userId
+    //   })
+    //   res.redirect(`/${loginedId}/admin/contact`)
+    // }
+    // console.log(roomExistCheck)
+
+    // let result = roomExistCheck
+    // db.query(`SELECT * FROM chatroom WHERE roomName=? OR roomName=?`, [roomName], function (err, roomCheck) {
+    //   if (err) {
+    //     throw `Error from /:userId/contact Router \n${err}`
+    //   }
+    //   // Checks Room Exist
+    //   if (roomCheck[0] === undefined) {
+    //     // Create Room
+    //     db.query(`INSERT INTO chatroom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginId])
+    //   }
+    //   res.redirect(`/${loginId}/admin/contact`)
+    // })
+    // }
+  } catch (err) {
+    throw err;
   }
 });
 
