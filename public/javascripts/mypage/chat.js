@@ -1,4 +1,6 @@
 /* Chat Page JS */
+// let socket = io.connect();
+// socket.on('connect', function(){});
 
 /* Contact Search Filter */
 function filter() {
@@ -53,7 +55,7 @@ function responsiveMobileDisplay() {
 }
 
 /*  Responsive (Desktop) Display */
-function responsiveDesktopDisplay(){
+function responsiveDesktopDisplay() {
     let typeMessage = document.getElementsByClassName('type_msg')[0];
     let mesgElement = document.getElementsByClassName('mesgs')[0];
     let elem = document.getElementById('content-wrapper');
@@ -75,6 +77,7 @@ function joinChat() {
         responsiveDesktopDisplay();
     }
     joinedRoomName = window.event.target.id; // Get clicked id (ROOM NAME)
+    console.log(joinedRoomName)
     others = document.getElementById(joinedRoomName).innerHTML; // Talk with this person
     $('.msg_history').empty(); // to Remove Previous Chats
     $('#message').val(''); // Reset Input Area
@@ -84,11 +87,12 @@ function joinChat() {
         receiver: userId
     });
     current = joinedRoomName;
-
+    console.log(`/admin/mypage/chat/${joinedRoomName}`)
     // Get Previous Chat Data
-    fetch(`/${userId}/${joinedRoomName}/admin/getPreviousChat`).then(res => res.json()).then(data => {
+    fetch(`/admin/mypage/chat/${joinedRoomName}`).then(res => res.json()).then(data => {
+        console.log(data);
         for (let i = 0; i < data.length; i++) {
-            let date = data[i].chatDate;
+            let date = data[i].chatCreated;
             if (data[i].chatSender != userId) {
                 $('.msg_history').append(`<div class="incoming_msg"><div class="incoming_msg_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"></div><div class="received_msg"><div class="received_withd_msg"><p>${data[i].chatMessage}</p><span class="time_date"> ${date}</span></div></div></div>`);
             } else {
