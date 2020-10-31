@@ -15,7 +15,7 @@ If the environment variable fails to load, run the node app with `node -r dotenv
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  max: 200 // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
 
@@ -30,9 +30,29 @@ const portfolioRouter = require('./routes/portfolioData.js');
 const mypageRouter = require('./routes/mypage.js');
 const errorRouter = require('./routes/error.js');
 
+
 /* View Engine Setup to PUG */
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+app.use(express.json());
+app.use(express.urlencoded({
+  extended: false
+}));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+/* Router Set */
+
+app.use('/', indexRouter);
+app.use('/telegram', server); // Telegram Bot Router
+app.use('/', findUserRouter)
+app.use('/admin/mypage', mypageRouter);
+app.use('/', portfolioRouter);
+app.use('/reportError', errorRouter); // Error Page Router
+
+
+
 
 /* Logger Setting */
 app.use(morgan('dev'));
@@ -44,20 +64,15 @@ let accessLogStream = rfs.createStream('access.log', {
 app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url" :status :res[content-length] :referrer', {
   stream: accessLogStream
 }));
-app.use(express.json());
-app.use(express.urlencoded({
-  extended: false
-}));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
 
-/* Router Set */
-app.use('/telegram', server); // Telegram Bot Router
-app.use('/', indexRouter);
-app.use('/', findUserRouter)
-app.use('/', mypageRouter);
-app.use('/', portfolioRouter);
-app.use('/reportError', errorRouter); // Error Page Router
+
+/* Database Settings */
+let User = require('./lib/models/userModel');
+let Repo = require('./lib/models/repoModel');
+let Counter = require('./lib/models/counterModel');
+let ChatRoom = require('./lib/models/chatRoomsModel');
+const Chat = require('./lib/models/chattingModel');
+
 
 /* catch 404 and forward to error handler */
 app.use(function (req, res, next) {
@@ -116,18 +131,28 @@ app.io.on('connection', function (socket) {
     // console.log(`NEW JOIN IN ${data.joinedRoomName}`)
     // console.log(`RECEIVER : ${data.receiver}`)
     // When Reads the message SET notice to '1'
-    db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
+    // db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
   })
 
   // Send Message Socket
-  socket.on('say', function (data) {
-    // console.log(`${data.userId} : ${data.msg}`);
-    //chat message to the others
-    app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
-    // console.log(`Message Send to : ${data.joinedRoomName}`)
-    // console.log(`Message Content : ${data.userId} : ${data.message}`);
-    // Chat Message Save to DB SQL
-    db.query(`INSERT INTO chatData (roomName, chatSender, chatReceiver, chatMessage) VALUES (?,?,?,?)`, [data.joinedRoomName, data.userId, data.receiver, data.msg])
+  socket.on('say', async function (data) {
+    try {
+      //chat message to the others
+      app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
+      console.log(`Message Send to : ${data.joinedRoomName}`)
+      console.log(`Message Content : ${data.userId} : ${data.message}`);
+      // Chat Message Save to DB SQL
+
+      await Chat.create({
+        'roomName': data.joinedRoomName,
+        'chatSender': data.userId,
+        'chatReceiver': data.receiver,
+        'chatMessage': data.msg
+      })
+
+    } catch (err) {
+      throw err;
+    }
   });
 
   // Typing... Socket Function
