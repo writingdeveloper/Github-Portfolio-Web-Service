@@ -16,7 +16,7 @@ html(lang='en')
 		link(href='/stylesheets/mypage/mypage.css', rel='stylesheet')
 body#page-top
 	nav.navbar.navbar-expand.navbar-dark.bg-dark.static-top
-		a.navbar-brand.mr-1(href='/') Portfolio World
+		a.navbar-brand.mr-1(href='/') ExpressMe
 		button#sidebarToggle.btn.btn-link.btn-sm.text-white.order-1.order-sm-0(href='#')
 			i.fas.fa-bars
 		// Navbar Search
@@ -28,7 +28,7 @@ body#page-top
 					i.fas.fa-bell.fa-fw
 					span.badge.badge-danger 9+
 			li.nav-item.dropdown.no-arrow.mx-1
-				a#messagesDropdown.nav-link.dropdown-toggle(href=`/${userId}/admin/contact`, role='button')
+				a#messagesDropdown.nav-link.dropdown-toggle(href=`/admin/mypage/contact/${userId}`, role='button')
 					i.fas.fa-envelope.fa-fw
 					span.badge.badge-danger#counter
 			li.nav-item.dropdown.no-arrow
@@ -42,29 +42,27 @@ body#page-top
 		// Sidebar
 		ul.sidebar.navbar-nav.toggled
 			li.nav-item.active
-				a.nav-link(href=`/${userId}/admin/mypage`)
+				a.nav-link(href=`/admin/mypage/${userId}`)
 					i.fas.fa-fw.fa-tachometer-alt
 					span Dashboard
 			li.nav-item
-				a.nav-link(href=`/${userId}/admin/contact`)
+				a.nav-link(href=`/admin/mypage/contact/${userId}`)
 					i.fas.fa-fw.fa-comments
 					span Contact
 			li.nav-item
-				a.nav-link(href=`/${userId}/admin/user`)
+				a.nav-link(href=`/admin/mypage/user/${userId}`)
 					i.fas.fa-fw.fa-user
 					span User Information
 		block content
 script.
 	let userId=!{JSON.stringify(userId)}
-
 // Bootstrap core JavaScript
 include ../libraries/bootstrapjs.pug
 include ../libraries/googleanalytics.pug
-// Socket IO Script
-script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js")
 // Global JS
 //- script(src='/javascripts/mypage/mypage.js')
 block customJS
 // SweetAlert JS CDN
 script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10')
-
+// Socket IO Script
+script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js")
