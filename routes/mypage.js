@@ -10,6 +10,7 @@ let User = require('../lib/models/userModel');
 let Repo = require('../lib/models/repoModel');
 let Counter = require('../lib/models/counterModel');
 let ChatRoom = require('../lib/models/chatRoomsModel');
+const Chat = require('../lib/models/chattingModel');
 
 router.use(bodyParser.json());
 router.use(express.static(path.join(__dirname, "public")));
@@ -27,7 +28,7 @@ let sessionCheck = (req, res, next) => {
 }
 
 /* GET MyPage Page */
-router.get(`/:userId/admin/mypage`, async (req, res, next) => {
+router.get(`/:userId`, async (req, res, next) => {
   let userId = req.params.userId;
   let finalArray;
 
@@ -166,7 +167,7 @@ router.get(`/:userId/admin/mypage`, async (req, res, next) => {
 })
 
 /* GET Mypage Remove Portfolio Data */
-router.get(`/:userId/admin/removeData`, sessionCheck, (req, res, next) => {
+router.get(`/:userId/removeData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
 
   /* Remove Repository Process */
@@ -192,7 +193,7 @@ router.get(`/:userId/admin/removeData`, sessionCheck, (req, res, next) => {
 });
 
 /* GET Mypage Get Github Portfolio Data */
-router.get(`/:userId/admin/getData`, sessionCheck, (req, res, next) => {
+router.get(`/:userId/getData`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
   request({
     headers: {
@@ -222,7 +223,7 @@ router.get(`/:userId/admin/getData`, sessionCheck, (req, res, next) => {
 })
 
 /* GET Mypage User Setting Page */
-router.get(`/:userId/admin/user`, sessionCheck, (req, res, next) => {
+router.get(`/user/:userId`, sessionCheck, (req, res, next) => {
   let userId = req.params.userId;
   User.find({
     'login': userId
@@ -243,7 +244,7 @@ router.get(`/:userId/admin/user`, sessionCheck, (req, res, next) => {
 })
 
 /* POST Mypage User Setting Page */
-router.post(`/:userId/admin/submit`, function (req, res, next) {
+router.post(`/:userId/submit`, function (req, res, next) {
   let userId = req.params.userId;
   let email = req.body.email;
   let phoneNumber = req.body.phoneNumber;
@@ -268,147 +269,93 @@ router.post(`/:userId/admin/submit`, function (req, res, next) {
 //-------------------------------------------------------------------------------------------------------------
 
 /* MyPage User Chat Room */
-router.get(`/:userId/admin/contact`, async (req, res) => {
+router.get(`/contact/:userId`, async (req, res) => {
   try {
     let userId = req.params.userId;
+    let participant = [];
 
-
+    let ownerData = await User.find({
+      'login': userId
+    })
 
     let chatRoomData = await ChatRoom.find({
       'participant': userId
     })
-    let userData = await User.find({
-      'login': chatRoomData[0].participant
+
+    chatRoomData.forEach((chatRoomData) => {
+      chatRoomData.participant.remove(userId);
+      participant.push(chatRoomData.participant[0])
     })
-    console.log(delete userData)
 
-
+    let userData = await User.find({
+      'login': participant
+    })
     res.render('mypage/contact', {
       userId: userId,
       userData,
+      ownerData,
+      chatRoomData
     })
-
   } catch (err) {
     throw err;
   }
-
-
-  // console.log(loginedId)
-
-  //   let roomData = await ChatRoom.find({}).or([{
-  //     'chatSender': userId
-  //   }, {
-  //     'chatReceiver': userId
-  //   }])
-  //   console.log(roomData)
-  //   // console.log(good)
-  //   let chatUserData = [];
-
-  // roomData.forEach((roomData) => {
-  //   chatUserData.push(roomData.chatReceiver)
-  // })
-  // console.log(chatUserData.reverse())
-  //   let profileImageData = await User.find({'login':chatUserData}, 'id login avatar_url')
-  //   // console.log(profileImageData)
-
-
-  //   console.log(roomData.concat(profileImageData))
-
-  // res.render('mypage/contact', {
-  // userId: userId,
-  // loginedId: loginedId,
-  // roomData,
-  // profileImageData
-  // })
-  // })
-  // })
-
 });
 
 /* GET Privious Chat Data Router */
-router.get(`/:userId/:joinedRoomName/admin/getPreviousChat`, function (req, res, next) {
-  let userId = req.params.userId;
-  let joinedRoomName = req.params.joinedRoomName;
-  console.log(`PREVIOUS CHAT DATA ROOM : ${joinedRoomName}`);
-  db.query(`SELECT * FROM chatData WHERE roomName=?`, [joinedRoomName], function (error, data) {
-    if (error) {
-      throw error;
-    }
-    // Recreate Date Type
-    for (let i = 0; i < data.length; i++) {
-      data[i].chatDate = data[i].chatDate.toLocaleString()
-    }
-    res.send(data);
-  });
+router.get(`/chat/:joinedRoomName`, async function (req, res, next) {
+  try {
+    let joinedRoomName = req.params.joinedRoomName;
+    console.log(`PREVIOUS CHAT DATA ROOM : ${joinedRoomName}`);
+
+    Chat.find({
+      'roomName': joinedRoomName
+    }, (err, data) => {
+      if (err) throw err;
+      console.log(data);
+      // Recreate Date Type
+      for (let i = 0; i < data.length; i++) {
+        data[i].chatCreated = data[i].chatCreated.toLocaleString()
+      }
+      res.json(data);
+    });
+  } catch (err) {
+    throw err;
+  }
 });
 
-/* MyPage User Chat Room */
-router.get(`/:userId/contact`, async (req, res) => {
+/* Create MyPage User Chat Room */
+router.get(`/request/contact/:userId/`, async (req, res) => {
   try {
     let userId = req.params.userId;
     let loginedId = req.user.username;
     let roomName = '';
+    console.log(loginedId)
 
     let userNumber = await User.find({
       'login': [loginedId, userId]
     }, 'id login')
 
     userNumber.forEach((userNumber) => {
-      roomName += `${userNumber.id}/`
+      roomName += `${userNumber.id}-`
     })
-    console.log(roomName);
-
+    console.log(roomName.slice(0, -1));
     let roomExistCheck = await ChatRoom.find({
-      'roomName': roomName
+      'roomName': roomName.slice(0, -1)
     })
     console.log(roomExistCheck)
 
     if (roomExistCheck.length === 0) {
       await ChatRoom.create({
-        'roomName': roomName,
+        'roomName': roomName.slice(0, -1),
         'participant': [loginedId, userId],
         'chatSender': loginedId,
         'chatReceiver': userId
       })
+      res.redirect(`/admin/mypage/contact/${loginedId}`)
+    } else {
+      res.redirect('/')
     }
-    res.redirect(`/${loginedId}/admin/contact`)
 
-
-    // res.redirect(`/${loginedId}/admin/contact`)
-    // let possibleRoomName = [loginedId, userId];
-    // let possibleRoomNameSecond = [userId, loginedId];
-
-    // console.log(possibleRoomName)
-    // console.log(possibleRoomNameSecond)
-    // let roomExistCheck = await ChatRoom.find({}).or([{
-    //   'roomName': possibleRoomName
-    // }, {
-    //   'roomName': possibleRoomNameSecond
-    // }])
-    // console.log(roomExistCheck.roomName)
-    // if (roomExistCheck.length === 0) {
-    //   await ChatRoom.create({
-    //     'roomName': new Array(possibleRoomName),
-    //     'chatSender': loginedId,
-    //     'chatReceiver': userId
-    //   })
-    //   res.redirect(`/${loginedId}/admin/contact`)
-    // }
-    // console.log(roomExistCheck)
-
-    // let result = roomExistCheck
-    // db.query(`SELECT * FROM chatroom WHERE roomName=? OR roomName=?`, [roomName], function (err, roomCheck) {
-    //   if (err) {
-    //     throw `Error from /:userId/contact Router \n${err}`
-    //   }
-    //   // Checks Room Exist
-    //   if (roomCheck[0] === undefined) {
-    //     // Create Room
-    //     db.query(`INSERT INTO chatroom (roomName, chatReceiver, chatSender) VALUES (?,?,?)`, [roomName, userId, loginId])
-    //   }
-    //   res.redirect(`/${loginId}/admin/contact`)
-    // })
-    // }
   } catch (err) {
     throw err;
   }
