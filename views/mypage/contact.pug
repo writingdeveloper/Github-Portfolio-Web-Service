@@ -15,35 +15,18 @@ block content
 							button(type='button')
 								i.fa.fa-search(aria-hidden='true')
 			.inbox_chat(id='contact')
-				//- .chat_list.active_chat
-				//- 	.chat_people
-				//- 		.chat_img
-				//- 			img(src='https://ptetutorials.com/images/user-profile.png', alt='sunil')
-				//- 		.chat_ib
-				//- 			h5
-				//- 				| Sunil Rajput 
-				//- 				span.chat_date Dec 25
-				//- 			p
-				//- 				| Test, which is a new approach to have all solutions
-				//- 				| astrology under one roof.
-				each room in roomData
-					.chat_list
+				each data in userData
+					.chat_list.active_chat
 						.chat_people
 							.chat_img
-								img(src='https://ptetutorials.com/images/user-profile.png', class='listImage')
+								img(src=`${data.avatar_url}`, class='listImage')
 							.chat_ib
-								a(href='#' onclick='joinChat()')
-									- if (room.chatSender === userId){
-									h5(id=`${room.roomName}`)
-										=`${room.chatReceiver}`
-									- } else {
-									h5(id=`${room.roomName}`)
-										=`${room.chatSender}`
-									- }
-								span.chat_date Dec 25
-								#chatData
-									| Test, which is a new approach to have all solutions
-									| astrology under one roof.
+									a(href='#' onclick='joinChat()')
+										h5(id=`${chatRoomData[0].roomName}`)=`${data.login}`
+									span.chat_date Dec 25
+									.chatData
+										| Test, which is a new approach to have all solutions
+										| astrology under one roof.
 		.mesgs
 			.msg_history
 		#contactListButton
@@ -59,6 +42,10 @@ block content
 
 block customJS
 	// Chat JS
+	script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js")
 	script(src="https://unpkg.com/babel-standalone@6/babel.min.js")
-	//- script(src='/javascripts/mypage/chat.js')
+	script(src='/javascripts/mypage/mypage.js')
+	script(src='/javascripts/mypage/chat.js')
 	include ../libraries/reactjs.pug
+	script.
+		let ownerId=!{JSON.stringify(ownerData)}

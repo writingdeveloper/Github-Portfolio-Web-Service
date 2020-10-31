@@ -25,7 +25,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
             span.sr-only (current)
         - if(ownerCheck === userId){
           a.nav-link(href='/logout') Logout
-          a.nav-link(href=`/${userId}/admin/mypage`) My Page
+          a.nav-link(href=`/admin/mypage/${userId}`) My Page
         - } else if (ownerCheck && (ownerCheck !== userId)){
 
         - } else {
@@ -33,7 +33,7 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
         - }
         //- li.nav-item
         li.nav-item
-          a.nav-link(href=`/${userId}/contact`) Contact
+          a.nav-link(href=`/admin/mypage/request/contact/${userId}`) Contact
 .toolbar.navbar(id="second_nav")
   select#type-select(onchange='selectBoxUpdate();')
     option(value='All') All Achievements
