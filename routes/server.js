@@ -6,11 +6,10 @@ const moment = require('moment-timezone');
 const telegramKey = process.env.telegramKey;
 
 
-router.get(`/`, function (req, res, next) {
+router.get(`/`, function (req, res) {
     let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
     let coreMessage = `MySQL Data BackUP Complete : ${timeData}`;
     request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
-    console.log('Finish');
     res.end();
 });
 
