@@ -40,9 +40,8 @@ nav.navbar.navbar-expand-lg.navbar-dark.bg-dark(id="first_nav")
     option(value='Project') Projects
     option(value='Certificate') Certifications
     option(value='Education') Education
-  - if(ownerCheck === userId) {
+  if(ownerCheck === userId)
   button(class='button' type='button' onclick=`window.location.href='/${userId}/create'`) New Data
-  -}
   input#input-url(type='hidden', value='Copied!')
   button(class='button' id='btn-copy') Copy URL
   input#hiddenQR(type='hidden')
