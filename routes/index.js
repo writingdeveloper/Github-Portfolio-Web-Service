@@ -139,32 +139,36 @@ router.get(`/sitemap/:pageNumber`, async (req, res) => {
 });
 
 /* Main Router */
-router.get("/", function (req, res, next) {
-
-  let ownerCheck;
-  if (req.user == undefined) {
-    ownerCheck = null;
-  } else {
-    ownerCheck = req.user.username;
-  }
-  User.find({}, 'login bio avatar_url', { // Main profile db query
-    limit: 5
-  }).sort({
-    created_at: -1
-  }).exec(function (err, result) {
-    if (err) console.log(err);
-    result.forEach(results => {
-      if (results.bio === null) { // If bio is none, replace 'NO BIO' text
-        results.bio = "NO BIO";
-      }
-    });
-    res.render('main', {
-      dataarray: result,
-      _user: req.user,
-      url: ownerCheck
+router.get("/", async (req, res) => {
+  try {
+    let ownerCheck;
+    if (req.user == undefined) {
+      ownerCheck = null;
+    } else {
+      ownerCheck = req.user.username;
+    }
+    await User.find({}, 'login bio avatar_url', { // Main profile db query
+      limit: 5
+    }).sort({
+      created_at: -1
+    }).exec(function (err, result) {
+      if (err) console.log(err);
+      result.forEach(results => {
+        if (results.bio === null) { // If bio is none, replace 'NO BIO' text
+          results.bio = "NO BIO";
+        }
+      });
+      res.render('main', {
+        dataarray: result,
+        _user: req.user,
+        url: ownerCheck
+      })
     })
-  })
-});
+  } catch (err) {
+    throw err;
+  }
+})
+
 
 /* POST User Save in MySQL DB */
 router.post("/user", function (req, res, next) {
