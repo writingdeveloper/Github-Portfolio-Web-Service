@@ -1,5 +1,6 @@
 /* Global */
-let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
+// let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
+var socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`, {secure: true});
 
 // Request Counter Data Function
 function counter() {
