@@ -49,7 +49,7 @@ main(role='main' class='main')
                         .d-flex.justify-content-between.align-items-center
                             .btn-group
                                 button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='${profile.login}'`) View
-                                button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='${profile.login}/contact'`) Contact
+                                button.btn.btn-sm.btn-outline-secondary(type='button' onClick=`location.href='/admin/mypage/request/contact/${profile.login}'`) Contact
                             small.text-muted=`View Score : ${profile.view_counter}`
       .moreUser
         <button type="button" onclick="loadMoreUsers();" class="btn btn-primary" id="loadMoreUsers">Load More Users</button>
