@@ -15,14 +15,14 @@ block content
 							button(type='button')
 								i.fa.fa-search(aria-hidden='true')
 			.inbox_chat(id='contact')
-				each data in userData
+				each data, index in userData
 					.chat_list.active_chat
 						.chat_people
 							.chat_img
 								img(src=`${data.avatar_url}`, class='listImage')
 							.chat_ib
 									a(href='#' onclick='joinChat()')
-										h5(id=`${chatRoomData[0].roomName}`)=`${data.login}`
+										h5(id=`${chatRoomData[index].roomName}`)=`${data.login}`
 									span.chat_date Dec 25
 									.chatData
 										| Test, which is a new approach to have all solutions
