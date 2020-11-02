@@ -280,7 +280,7 @@ router.get(`/contact/:userId`, async (req, res) => {
 
     let chatRoomData = await ChatRoom.find({
       'participant': userId
-    })
+    }).sort({'roomName':'asc'})
 
     chatRoomData.forEach((chatRoomData) => {
       chatRoomData.participant.remove(userId);
@@ -290,6 +290,10 @@ router.get(`/contact/:userId`, async (req, res) => {
     let userData = await User.find({
       'login': participant
     })
+
+    // chatRoomData = chatRoomData.reverse()
+    console.log(chatRoomData)
+    console.log(userData);
     res.render('mypage/contact', {
       userId: userId,
       userData,
