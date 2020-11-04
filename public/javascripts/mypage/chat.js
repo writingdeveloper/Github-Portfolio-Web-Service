@@ -1,6 +1,5 @@
 /* Chat Page JS */
 let socket = io.connect();
-// socket.on('connect', function(){});
 
 /* Contact Search Filter */
 function filter() {
@@ -34,7 +33,6 @@ document.getElementById('contactListButton').onclick = function () {
     buttonElement.style.display = 'none';
     mesgElement.style.display = 'none';
     typeMessage.style.display = 'none';
-
     let elem = document.getElementById('content-wrapper');
     elem.style.gridTemplateAreas = '"l l l l l l l l" "l l l l l l l l" "l l l l l l l l" "l l l l l l l l" "l l l l l l l l" "l l l l l l l l"';
 }
@@ -46,7 +44,6 @@ function responsiveMobileDisplay() {
     let contactList = document.getElementsByClassName('inbox_people')[0];
     let typeMessage = document.getElementsByClassName('type_msg')[0];
     let elem = document.getElementById('content-wrapper');
-
     contactList.style.display = "none";
     buttonElement.style.display = 'block';
     mesgElement.style.display = 'block';
@@ -62,45 +59,64 @@ function responsiveDesktopDisplay() {
     mesgElement.style.display = 'block';
     typeMessage.style.display = 'inline';
     elem.style.gridTemplateAreas = '"l l m m m m m m" "l l m m m m m m" "l l m m m m m m" "l l m m m m m m" "l l m m m m m m" "l l t t t t t t"';
-
 }
 
 /* Chat Functions */
-let joinedRoomName, current, others;
+let joinedRoomName, current, others, avatar_url;
 
 /* Click Each Room list Function */
-function joinChat() {
-    let screenWidth = $(document).width();
-    if (screenWidth < 800) {
-        responsiveMobileDisplay();
-    } else {
-        responsiveDesktopDisplay();
-    }
-    joinedRoomName = window.event.target.id; // Get clicked id (ROOM NAME)
-    console.log(joinedRoomName)
-    others = document.getElementById(joinedRoomName).innerHTML; // Talk with this person
-    $('.msg_history').empty(); // to Remove Previous Chats
-    $('#message').val(''); // Reset Input Area
-    socket.emit('JoinRoom', {
-        joinedRoomName,
-        leave: current,
-        receiver: userId
-    });
-    current = joinedRoomName;
-    console.log(`/admin/mypage/chat/${joinedRoomName}`)
-    // Get Previous Chat Data
-    fetch(`/admin/mypage/chat/${joinedRoomName}`).then(res => res.json()).then(data => {
-        console.log(data);
-        for (let i = 0; i < data.length; i++) {
-            let date = data[i].chatCreated;
-            if (data[i].chatSender != userId) {
-                $('.msg_history').append(`<div class="incoming_msg"><div class="incoming_msg_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"></div><div class="received_msg"><div class="received_withd_msg"><p>${data[i].chatMessage}</p><span class="time_date"> ${date}</span></div></div></div>`);
-            } else {
-                $('.msg_history').append(`<div class="outgoing_msg"><div class="sent_msg"><p>${data[i].chatMessage}</p><span class="time_date">  ${date}</span></div></div>`);
-            }
+async function joinChat() {
+    try {
+        /* Check screen Width to apply responsive page */
+        let screenWidth = $(document).width();
+        if (screenWidth < 1300) {
+            responsiveMobileDisplay()
+        } else {
+            responsiveDesktopDisplay();
         }
-        Scroll(); // Scroll to Bottom
-    })
+        joinedRoomName = window.event.target.id; // get room name
+        avatar_url = window.event.target.getAttribute("data"); // get avatar URL to serve chat profile image
+        others = document.getElementById(joinedRoomName).innerHTML; // Talk with this person
+        document.getElementById('message').value = ''; // Remove chat Input form data
+        document.getElementsByClassName('msg_history')[0].innerHTML = ''; // Remove chat data
+        /* Room join Socket */
+        socket.emit('JoinRoom', {
+            joinedRoomName,
+            leave: current,
+            receiver: userId
+        });
+        current = joinedRoomName;
+        /* Get previsous chat data */
+        await fetch(`/admin/mypage/chat/${joinedRoomName}`).then(res => res.json()).then(result => {
+            result.map((data) => {
+                let date = data.chatCreated;
+                if (data.chatSender != userId) {
+                    $('.msg_history').append(`<div class="incoming_msg"><div class="incoming_msg_img"><img src="${avatar_url}" alt="sunil"></div><div class="received_msg"><div class="received_withd_msg"><p>${data.chatMessage}</p><span class="time_date">${date}</span></div></div></div>`);
+                } else {
+                    $('.msg_history').append(`<div class="outgoing_msg"><div class="sent_msg"><p>${data.chatMessage}</p><span class="time_date">${date}</span></div></div>`);
+                }
+            })
+            /* Room Join Check SweetAlert function */
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            Toast.fire({
+                icon: 'success',
+                title: `Room ${others} Joined!`,
+            })
+            Scroll(); // Scroll to bottom
+        })
+    } catch (err) {
+        throw err;
+    }
 }
 
 // SET Notice Data '0' Function
@@ -117,12 +133,15 @@ function intervalCheck() {
 }
 
 // When Join's in the room SET notice data to '0'
-setInterval(intervalCheck, 3000);
+setInterval(intervalCheck, 5000);
 
 /* Scroll To Bottom in Chat Area */
 function Scroll() {
     let d = $('.mesgs')
-    d.scrollTop(d.prop("scrollHeight"))
+    $(".mesgs").animate({
+        scrollTop: (d.prop("scrollHeight"))
+    }, 1000);
+
 }
 
 /* SocketIO Functions */
@@ -135,10 +154,25 @@ $(function () {
     /* Submit Event (Keyboard Enter) */
     $('#chat').submit(function () {
         if (joinedRoomName === undefined) {
+            /* Not yet joined Alert */
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'bottom',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                didOpen: (toast) => {
+                    toast.addEventListener('mouseenter', Swal.stopTimer)
+                    toast.addEventListener('mouseleave', Swal.resumeTimer)
+                }
+            })
+            Toast.fire({
+                icon: 'warning',
+                title: 'Please joined room first!'
+            })
             $('#message').val('Joined ROOM First!!');
         } else {
-            //submit only if it's not empty
-            if ($('#message').val() != "") {
+            if ($('#message') !== '') {
                 let msg = $('#message').val();
                 socket.emit('say', {
                     msg: msg,
@@ -184,7 +218,7 @@ $(function () {
         d = new Date(d);
         d = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours() > 12 ? d.getHours() - 12 : d.getHours()} : ${d.getMinutes()} ${(d.getHours() >= 12 ? "PM" : "AM")}`;
         if (data.userId != userId) {
-            $('.msg_history').append(`<div class="incoming_msg"><div class="incoming_msg_img"><img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"></div><div class="received_msg"><div class="received_withd_msg"><p>${data.msg}</p><span class="time_date">${d}</span></div></div></div>`);
+            $('.msg_history').append(`<div class="incoming_msg"><div class="incoming_msg_img"><img src="${avatar_url}" alt="sunil"></div><div class="received_msg"><div class="received_withd_msg"><p>${data.msg}</p><span class="time_date">${d}</span></div></div></div>`);
             $('#chatData').text(`${data.msg}`)
         } else {
             $('.msg_history').append(`<div class="outgoing_msg"><div class="sent_msg"><p>${data.msg}</p><span class="time_date"> ${d}</span></div></div>`);
