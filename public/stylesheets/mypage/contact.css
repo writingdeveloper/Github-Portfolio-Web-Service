@@ -272,7 +272,7 @@ img {
 }
 
 /* If the screen size is 600px wide or less, hide the element */
-@media screen and (max-width: 600px) {
+@media screen and (max-width: 1300px) {
     #content-wrapper {
         display: grid;
         overflow-x: hidden;
@@ -289,8 +289,8 @@ img {
             "l l l l l l l l"
             "l l l l l l l l"
             "l l l l l l l l"
-            "l l l l l l l l";
-    }
+            "l l l l l l l l"; 
+    } 
 
     .inbox_people {
         display: block;
