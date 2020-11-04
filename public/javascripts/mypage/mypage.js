@@ -1,8 +1,4 @@
 /* Global */
-// let socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`);
-// var socket = io.connect(`${location.origin.replace(/^http/, 'ws')}`, {
-//     secure: true
-// });
 
 // Request Counter Data Function
 function counter() {
@@ -26,11 +22,10 @@ socket.on('noticeAlarm', function (count) {
 
 // Side bar
 ! function (t) {
-    "use strict";
     t("#sidebarToggle").click(function (e) {
         e.preventDefault(), t("body").toggleClass("sidebar-toggled"), t(".sidebar").toggleClass("toggled")
     }), t("body.fixed-nav .sidebar").on("mousewheel DOMMouseScroll wheel", function (e) {
-        if (768 < $window.width()) {
+        if (1300 < $window.width()) {
             var o = e.originalEvent,
                 t = o.wheelDelta || -o.detail;
             this.scrollTop += 30 * (t < 0 ? 1 : -1), e.preventDefault()

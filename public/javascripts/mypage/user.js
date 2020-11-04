@@ -8,7 +8,7 @@ function userInformationSend() {
         bio: document.getElementById('bio').value
     }
     /* Use Fetch API */
-    fetch(`/${userId}/admin/submit`, {
+    fetch(`/admin/mypage/${userId}/submit`, {
         method: 'POST',
         body: JSON.stringify(data),
         headers: new Headers({
@@ -23,8 +23,8 @@ function userInformationSend() {
     }).catch((err) => {
         Swal.fire(
             'ERROR?',
-            'SOMETHING IS NOT WOKRING',
-            `ERROR :${err}`
+            `${err}`,
+            `error`
         )
     })
 }

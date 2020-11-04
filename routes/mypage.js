@@ -28,7 +28,7 @@ let sessionCheck = (req, res, next) => {
 }
 
 /* GET MyPage Page */
-router.get(`/:userId`, async (req, res, next) => {
+router.get(`/:userId`, async (req, res) => {
   let userId = req.params.userId;
   let finalArray;
 
@@ -41,7 +41,6 @@ router.get(`/:userId`, async (req, res, next) => {
       let d = new Date();
       d.setDate(d.getDate() - i);
       chartArray.push(d.toISOString().substr(0, 10).replace('T', ''));
-      // console.log(chartArray[i])
 
       await Counter.aggregate([{
           $match: {
@@ -167,9 +166,8 @@ router.get(`/:userId`, async (req, res, next) => {
 })
 
 /* GET Mypage Remove Portfolio Data */
-router.get(`/:userId/removeData`, sessionCheck, (req, res, next) => {
+router.get(`/:userId/removeData`, sessionCheck, (req, res) => {
   let userId = req.params.userId;
-
   /* Remove Repository Process */
   Repo.deleteMany({
     'owner.login': userId
@@ -192,8 +190,9 @@ router.get(`/:userId/removeData`, sessionCheck, (req, res, next) => {
   })
 });
 
+
 /* GET Mypage Get Github Portfolio Data */
-router.get(`/:userId/getData`, sessionCheck, (req, res, next) => {
+router.get(`/:userId/getData`, sessionCheck, (req, res) => {
   let userId = req.params.userId;
   request({
     headers: {
@@ -205,7 +204,6 @@ router.get(`/:userId/getData`, sessionCheck, (req, res, next) => {
     json: true,
     url: `https://api.github.com/users/${userId}/repos?per_page=100`,
   }, (error, response, data) => {
-    console.log(response.statusCode)
     if (response.statusCode == 200) {
       res.json('{success}')
     } else {
@@ -223,7 +221,7 @@ router.get(`/:userId/getData`, sessionCheck, (req, res, next) => {
 })
 
 /* GET Mypage User Setting Page */
-router.get(`/user/:userId`, sessionCheck, (req, res, next) => {
+router.get(`/user/:userId`, sessionCheck, (req, res) => {
   let userId = req.params.userId;
   User.find({
     'login': userId
@@ -244,26 +242,29 @@ router.get(`/user/:userId`, sessionCheck, (req, res, next) => {
 })
 
 /* POST Mypage User Setting Page */
-router.post(`/:userId/submit`, function (req, res, next) {
-  let userId = req.params.userId;
-  let email = req.body.email;
-  let phoneNumber = req.body.phoneNumber;
-  let bio = req.body.bio;
-  console.log(email + phoneNumber + bio)
-  User.findOneAndUpdate({
-    'login': userId,
-  }, {
-    $set: {
-      email: email,
-      phoneNumber: phoneNumber,
-      bio: bio
-    },
-  }, {
-    useFindAndModify: false
-  }, (err, result) => {
-    if (err) throw err;
-    res.json(result);
-  })
+router.post(`/:userId/submit`, async (req, res) => {
+  try {
+    let userId = req.params.userId;
+    let email = req.body.email;
+    let phoneNumber = req.body.phoneNumber;
+    let bio = req.body.bio;
+    await User.findOneAndUpdate({
+      'login': userId,
+    }, {
+      $set: {
+        email: email,
+        phoneNumber: phoneNumber,
+        bio: bio
+      },
+    }, {
+      useFindAndModify: false
+    }, (err, result) => {
+      if (err) throw err;
+      res.json(result);
+    })
+  } catch (err) {
+    throw err;
+  }
 })
 
 //-------------------------------------------------------------------------------------------------------------
@@ -280,7 +281,9 @@ router.get(`/contact/:userId`, async (req, res) => {
 
     let chatRoomData = await ChatRoom.find({
       'participant': userId
-    }).sort({'roomName':'asc'})
+    }).sort({
+      'roomName': 'asc'
+    })
 
     chatRoomData.forEach((chatRoomData) => {
       chatRoomData.participant.remove(userId);
@@ -290,10 +293,6 @@ router.get(`/contact/:userId`, async (req, res) => {
     let userData = await User.find({
       'login': participant
     })
-
-    // chatRoomData = chatRoomData.reverse()
-    console.log(chatRoomData)
-    console.log(userData);
     res.render('mypage/contact', {
       userId: userId,
       userData,
@@ -306,11 +305,9 @@ router.get(`/contact/:userId`, async (req, res) => {
 });
 
 /* GET Privious Chat Data Router */
-router.get(`/chat/:joinedRoomName`, async function (req, res, next) {
+router.get(`/chat/:joinedRoomName`, async (req, res) => {
   try {
     let joinedRoomName = req.params.joinedRoomName;
-    console.log(`PREVIOUS CHAT DATA ROOM : ${joinedRoomName}`);
-
     Chat.find({
       'roomName': joinedRoomName
     }, (err, data) => {
@@ -342,12 +339,9 @@ router.get(`/request/contact/:userId/`, async (req, res) => {
     userNumber.forEach((userNumber) => {
       roomName += `${userNumber.id}-`
     })
-    console.log(roomName.slice(0, -1));
     let roomExistCheck = await ChatRoom.find({
       'roomName': roomName.slice(0, -1)
     })
-    console.log(roomExistCheck)
-
     if (roomExistCheck.length === 0) {
       await ChatRoom.create({
         'roomName': roomName.slice(0, -1),
@@ -359,7 +353,6 @@ router.get(`/request/contact/:userId/`, async (req, res) => {
     } else {
       res.redirect('/')
     }
-
   } catch (err) {
     throw err;
   }

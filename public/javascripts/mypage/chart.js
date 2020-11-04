@@ -93,7 +93,7 @@ function removeData() {
     cancelButtonColor: '#d33',
     confirmButtonText: 'Yes, delete it!',
     preConfirm: () => {
-      return fetch(`/${userId}/admin/removeData`)
+      return fetch(`/admin/mypage/${userId}/removeData`)
         .then(response => {
           console.log(response);
           if (!response.ok) {
@@ -138,7 +138,7 @@ function getData() {
     confirmButtonText: 'Get Data',
     showLoaderOnConfirm: true,
     preConfirm: () => {
-      return fetch(`/${userId}/admin/getData`)
+      return fetch(`/admin/mypage/${userId}/getData`)
         .then(response => {
           console.log(response);
           if (!response.ok) {
