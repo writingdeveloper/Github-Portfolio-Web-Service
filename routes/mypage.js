@@ -64,11 +64,9 @@ router.get(`/:userId`, async (req, res) => {
           viewData = viewData[0].count;
         }
         chartData.push(viewData);
-        console.log(chartData);
       });
     }
     finalArray = chartData;
-    console.log('After all the queries: ', chartData);
   } catch (e) {
     // throw an error
     throw e;
@@ -312,7 +310,6 @@ router.get(`/chat/:joinedRoomName`, async (req, res) => {
       'roomName': joinedRoomName
     }, (err, data) => {
       if (err) throw err;
-      console.log(data);
       // Recreate Date Type
       for (let i = 0; i < data.length; i++) {
         data[i].chatCreated = data[i].chatCreated.toLocaleString()
@@ -330,8 +327,6 @@ router.get(`/request/contact/:userId/`, async (req, res) => {
     let userId = req.params.userId;
     let loginedId = req.user.username;
     let roomName = '';
-    console.log(loginedId)
-
     let userNumber = await User.find({
       'login': [loginedId, userId]
     }, 'id login')
