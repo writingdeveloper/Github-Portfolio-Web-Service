@@ -1,4 +1,5 @@
 /* Global */
+let socket = io.connect();
 
 // Request Counter Data Function
 function counter() {
@@ -44,7 +45,6 @@ socket.on('noticeAlarm', function (count) {
 $(function () {
     $('[data-toggle="tooltip"]').tooltip()
 });
-
 
 /* Logout in Mypage, User page*/
 function logout() {

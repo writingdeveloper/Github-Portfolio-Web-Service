@@ -1,5 +1,4 @@
 /* Chat Page JS */
-let socket = io.connect();
 
 /* Contact Search Filter */
 function filter() {

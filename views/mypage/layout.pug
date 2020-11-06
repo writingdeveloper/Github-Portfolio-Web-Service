@@ -8,7 +8,7 @@ html(lang='en')
 		meta(name='author', content='')
 		title Dashboard - MyPage
 		include ../libraries/bootstrapcss.pug
-		include ../libraries/googleadsense.pug
+		//- include ../libraries/googleadsense.pug
 		// Font Awesome CSS CDN
 		link(rel='stylesheet', href='https://use.fontawesome.com/releases/v5.7.2/css/all.css', integrity='sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr', crossorigin='anonymous')
 		// Layout CSS
@@ -58,13 +58,11 @@ script.
 	let userId=!{JSON.stringify(userId)}
 // Bootstrap core JavaScript
 include ../libraries/bootstrapjs.pug
-include ../libraries/googleanalytics.pug
+//- include ../libraries/googleanalytics.pug
 block customJS
 // Socket IO Script
 script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js")
-// SweetAlert JS CDN
-script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10')
 // Global JS
 script(src='/javascripts/mypage/mypage.js')
-script(src='/javascripts/mypage/chat.js')
-script(src='/javascripts/mypage/user.js')
+// SweetAlert JS CDN
+script(src='https://cdn.jsdelivr.net/npm/sweetalert2@10')
