@@ -13,7 +13,7 @@ setInterval(counter, 5000);
 
 // Get Notice Counter Socket
 socket.on('noticeAlarm', function (count) {
-    // console.log(count);
+    console.log(count);
     if (count == 0) {
         document.getElementById('counter').innerHTML = ''; // If no counter Data SET NULL
     } else {
