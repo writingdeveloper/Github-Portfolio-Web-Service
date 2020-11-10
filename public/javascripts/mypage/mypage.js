@@ -9,7 +9,7 @@ function counter() {
 }
 
 // Counter Receiver every 3 Seconds
-setInterval(counter, 5000);
+setInterval(counter, 3000);
 
 // Get Notice Counter Socket
 socket.on('noticeAlarm', function (count) {

@@ -30,7 +30,6 @@ const portfolioRouter = require('./routes/portfolioData.js');
 const mypageRouter = require('./routes/mypage.js');
 const errorRouter = require('./routes/error.js');
 
-
 /* View Engine Setup to PUG */
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
@@ -41,9 +40,7 @@ app.use(express.urlencoded({
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-
 /* Router Set */
-
 app.use('/', indexRouter);
 app.use('/telegram', server); // Telegram Bot Router
 app.use('/', findUserRouter)
@@ -51,20 +48,16 @@ app.use('/admin/mypage', mypageRouter);
 app.use('/', portfolioRouter);
 app.use('/reportError', errorRouter); // Error Page Router
 
-
-
-
 /* Logger Setting */
 app.use(morgan('dev'));
 let accessLogStream = rfs.createStream('access.log', {
-  size: "10M",
+  size: "5M",
   path: path.join('../')
 })
 /* Logger Format */
 app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url" :status :res[content-length] :referrer', {
   stream: accessLogStream
 }));
-
 
 /* Database Settings */
 let User = require('./lib/models/userModel');
@@ -118,7 +111,6 @@ app.use(async function (err, req, res) {
   res.render('error');
 });
 
-
 /*-----------------------------------------------------------------------*/
 
 /* Socket IO Functions */
@@ -132,6 +124,23 @@ app.io.on('connection', function (socket) {
     // console.log(`RECEIVER : ${data.receiver}`)
     // When Reads the message SET notice to '1'
     // db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
+
+    Chat.aggregate([{
+        $match: {
+          'chatReceiver': data.receiver,
+          'roomName': data.joinedRoomName,
+          'chatNotice': 1
+        }
+      },
+      {
+        $set: {
+          'chatNotice': 0
+        }
+      }
+    ], (err, result) => {
+      if (err) throw err;
+      // console.log(result);
+    })
   })
 
   // Send Message Socket
@@ -139,8 +148,8 @@ app.io.on('connection', function (socket) {
     try {
       //chat message to the others
       app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
-      console.log(`Message Send to : ${data.joinedRoomName}`)
-      console.log(`Message Content : ${data.userId} : ${data.message}`);
+      // console.log(`Message Send to : ${data.joinedRoomName}`)
+      // console.log(`Message Content : ${data.userId} : ${data.msg}`);
       // Chat Message Save to DB SQL
 
       await Chat.create({
@@ -167,21 +176,35 @@ app.io.on('connection', function (socket) {
   });
 
   // Notice Counter Socket
-  // socket.on('counter', function (data) {
-  //   let counterTo = data.userId;
-  //   socket.join(`${data.userId}`)
-  //   // console.log(`COUNTER ${data.userId} ON!`)
-  //   db.query(`SELECT COUNT(notice) FROM chatData WHERE chatReceiver=? AND notice='0'`, [data.userId], function (error, data) {
-  //     if (error) {
-  //       throw error;
-  //     }
-  //     let count = data[0]['COUNT(notice)'];
-  //     // console.log(data[0]['COUNT(notice)']);
-  //     // console.log(COUNT(notice));
-  //     app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count)
-  //     // console.log(`SEND NOTICE TO ${counterTo} NUM : ${count}`)
-  //   })
-  // })
+  socket.on('counter', function (data) {
+    let counterTo = data.userId;
+    socket.join(`${data.userId}`)
+    console.log(data);
+    Chat.aggregate([{
+        $match: {
+          chatReceiver: data.userId,
+          roomName: data.joinedRoomName,
+          chatNotice: 1
+        }
+      },
+      {
+        $group: {
+          _id: null,
+          count: {
+            $sum: '$chatNotice'
+          }
+        }
+      }
+    ], (err, count) => {
+      if (err) throw err;
+      // console.log(count)
+      if (count[0] == undefined) {
+        // console.log('No Count DatA')
+      } else {
+        app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
+      }
+    })
+  })
 
   // Quit Typing Socket
   socket.on('quitTyping', function (others) {
