@@ -1,33 +1,21 @@
-#!/usr/bin/env node
+// #!/usr/bin/env node
 
-/**
- * Module dependencies.
- */
-
-var app = require('../app');
-var debug = require('debug')('udacity-build-a-portfolio-site-express:server');
-var http = require('http');
-
-/**
- * Get port from environment and store in Express.
- */
-
-var port = normalizePort(process.env.PORT || '443');
-app.set('port', port);
-
+// /**
+//  * Module dependencies.
+//  */
 
 const fs = require('fs');
 const path = require('path');
 const HTTPS = require('https');
-var domain = 'expressme.dev' // TODO : 구매한 도메인을 기재한다.
+var domain = 'expressme.dev';
 
 const sslport = process.env.PORT || 443;
 
 try {
   const option = {
-    ca: fs.readFileSync('/etc/letsencrypt/live/' + domain+ '/fullchain.pem'),
-    key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain+ '/privkey.pem'), 'utf8').toString(),
-    cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain+ '/cert.pem'), 'utf8').toString(),
+    ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
+    key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/privkey.pem'), 'utf8').toString(),
+    cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/cert.pem'), 'utf8').toString(),
   };
 
   HTTPS.createServer(option, app).listen(sslport, () => {
@@ -39,29 +27,34 @@ try {
 }
 
 
+var app = require('../app');
+var debug = require('debug')('udacity-build-a-portfolio-site-express:server');
+var http = require('http');
 
-
-
-
-/**
- * Create HTTP server.
- */
+// /**
+//  * Get port from environment and store in Express.
+//  */;
+var port = normalizePort(process.env.PORT || '443');
+app.set('port', port);
+// /**
+//  * Create HTTP server.
+//  */
 
 var server = http.createServer(app);
-// CUSTOM
+// // CUSTOM
 app.io.attach(server);
 
-/**
- * Listen on provided port, on all network interfaces.
- */
+// /**
+//  * Listen on provided port, on all network interfaces.
+//  */
 
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 
-/**
- * Normalize a port into a number, string, or false.
- */
+// /**
+//  * Normalize a port into a number, string, or false.
+//  */
 
 function normalizePort(val) {
   var port = parseInt(val, 10);
@@ -79,9 +72,9 @@ function normalizePort(val) {
   return false;
 }
 
-/**
- * Event listener for HTTP server "error" event.
- */
+// /**
+//  * Event listener for HTTP server "error" event.
+//  */
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -107,9 +100,9 @@ function onError(error) {
   }
 }
 
-/**
- * Event listener for HTTP server "listening" event.
- */
+// /**
+//  * Event listener for HTTP server "listening" event.
+//  */
 
 function onListening() {
   var addr = server.address();
@@ -118,3 +111,13 @@ function onListening() {
     'port ' + addr.port;
   debug('Listening on ' + bind);
 }
+
+// var https = require('https');
+// var server = https.createServer({
+//   key: require('fs').readFileSync('./privkey.pem')
+// , cert: require('fs').readFileSync('./fullchain.pem')
+// }, function (req, res) {
+//   res.end("Hello, World!");
+// }).listen(443, function () {
+//   console.log('Listening on', this.address());
+// })
