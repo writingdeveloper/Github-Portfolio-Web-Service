@@ -9,7 +9,7 @@ const path = require('path');
 const HTTPS = require('https');
 var domain = 'expressme.dev';
 
-const sslport = process.env.PORT || 443;
+const sslport = 443;
 
 try {
   const option = {
@@ -48,76 +48,76 @@ app.io.attach(server);
 //  * Listen on provided port, on all network interfaces.
 //  */
 
-server.listen(sslport);
-server.on('error', onError);
-server.on('listening', onListening);
+// server.listen(sslport);
+// server.on('error', onError);
+// server.on('listening', onListening);
 
-// /**
-//  * Normalize a port into a number, string, or false.
-//  */
+// // /**
+// //  * Normalize a port into a number, string, or false.
+// //  */
 
-function normalizePort(val) {
-  var port = parseInt(val, 10);
+// function normalizePort(val) {
+//   var port = parseInt(val, 10);
 
-  if (isNaN(port)) {
-    // named pipe
-    return val;
-  }
+//   if (isNaN(port)) {
+//     // named pipe
+//     return val;
+//   }
 
-  if (port >= 0) {
-    // port number
-    return port;
-  }
+//   if (port >= 0) {
+//     // port number
+//     return port;
+//   }
 
-  return false;
-}
+//   return false;
+// }
 
-// /**
-//  * Event listener for HTTP server "error" event.
-//  */
+// // /**
+// //  * Event listener for HTTP server "error" event.
+// //  */
 
-function onError(error) {
-  if (error.syscall !== 'listen') {
-    throw error;
-  }
+// function onError(error) {
+//   if (error.syscall !== 'listen') {
+//     throw error;
+//   }
 
-  var bind = typeof sslport === 'string' ?
-    'Pipe ' + sslport :
-    'Port ' + sslport;
+//   var bind = typeof sslport === 'string' ?
+//     'Pipe ' + sslport :
+//     'Port ' + sslport;
 
-  // handle specific listen errors with friendly messages
-  switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
-      process.exit(1);
-      break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
-      process.exit(1);
-      break;
-    default:
-      throw error;
-  }
-}
+//   // handle specific listen errors with friendly messages
+//   switch (error.code) {
+//     case 'EACCES':
+//       console.error(bind + ' requires elevated privileges');
+//       process.exit(1);
+//       break;
+//     case 'EADDRINUSE':
+//       console.error(bind + ' is already in use');
+//       process.exit(1);
+//       break;
+//     default:
+//       throw error;
+//   }
+// }
 
-// /**
-//  * Event listener for HTTP server "listening" event.
-//  */
+// // /**
+// //  * Event listener for HTTP server "listening" event.
+// //  */
 
-function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string' ?
-    'pipe ' + addr :
-    'port ' + addr.sslport;
-  debug('Listening on ' + bind);
-}
+// function onListening() {
+//   var addr = server.address();
+//   var bind = typeof addr === 'string' ?
+//     'pipe ' + addr :
+//     'port ' + addr.sslport;
+//   debug('Listening on ' + bind);
+// }
 
-// var https = require('https');
-// var server = https.createServer({
-//   key: require('fs').readFileSync('./privkey.pem')
-// , cert: require('fs').readFileSync('./fullchain.pem')
-// }, function (req, res) {
-//   res.end("Hello, World!");
-// }).listen(443, function () {
-//   console.log('Listening on', this.address());
-// })
+// // var https = require('https');
+// // var server = https.createServer({
+// //   key: require('fs').readFileSync('./privkey.pem')
+// // , cert: require('fs').readFileSync('./fullchain.pem')
+// // }, function (req, res) {
+// //   res.end("Hello, World!");
+// // }).listen(443, function () {
+// //   console.log('Listening on', this.address());
+// // })
