@@ -16,6 +16,7 @@ If the environment variable fails to load, run the node app with `node -r dotenv
 const https = require('https')
 const http = require('http')
 const PORT = process.env.PORT || 443;
+const domain = 'expressme.dev';
 const option = process.env.NODE_ENV === "production" ?
   {
     ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
