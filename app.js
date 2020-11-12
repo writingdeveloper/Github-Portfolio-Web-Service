@@ -20,7 +20,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 /* Socket IO */
-const io = require('socket.io')(443);
+const io = require('socket.io')(app)
 
 // app.io.attach(app);
 
