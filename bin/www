@@ -40,7 +40,7 @@ app.set('port', sslport);
 //  * Create HTTP server.
 //  */
 
-var server = http.createServer(app);
+// var server = http.createServer(app);
 // // CUSTOM
 app.io.attach(server);
 
