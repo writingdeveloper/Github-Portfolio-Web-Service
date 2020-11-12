@@ -8,6 +8,7 @@ const moment = require('moment-timezone');
 const morgan = require('morgan');
 const rfs = require('rotating-file-stream')
 const rateLimit = require("express-rate-limit");
+const fs = require('fs')
 const app = express();
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
