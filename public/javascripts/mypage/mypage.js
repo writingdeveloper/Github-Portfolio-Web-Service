@@ -1,5 +1,5 @@
 /* Global */
-let socket = io.connect('https://expressme.dev');
+let socket = io.connect(`${window.location.hostname}`);
 
 // Request Counter Data Function
 function counter() {

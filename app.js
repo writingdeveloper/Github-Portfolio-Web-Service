@@ -58,9 +58,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 /* Socket IO */
-// app.io = require('socket.io')()
-
-app.io.attach(app);
+app.io = require('socket.io')();
 
 /* Router Sequences */
 const server = require('./routes/server.js');
