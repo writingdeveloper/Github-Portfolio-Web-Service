@@ -116,7 +116,7 @@ app.use(async function (err, req, res) {
 /*-----------------------------------------------------------------------*/
 
 /* Socket IO Functions */
-app.io.on('connection', function (socket) {
+io.on('connection', function (socket) {
   // Join Room Scoket
   socket.on('JoinRoom', function (data) {
     socket.leave(`${data.leave}`)
@@ -149,7 +149,7 @@ app.io.on('connection', function (socket) {
   socket.on('say', async function (data) {
     try {
       //chat message to the others
-      app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
+      io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
       // console.log(`Message Send to : ${data.joinedRoomName}`)
       // console.log(`Message Content : ${data.userId} : ${data.msg}`);
       // Chat Message Save to DB SQL
@@ -173,7 +173,7 @@ app.io.on('connection', function (socket) {
       whoIsTyping.push(others);
       // console.log('who is typing now');
       // console.log(whoIsTyping);
-      app.io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
+      io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
     }
   });
 
@@ -203,7 +203,7 @@ app.io.on('connection', function (socket) {
       if (count[0] == undefined) {
         // console.log('No Count DatA')
       } else {
-        app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
+        io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
       }
     })
   })
@@ -214,7 +214,7 @@ app.io.on('connection', function (socket) {
     if (whoIsTyping.length == 0) {
       //if it's empty
       // console.log('emit endTyping');
-      app.io.emit('endTyping');
+      io.emit('endTyping');
     } else {
       //if someone else is typing
       var index = whoIsTyping.indexOf(others);
@@ -223,9 +223,9 @@ app.io.on('connection', function (socket) {
         whoIsTyping.splice(index, 1);
         if (whoIsTyping.length == 0) {
           // console.log('emit endTyping');
-          app.io.emit('endTyping');
+          io.emit('endTyping');
         } else {
-          app.io.emit('typing', whoIsTyping);
+          io.emit('typing', whoIsTyping);
           // console.log('emit quitTyping');
           // console.log('whoIsTyping after quit');
           // console.log(whoIsTyping);
