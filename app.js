@@ -14,13 +14,26 @@ const app = express();
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
 const https = require('https')
+const http = require('http')
 const PORT = process.env.PORT || 443;
-const options = {
-  ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
-  key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/privkey.pem'), 'utf8').toString(),
-  cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/cert.pem'), 'utf8').toString(),
-};
-https.createServer(options, app).listen(PORT);
+const option = process.env.NODE_ENV === "production" ?
+  {
+    ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
+    key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/privkey.pem'), 'utf8').toString(),
+    cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/cert.pem'), 'utf8').toString(),
+  } :
+  undefined;
+
+// production 모드에서는 https 서버를
+// development 모드에서는 http 서버를 사용합니다
+option
+  ?
+  https.createServer(option, app).listen(PORT, () => {
+    console.log(`Server is running at port ${PORT}`);
+  }) :
+  http.createServer(app).listen(PORT, () => {
+    console.log(`Server is running at port ${PORT}`);
+  });
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 15 minutes
@@ -245,6 +258,6 @@ app.io.on('connection', function (socket) {
 });
 
 
-console.log('it connects again!')
-console.log(`Now It Works Fine in Port ${process.env.PORT}`);
+// console.log('it connects again!')
+// console.log(`Now It Works Fine in Port ${process.env.PORT}`);
 module.exports = app;
