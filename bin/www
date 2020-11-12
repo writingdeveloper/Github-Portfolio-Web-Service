@@ -42,7 +42,7 @@ app.set('port', sslport);
 
 // var server = http.createServer(app);
 // // CUSTOM
-app.io.attach(server);
+app.io.attach(app);
 
 // /**
 //  * Listen on provided port, on all network interfaces.
