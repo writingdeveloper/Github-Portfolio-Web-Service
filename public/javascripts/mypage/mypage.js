@@ -1,5 +1,7 @@
 /* Global */
-let socket = io.connect();
+let socket = io.connect('https://expressme.dev', {
+    secure: true
+});
 
 // Request Counter Data Function
 function counter() {

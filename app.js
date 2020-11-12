@@ -20,7 +20,9 @@ const limiter = rateLimit({
 app.use(limiter);
 
 /* Socket IO */
-app.io = require('socket.io')();
+const io = require('socket.io')(443);
+
+// app.io.attach(app);
 
 /* Router Sequences */
 const server = require('./routes/server.js');
