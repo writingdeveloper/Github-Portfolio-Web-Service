@@ -20,7 +20,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 /* Socket IO */
-const io = require('socket.io')(app)
+app.io = require('socket.io')()
 
 // app.io.attach(app);
 
@@ -116,7 +116,7 @@ app.use(async function (err, req, res) {
 /*-----------------------------------------------------------------------*/
 
 /* Socket IO Functions */
-io.on('connection', function (socket) {
+app.io.on('connection', function (socket) {
   // Join Room Scoket
   socket.on('JoinRoom', function (data) {
     socket.leave(`${data.leave}`)
@@ -149,7 +149,7 @@ io.on('connection', function (socket) {
   socket.on('say', async function (data) {
     try {
       //chat message to the others
-      io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
+      app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
       // console.log(`Message Send to : ${data.joinedRoomName}`)
       // console.log(`Message Content : ${data.userId} : ${data.msg}`);
       // Chat Message Save to DB SQL
@@ -173,7 +173,7 @@ io.on('connection', function (socket) {
       whoIsTyping.push(others);
       // console.log('who is typing now');
       // console.log(whoIsTyping);
-      io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
+      app.io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
     }
   });
 
@@ -203,7 +203,7 @@ io.on('connection', function (socket) {
       if (count[0] == undefined) {
         // console.log('No Count DatA')
       } else {
-        io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
+        app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
       }
     })
   })
@@ -214,7 +214,7 @@ io.on('connection', function (socket) {
     if (whoIsTyping.length == 0) {
       //if it's empty
       // console.log('emit endTyping');
-      io.emit('endTyping');
+      app.io.emit('endTyping');
     } else {
       //if someone else is typing
       var index = whoIsTyping.indexOf(others);
@@ -223,9 +223,9 @@ io.on('connection', function (socket) {
         whoIsTyping.splice(index, 1);
         if (whoIsTyping.length == 0) {
           // console.log('emit endTyping');
-          io.emit('endTyping');
+          app.io.emit('endTyping');
         } else {
-          io.emit('typing', whoIsTyping);
+          app.io.emit('typing', whoIsTyping);
           // console.log('emit quitTyping');
           // console.log('whoIsTyping after quit');
           // console.log(whoIsTyping);

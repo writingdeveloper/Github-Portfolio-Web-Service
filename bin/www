@@ -3,7 +3,7 @@
 // /**
 //  * Module dependencies.
 //  */
-
+var app = require('../app');
 const fs = require('fs');
 const path = require('path');
 const HTTPS = require('https');
@@ -18,16 +18,18 @@ try {
     cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/cert.pem'), 'utf8').toString(),
   };
 
-  HTTPS.createServer(option, app).listen(sslport, () => {
+  let server = HTTPS.createServer(option, app).listen(sslport, () => {
+    app.io.attach(server);
     console.log('[HTTPS] Server is started on port 443');
   });
 } catch (error) {
   console.log('[HTTPS] Server is not Active. Please Check Your Server');
   console.log(error);
+  
 }
 
 
-var app = require('../app');
+
 var debug = require('debug')('udacity-build-a-portfolio-site-express:server');
 var http = require('http');
 
@@ -42,7 +44,7 @@ app.set('port', sslport);
 
 // var server = http.createServer(app);
 // // CUSTOM
-// app.io.attach(app);
+
 
 // /**
 //  * Listen on provided port, on all network interfaces.
