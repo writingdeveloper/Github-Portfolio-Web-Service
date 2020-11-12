@@ -8,6 +8,8 @@ hooks:
   BeforeInstall:
     - location: /scripts/initialize.sh
       runas: root
+  AfterInstall:
+    - location: /scripts/npminstall.sh
 
   ApplicationStart:
     - location: /scripts/start.sh
