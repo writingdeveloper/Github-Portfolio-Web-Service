@@ -12,6 +12,14 @@ const app = express();
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
+const https = require('https')
+const PORT = process.env.PORT || 443;
+const options = {
+  ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
+  key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/privkey.pem'), 'utf8').toString(),
+  cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/cert.pem'), 'utf8').toString(),
+};
+https.createServer(options, app).listen(PORT);
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 15 minutes

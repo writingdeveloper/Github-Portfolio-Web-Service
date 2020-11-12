@@ -6,11 +6,13 @@
 var app = require('../app');
 const fs = require('fs');
 const path = require('path');
-const HTTPS = require('https');
-var domain = 'expressme.dev';
+const HTTPS = require('https'); // To server HTTPS
+const domain = 'expressme.dev'; // Domain Name
+const sslport = 443;  // SSL Port
 
-const sslport = 443;
 app.set('port', sslport);
+
+/* SSL Settings */
 try {
   const option = {
     ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
@@ -19,107 +21,12 @@ try {
   };
 
   let server = HTTPS.createServer(option, app).listen(sslport, () => {
-    app.io.attach(server);
+    app.io.attach(server);  // Socket IO Connection
     console.log('[HTTPS] Server is started on port 443');
   });
 } catch (error) {
   console.log('[HTTPS] Server is not Active. Please Check Your Server');
   console.log(error);
-  
+
 }
 
-
-
-var debug = require('debug')('udacity-build-a-portfolio-site-express:server');
-var http = require('http');
-
-// /**
-//  * Get port from environment and store in Express.
-//  */;
-// var port = normalizePort(process.env.PORT || '443');
-
-// /**
-//  * Create HTTP server.
-//  */
-
-// var server = http.createServer(app);
-// // CUSTOM
-
-
-// /**
-//  * Listen on provided port, on all network interfaces.
-//  */
-
-// server.listen(sslport);
-// server.on('error', onError);
-// server.on('listening', onListening);
-
-// // /**
-// //  * Normalize a port into a number, string, or false.
-// //  */
-
-// function normalizePort(val) {
-//   var port = parseInt(val, 10);
-
-//   if (isNaN(port)) {
-//     // named pipe
-//     return val;
-//   }
-
-//   if (port >= 0) {
-//     // port number
-//     return port;
-//   }
-
-//   return false;
-// }
-
-// // /**
-// //  * Event listener for HTTP server "error" event.
-// //  */
-
-// function onError(error) {
-//   if (error.syscall !== 'listen') {
-//     throw error;
-//   }
-
-//   var bind = typeof sslport === 'string' ?
-//     'Pipe ' + sslport :
-//     'Port ' + sslport;
-
-//   // handle specific listen errors with friendly messages
-//   switch (error.code) {
-//     case 'EACCES':
-//       console.error(bind + ' requires elevated privileges');
-//       process.exit(1);
-//       break;
-//     case 'EADDRINUSE':
-//       console.error(bind + ' is already in use');
-//       process.exit(1);
-//       break;
-//     default:
-//       throw error;
-//   }
-// }
-
-// // /**
-// //  * Event listener for HTTP server "listening" event.
-// //  */
-
-// function onListening() {
-//   var addr = server.address();
-//   var bind = typeof addr === 'string' ?
-//     'pipe ' + addr :
-//     'port ' + addr.sslport;
-//   debug('Listening on ' + bind);
-// }
-
-// // var https = require('https');
-// // var server = https.createServer({
-// //   key: require('fs').readFileSync('./privkey.pem')
-// // , cert: require('fs').readFileSync('./fullchain.pem')
-// // }, function (req, res) {
-// //   res.end("Hello, World!");
-// // }).listen(443, function () {
-// //   console.log('Listening on', this.address());
-// // })
