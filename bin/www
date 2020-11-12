@@ -10,7 +10,7 @@ const HTTPS = require('https');
 var domain = 'expressme.dev';
 
 const sslport = 443;
-
+app.set('port', sslport);
 try {
   const option = {
     ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
@@ -37,7 +37,7 @@ var http = require('http');
 //  * Get port from environment and store in Express.
 //  */;
 // var port = normalizePort(process.env.PORT || '443');
-app.set('port', sslport);
+
 // /**
 //  * Create HTTP server.
 //  */
