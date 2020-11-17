@@ -93,8 +93,7 @@ router.get(`/:userId`, (req, res, next) => {
           repo.forEach((repo) => {
             let imageName = (repo.language || '').toLowerCase();
             /* If AWS Image Exists */
-            if (repo.imageURL) {
-            } else if (languageNameArray.includes(imageName) == false) {
+            if (repo.imageURL) {} else if (languageNameArray.includes(imageName) == false) {
               repo.imageURL = `/images/app/${repo.projectType}.png`
             } else if (languageNameArray.includes(imageName) == true) {
               let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
@@ -203,8 +202,7 @@ router.get("/:userId/:pageId/update", (req, res) => {
     let languageNameArray = require('../config/languageNames')
     let imageName = (repo.language || '').toLowerCase();
     /* If AWS Image Exists */
-    if (repo.imageURL) {
-    } else if (languageNameArray.includes(imageName) == false) {
+    if (repo.imageURL) {} else if (languageNameArray.includes(imageName) == false) {
       repo.imageURL = `/images/app/${repo.projectType}.png`
     } else if (languageNameArray.includes(imageName) == true) {
       let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
@@ -330,8 +328,7 @@ router.get("/:userId/:pageId", (req, res, next) => {
       let languageNameArray = require('../config/languageNames')
       let imageName = (repo.language || '').toLowerCase();
       /* If AWS Image Exists */
-      if (repo.imageURL) {
-      } else if (languageNameArray.includes(imageName) == false) {
+      if (repo.imageURL) {} else if (languageNameArray.includes(imageName) == false) {
         repo.imageURL = `/images/app/${repo.projectType}.png`
       } else if (languageNameArray.includes(imageName) == true) {
         let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
@@ -362,7 +359,6 @@ router.get("/:userId/:pageId", (req, res, next) => {
         let created_at = repo.created_at.toISOString().substr(0, 10).replace('T', ' ');
         let updated_at = repo.updated_at.toISOString().substr(0, 10).replace('T', ' ');
         let fullName = repo.html_url.replace(/^\/\/|^https?:\/\/github.com\//g, '') // Get real README.md file
-
         /* README.md API Process */
         request({
             headers: {
@@ -375,7 +371,9 @@ router.get("/:userId/:pageId", (req, res, next) => {
             url: `https://api.github.com/repos/${fullName}/readme`
           },
           (error, response, readmeData) => {
+            console.log(response.statusCode)
             if (response.statusCode == 404) {
+              console.log('404!!!')
               readmeHTML = 'No Readme.MD file';
             } else {
               if (error) throw error;
@@ -395,7 +393,7 @@ router.get("/:userId/:pageId", (req, res, next) => {
                 url: `https://api.github.com/repos/${userId}/${repo.name}/languages`
               },
               (error, response, keyword) => {
-                if (response.statusCode == 404) {
+                if (response.statusCode == 404 || response.statusCode == 401) {
                   keyword = '';
                 } else {
                   if (error) throw error;
