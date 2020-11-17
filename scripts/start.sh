@@ -21,3 +21,6 @@ export NVM_DIR="$HOME/.nvm"
 # 원래 node 프로세스 종료
 sudo pkill -f node `grep 'node ./bin/www' | awk '{print $2}'`
 nohup npm start >/home/projects/logs 2>&1 </home/projects/errors &
+
+cd /home/project/build
+pm2 start app.js --watch
