@@ -1,5 +1,5 @@
 /* Global */
-let socket = io.connect(`${window.location.hostname}`);
+let socket = io.connect('http://127.0.0.1:3000');
 
 // Request Counter Data Function
 function counter() {

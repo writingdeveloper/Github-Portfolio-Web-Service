@@ -17,8 +17,7 @@ const https = require('https')
 const http = require('http')
 const PORT = process.env.PORT || 443;
 const domain = 'expressme.dev';
-const option = process.env.NODE_ENV === "production" ?
-  {
+const option = process.env.NODE_ENV === "production" ? {
     ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
     key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/privkey.pem'), 'utf8').toString(),
     cert: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/cert.pem'), 'utf8').toString(),
@@ -30,26 +29,28 @@ const option = process.env.NODE_ENV === "production" ?
 
 /* HTTPS Server */
 option
-  ? https.createServer(option, app).listen(PORT, () => {
-      console.log(`Server is running at port ${PORT}`);
-    })
-  : undefined;
+  ?
+  https.createServer(option, app).listen(PORT, () => {
+    console.log(`Server is running at port ${PORT}`);
+  }) :
+  undefined;
 
 // HTTPS 서버로 요청을 전달하여 자동으로 SSL 연결을 해주는 HTTP 서버
 // SSL option 이 존재하지 않는 development 단계에서는 그냥 HTTP 서버만이 존재하게 됩니다.
 option
-  ? http
-      .createServer(function(req, res) {
-        res.writeHead(301, {
-          Location: "https://" + req.headers["host"] + req.url
-        });
-        res.end();
-      })
-      .listen(80)
-  : http.createServer(app).listen(PORT, () => {
-      console.log(`Server is running at port ${PORT}`);
+  ?
+  http
+  .createServer(function (req, res) {
+    res.writeHead(301, {
+      Location: "https://" + req.headers["host"] + req.url
     });
-    
+    res.end();
+  })
+  .listen(80) :
+  http.createServer(app).listen(PORT, () => {
+    console.log(`Server is running at port ${PORT}`);
+  });
+
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 15 minutes
@@ -58,7 +59,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 /* Socket IO */
-app.io = require('socket.io')();
+const io = require('socket.io')(3000);
 
 /* Router Sequences */
 const server = require('./routes/server.js');
@@ -80,10 +81,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* Router Set */
 app.use('/', indexRouter);
+app.use('/', portfolioRouter);
 app.use('/telegram', server); // Telegram Bot Router
 app.use('/', findUserRouter)
 app.use('/admin/mypage', mypageRouter);
-app.use('/', portfolioRouter);
+
 app.use('/reportError', errorRouter); // Error Page Router
 
 /* Logger Setting */
@@ -152,7 +154,7 @@ app.use(async function (err, req, res) {
 /*-----------------------------------------------------------------------*/
 
 /* Socket IO Functions */
-app.io.on('connection', function (socket) {
+io.on('connection', function (socket) {
   // Join Room Scoket
   socket.on('JoinRoom', function (data) {
     socket.leave(`${data.leave}`)
@@ -185,7 +187,7 @@ app.io.on('connection', function (socket) {
   socket.on('say', async function (data) {
     try {
       //chat message to the others
-      app.io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
+      io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
       // console.log(`Message Send to : ${data.joinedRoomName}`)
       // console.log(`Message Content : ${data.userId} : ${data.msg}`);
       // Chat Message Save to DB SQL
@@ -209,7 +211,7 @@ app.io.on('connection', function (socket) {
       whoIsTyping.push(others);
       // console.log('who is typing now');
       // console.log(whoIsTyping);
-      app.io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
+      io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
     }
   });
 
@@ -221,7 +223,6 @@ app.io.on('connection', function (socket) {
     Chat.aggregate([{
         $match: {
           chatReceiver: data.userId,
-          roomName: data.joinedRoomName,
           chatNotice: 1
         }
       },
@@ -239,7 +240,7 @@ app.io.on('connection', function (socket) {
       if (count[0] == undefined) {
         // console.log('No Count DatA')
       } else {
-        app.io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
+        io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
       }
     })
   })
@@ -250,18 +251,18 @@ app.io.on('connection', function (socket) {
     if (whoIsTyping.length == 0) {
       //if it's empty
       // console.log('emit endTyping');
-      app.io.emit('endTyping');
+      io.emit('endTyping');
     } else {
       //if someone else is typing
-      var index = whoIsTyping.indexOf(others);
+      let index = whoIsTyping.indexOf(others);
       // console.log(index);
       if (index != -1) {
         whoIsTyping.splice(index, 1);
         if (whoIsTyping.length == 0) {
           // console.log('emit endTyping');
-          app.io.emit('endTyping');
+          io.emit('endTyping');
         } else {
-          app.io.emit('typing', whoIsTyping);
+          io.emit('typing', whoIsTyping);
           // console.log('emit quitTyping');
           // console.log('whoIsTyping after quit');
           // console.log(whoIsTyping);
