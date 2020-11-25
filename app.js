@@ -26,7 +26,7 @@ const option = process.env.NODE_ENV === "production" ? {
 
 // In Production Mode use HTTPS Server
 // In Development Mode use HTTP Server
-
+let socket;
 /* HTTPS Server */
 option
   ?
@@ -34,32 +34,27 @@ option
     console.log(`Server is running at port ${PORT}`);
   }) :
   undefined;
-
-// HTTPS 서버로 요청을 전달하여 자동으로 SSL 연결을 해주는 HTTP 서버
-// SSL option 이 존재하지 않는 development 단계에서는 그냥 HTTP 서버만이 존재하게 됩니다.
+/* HTTP Server */
 option
   ?
-  http
-  .createServer(function (req, res) {
+  socket = http.createServer(function (req, res) {
     res.writeHead(301, {
       Location: "https://" + req.headers["host"] + req.url
     });
     res.end();
   })
   .listen(80) :
-  http.createServer(app).listen(PORT, () => {
+  socket = http.createServer(app).listen(PORT, () => {
     console.log(`Server is running at port ${PORT}`);
   });
 
+const io = require('socket.io')(socket);
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 15 minutes
-  max: 200 // limit each IP to 100 requests per windowMs
+  max: 250 // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
-
-/* Socket IO */
-const io = require('socket.io')(3000);
 
 /* Router Sequences */
 const server = require('./routes/server.js');
