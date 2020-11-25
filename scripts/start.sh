@@ -22,5 +22,6 @@ export NVM_DIR="$HOME/.nvm"
 sudo pkill -f node `grep 'node ./bin/www' | awk '{print $2}'`
 nohup npm start >/home/projects/logs 2>&1 </home/projects/errors &
 
-cd /home/project/build
 pm2 start app.js --watch
+# cd /home/project/build
+# pm2 start app.js --watch
