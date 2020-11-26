@@ -20,6 +20,6 @@ export NVM_DIR="$HOME/.nvm"
 
 # 원래 node 프로세스 종료
 # sudo pkill -f node `grep 'node ./bin/www' | awk '{print $2}'`
-sudo pm2 stop app
-sudo npm start
-nohup npm start >/home/projects/logs 2>&1 </home/projects/errors
+# sudo pm2 stop app
+# sudo npm start
+# nohup npm start >/home/projects/logs 2>&1 </home/projects/errors
