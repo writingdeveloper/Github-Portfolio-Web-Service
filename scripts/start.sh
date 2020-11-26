@@ -19,9 +19,7 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
 # 원래 node 프로세스 종료
-sudo pkill -f node `grep 'node ./bin/www' | awk '{print $2}'`
-nohup npm start >/home/projects/logs 2>&1 </home/projects/errors &
-
-pm2 start /home/project/build/app.js --watch
-# cd /home/project/build
-# pm2 start app.js --watch
+# sudo pkill -f node `grep 'node ./bin/www' | awk '{print $2}'`
+sudo pm2 stop app
+sudo npm start
+nohup npm start >/home/projects/logs 2>&1 </home/projects/errors
