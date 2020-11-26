@@ -16,7 +16,7 @@ If the environment variable fails to load, run the node app with `node -r dotenv
 const https = require('https')
 const http = require('http')
 const PORT = process.env.PORT || 443;
-const domain = 'expressme.dev';
+const domain = 'expressme.dev'; // Domain Name
 const option = process.env.NODE_ENV === "production" ? {
     ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
     key: fs.readFileSync(path.resolve(process.cwd(), '/etc/letsencrypt/live/' + domain + '/privkey.pem'), 'utf8').toString(),
@@ -30,7 +30,7 @@ let socket;
 /* HTTPS Server */
 option
   ?
-  https.createServer(option, app).listen(PORT, () => {
+  socket = https.createServer(option, app).listen(PORT, () => {
     console.log(`Server is running at port ${PORT}`);
   }) :
   undefined;
@@ -159,7 +159,7 @@ io.on('connection', function (socket) {
     // console.log(`RECEIVER : ${data.receiver}`)
     // When Reads the message SET notice to '1'
     // db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
-
+    console.log(data);
     Chat.aggregate([{
         $match: {
           'chatReceiver': data.receiver,
@@ -174,7 +174,7 @@ io.on('connection', function (socket) {
       }
     ], (err, result) => {
       if (err) throw err;
-      // console.log(result);
+      console.log(result);
     })
   })
 
