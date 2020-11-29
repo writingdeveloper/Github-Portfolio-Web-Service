@@ -13,6 +13,9 @@ const app = express();
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
+
+// Set env in source/environment
+
 const https = require('https')
 const http = require('http')
 const PORT = process.env.PORT || 443;
