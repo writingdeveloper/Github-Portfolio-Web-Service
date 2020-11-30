@@ -28,7 +28,7 @@ let sessionCheck = (req, res, next) => {
 }
 
 /* GET MyPage Page */
-router.get(`/:userId`, async (req, res) => {
+router.get(`/admin/mypage/:userId`, async (req, res) => {
   let userId = req.params.userId;
   let finalArray;
 
@@ -164,7 +164,7 @@ router.get(`/:userId`, async (req, res) => {
 })
 
 /* GET Mypage Remove Portfolio Data */
-router.get(`/:userId/removeData`, sessionCheck, (req, res) => {
+router.get(`/admin/mypage/:userId/removeData`, sessionCheck, (req, res) => {
   let userId = req.params.userId;
   /* Remove Repository Process */
   Repo.deleteMany({
@@ -190,7 +190,7 @@ router.get(`/:userId/removeData`, sessionCheck, (req, res) => {
 
 
 /* GET Mypage Get Github Portfolio Data */
-router.get(`/:userId/getData`, sessionCheck, (req, res) => {
+router.get(`/admin/mypage/:userId/getData`, sessionCheck, (req, res) => {
   let userId = req.params.userId;
   request({
     headers: {
@@ -219,7 +219,7 @@ router.get(`/:userId/getData`, sessionCheck, (req, res) => {
 })
 
 /* GET Mypage User Setting Page */
-router.get(`/user/:userId`, sessionCheck, (req, res) => {
+router.get(`/admin/mypage/user/:userId`, sessionCheck, (req, res) => {
   let userId = req.params.userId;
   User.find({
     'login': userId
@@ -240,7 +240,7 @@ router.get(`/user/:userId`, sessionCheck, (req, res) => {
 })
 
 /* POST Mypage User Setting Page */
-router.post(`/:userId/submit`, async (req, res) => {
+router.post(`/admin/mypage/:userId/submit`, async (req, res) => {
   try {
     let userId = req.params.userId;
     let email = req.body.email;
@@ -268,7 +268,7 @@ router.post(`/:userId/submit`, async (req, res) => {
 //-------------------------------------------------------------------------------------------------------------
 
 /* MyPage User Chat Room */
-router.get(`/contact/:userId`, async (req, res) => {
+router.get(`/admin/mypage/contact/:userId`, async (req, res) => {
   try {
     let userId = req.params.userId;
     let participant = [];
@@ -303,7 +303,7 @@ router.get(`/contact/:userId`, async (req, res) => {
 });
 
 /* GET Privious Chat Data Router */
-router.get(`/chat/:joinedRoomName`, async (req, res) => {
+router.get(`/admin/mypage/chat/:joinedRoomName`, async (req, res) => {
   try {
     let joinedRoomName = req.params.joinedRoomName;
     Chat.find({
@@ -322,7 +322,7 @@ router.get(`/chat/:joinedRoomName`, async (req, res) => {
 });
 
 /* Create MyPage User Chat Room */
-router.get(`/request/contact/:userId/`, async (req, res) => {
+router.get(`/admin/mypage/request/contact/:userId/`, async (req, res) => {
   try {
     let userId = req.params.userId;
     let loginedId = req.user.username;
