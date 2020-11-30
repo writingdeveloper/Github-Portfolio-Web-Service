@@ -13,6 +13,9 @@ const app = express();
 /*
 If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
 */
+
+// Set env in source/environment
+
 const https = require('https')
 const http = require('http')
 const PORT = process.env.PORT || 443;
@@ -79,7 +82,7 @@ app.use('/', indexRouter);
 app.use('/', portfolioRouter);
 app.use('/telegram', server); // Telegram Bot Router
 app.use('/', findUserRouter)
-app.use('/admin/mypage', mypageRouter);
+app.use('/', mypageRouter);
 
 app.use('/reportError', errorRouter); // Error Page Router
 
@@ -159,7 +162,7 @@ io.on('connection', function (socket) {
     // console.log(`RECEIVER : ${data.receiver}`)
     // When Reads the message SET notice to '1'
     // db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
-    console.log(data);
+    // console.log(data);
     Chat.aggregate([{
         $match: {
           'chatReceiver': data.receiver,
@@ -174,29 +177,26 @@ io.on('connection', function (socket) {
       }
     ], (err, result) => {
       if (err) throw err;
-      console.log(result);
+      // console.log(result);
     })
   })
 
   // Send Message Socket
-  socket.on('say', async function (data) {
-    try {
-      //chat message to the others
-      io.sockets.to(`${data.joinedRoomName}`).emit('mySaying', data);
-      // console.log(`Message Send to : ${data.joinedRoomName}`)
-      // console.log(`Message Content : ${data.userId} : ${data.msg}`);
-      // Chat Message Save to DB SQL
+  socket.on('say', function (data) {
 
-      await Chat.create({
-        'roomName': data.joinedRoomName,
-        'chatSender': data.userId,
-        'chatReceiver': data.receiver,
-        'chatMessage': data.msg
-      })
+    //chat message to the others
+    socket.to(`${data.joinedRoomName}`).emit('mySaying', data);
+    console.log(data)
+    console.log(`Message Send to : ${data.joinedRoomName}`)
+    console.log(`Message Content : ${data.userId} : ${data.msg}`);
+    // Chat Message Save to DB SQL
 
-    } catch (err) {
-      throw err;
-    }
+    Chat.create({
+      'roomName': data.joinedRoomName,
+      'chatSender': data.userId,
+      'chatReceiver': data.receiver,
+      'chatMessage': data.msg
+    })
   });
 
   // Typing... Socket Function
@@ -206,7 +206,7 @@ io.on('connection', function (socket) {
       whoIsTyping.push(others);
       // console.log('who is typing now');
       // console.log(whoIsTyping);
-      io.sockets.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
+      socket.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
     }
   });
 
@@ -214,7 +214,7 @@ io.on('connection', function (socket) {
   socket.on('counter', function (data) {
     let counterTo = data.userId;
     socket.join(`${data.userId}`)
-    console.log(data);
+    // console.log(data);
     Chat.aggregate([{
         $match: {
           chatReceiver: data.userId,
@@ -235,7 +235,7 @@ io.on('connection', function (socket) {
       if (count[0] == undefined) {
         // console.log('No Count DatA')
       } else {
-        io.sockets.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
+        socket.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
       }
     })
   })
@@ -246,7 +246,7 @@ io.on('connection', function (socket) {
     if (whoIsTyping.length == 0) {
       //if it's empty
       // console.log('emit endTyping');
-      io.emit('endTyping');
+      socket.emit('endTyping');
     } else {
       //if someone else is typing
       let index = whoIsTyping.indexOf(others);
@@ -255,9 +255,9 @@ io.on('connection', function (socket) {
         whoIsTyping.splice(index, 1);
         if (whoIsTyping.length == 0) {
           // console.log('emit endTyping');
-          io.emit('endTyping');
+          socket.emit('endTyping');
         } else {
-          io.emit('typing', whoIsTyping);
+          socket.emit('typing', whoIsTyping);
           // console.log('emit quitTyping');
           // console.log('whoIsTyping after quit');
           // console.log(whoIsTyping);
@@ -267,7 +267,4 @@ io.on('connection', function (socket) {
   });
 });
 
-
-// console.log('it connects again!')
-// console.log(`Now It Works Fine in Port ${process.env.PORT}`);
 module.exports = app;
