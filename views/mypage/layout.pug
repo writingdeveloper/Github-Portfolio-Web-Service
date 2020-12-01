@@ -61,9 +61,9 @@ include ../libraries/bootstrapjs.pug
 //- include ../libraries/googleanalytics.pug
 block customJS
 // Socket IO Script
-script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.1/socket.io.js")
+script(src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/3.0.1/socket.io.min.js")
 script.
-	var socket = io();
+	let socket = io();
 // Global JS
 script(src='/javascripts/mypage/mypage.js')
 // SweetAlert JS CDN
