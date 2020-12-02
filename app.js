@@ -79,9 +79,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 /* Router Set */
 app.use('/', indexRouter);
+app.use('/', findUserRouter)
 app.use('/', portfolioRouter);
 app.use('/telegram', server); // Telegram Bot Router
-app.use('/', findUserRouter)
 app.use('/', mypageRouter);
 
 app.use('/reportError', errorRouter); // Error Page Router
@@ -102,7 +102,7 @@ let User = require('./lib/models/userModel');
 let Repo = require('./lib/models/repoModel');
 let Counter = require('./lib/models/counterModel');
 let ChatRoom = require('./lib/models/chatRoomsModel');
-const Chat = require('./lib/models/chattingModel');
+let Chat = require('./lib/models/chattingModel');
 
 
 /* catch 404 and forward to error handler */
@@ -154,7 +154,7 @@ app.use(async function (err, req, res) {
 /* Socket IO Functions */
 io.on('connection', function (socket) {
   // Join Room Scoket
-  socket.on('JoinRoom', function (data) {
+  socket.on('JoinRoom', async function (data) {
     socket.leave(`${data.leave}`)
     // console.log(`Leave ROOM : ${data.leave}`)
     socket.join(`${data.joinedRoomName}`);
@@ -163,29 +163,46 @@ io.on('connection', function (socket) {
     // When Reads the message SET notice to '1'
     // db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
     // console.log(data);
-    Chat.aggregate([{
-        $match: {
-          'chatReceiver': data.receiver,
-          'roomName': data.joinedRoomName,
-          'chatNotice': 1
-        }
-      },
-      {
+    console.log(`${data.receiver} + ${data.joinedRoomName}`)
+    //   Chat.aggregate([{
+    //       $match: {
+    //         'chatReceiver': data.receiver,
+    //         'roomName': data.joinedRoomName,
+    //         'chatNotice': 1
+    //       }
+    //     },
+    //     {
+    //       $set: {
+    //         'chatNotice': 0
+    //       }
+    //     }
+    //   ], (err, result) => {
+    //     if (err) throw err;
+    //     // console.log(result);
+    //     console.log('HERE')
+    //   })
+    try {
+      Chat.updateMany({
+        'chatReceiver': data.receiver,
+        'roomName': data.joinedRoomName,
+        'chatNotice': 1
+      }, {
         $set: {
           'chatNotice': 0
         }
-      }
-    ], (err, result) => {
-      if (err) throw err;
-      // console.log(result);
-    })
+      })
+      console.log('Done')
+    } catch (e) {
+      print(e);
+    }
   })
+
 
   // Send Message Socket
   socket.on('say', function (data) {
 
     //chat message to the others
-    socket.to(`${data.joinedRoomName}`).emit('mySaying', data);
+    io.in(`${data.joinedRoomName}`).emit('mySaying', data);
     console.log(data)
     console.log(`Message Send to : ${data.joinedRoomName}`)
     console.log(`Message Content : ${data.userId} : ${data.msg}`);
@@ -195,7 +212,8 @@ io.on('connection', function (socket) {
       'roomName': data.joinedRoomName,
       'chatSender': data.userId,
       'chatReceiver': data.receiver,
-      'chatMessage': data.msg
+      'chatMessage': data.msg,
+      'chatNotice' :1
     })
   });
 
@@ -213,8 +231,8 @@ io.on('connection', function (socket) {
   // Notice Counter Socket
   socket.on('counter', function (data) {
     let counterTo = data.userId;
-    socket.join(`${data.userId}`)
-    // console.log(data);
+    // socket.join(`${data.userId}`)
+    console.log(data);
     Chat.aggregate([{
         $match: {
           chatReceiver: data.userId,
@@ -235,7 +253,9 @@ io.on('connection', function (socket) {
       if (count[0] == undefined) {
         // console.log('No Count DatA')
       } else {
-        socket.to(`${counterTo}`).emit('noticeAlarm', count[0].count)
+        socket.emit('noticeAlarm', count[0].count)
+        console.log(counterTo)
+        console.log(count[0].count)
       }
     })
   })
