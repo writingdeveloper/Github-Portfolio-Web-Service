@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config()  // To load Environment Vars
 const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
@@ -10,12 +10,8 @@ const rfs = require('rotating-file-stream')
 const rateLimit = require("express-rate-limit");
 const fs = require('fs')
 const app = express();
-/*
-If the environment variable fails to load, run the node app with `node -r dotenv/config. /bin/www`
-*/
 
-// Set env in source/environment
-
+/* HTTP(dev) HTTPS(production) settings */
 const https = require('https')
 const http = require('http')
 const PORT = process.env.PORT || 443;
@@ -50,7 +46,6 @@ option
   socket = http.createServer(app).listen(PORT, () => {
     console.log(`Server is running at port ${PORT}`);
   });
-
 const io = require('socket.io')(socket);
 
 const limiter = rateLimit({
@@ -81,10 +76,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/', findUserRouter)
 app.use('/', portfolioRouter);
-app.use('/telegram', server); // Telegram Bot Router
 app.use('/', mypageRouter);
-
 app.use('/reportError', errorRouter); // Error Page Router
+app.use('/telegram', server); // Telegram Bot Router
 
 /* Logger Setting */
 app.use(morgan('dev'));
@@ -97,21 +91,19 @@ app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url" :status 
   stream: accessLogStream
 }));
 
-/* Database Settings */
-let User = require('./lib/models/userModel');
-let Repo = require('./lib/models/repoModel');
-let Counter = require('./lib/models/counterModel');
-let ChatRoom = require('./lib/models/chatRoomsModel');
-let Chat = require('./lib/models/chattingModel');
+/* Database Model Settings */
+const User = require('./lib/models/userModel');
+const Repo = require('./lib/models/repoModel');
+const Counter = require('./lib/models/counterModel');
+const ChatRoom = require('./lib/models/chatRoomsModel');
+const Chat = require('./lib/models/chattingModel');
+const errorMessageLog = require('./lib/models/errorMessageLogsModel')
 
 
 /* catch 404 and forward to error handler */
 app.use(function (req, res, next) {
   next(createError(404));
 });
-
-/* Database Setting */
-const errorMessageLog = require('./lib/models/errorMessageLogsModel')
 
 /* Error Handler */
 app.use(async function (err, req, res) {
@@ -131,7 +123,7 @@ app.use(async function (err, req, res) {
       userAgent,
       errorURL,
       timeData
-    }, (err, result) => {
+    }, (err) => {
       if (err) throw err;
     })
     let coreMessage =
@@ -149,90 +141,50 @@ app.use(async function (err, req, res) {
   res.render('error');
 });
 
-/*-----------------------------------------------------------------------*/
-
 /* Socket IO Functions */
-io.on('connection', function (socket) {
-  // Join Room Scoket
-  socket.on('JoinRoom', async function (data) {
+io.on('connection', (socket) => {
+
+  /* Join & Leave previous room Socket */
+  socket.on('JoinRoom', data => {
     socket.leave(`${data.leave}`)
-    // console.log(`Leave ROOM : ${data.leave}`)
     socket.join(`${data.joinedRoomName}`);
-    // console.log(`NEW JOIN IN ${data.joinedRoomName}`)
-    // console.log(`RECEIVER : ${data.receiver}`)
-    // When Reads the message SET notice to '1'
-    // db.query(`UPDATE chatData SET notice='1' WHERE chatReceiver=? AND roomName=?`, [data.receiver, data.joinedRoomName])
-    // console.log(data);
-    console.log(`${data.receiver} + ${data.joinedRoomName}`)
-    //   Chat.aggregate([{
-    //       $match: {
-    //         'chatReceiver': data.receiver,
-    //         'roomName': data.joinedRoomName,
-    //         'chatNotice': 1
-    //       }
-    //     },
-    //     {
-    //       $set: {
-    //         'chatNotice': 0
-    //       }
-    //     }
-    //   ], (err, result) => {
-    //     if (err) throw err;
-    //     // console.log(result);
-    //     console.log('HERE')
-    //   })
-    try {
-      Chat.updateMany({
-        'chatReceiver': data.receiver,
-        'roomName': data.joinedRoomName,
-        'chatNotice': 1
-      }, {
-        $set: {
-          'chatNotice': 0
-        }
-      })
-      console.log('Done')
-    } catch (e) {
-      print(e);
-    }
+    Chat.updateMany({ // When clicks the target room, target's Notice alarm will set to 0
+      'chatReceiver': data.receiver,
+      'roomName': data.joinedRoomName,
+      'chatNotice': 1
+    }, {
+      $set: {
+        'chatNotice': 0
+      }
+    }, (err) => {
+      if (err) throw err;
+    })
   })
 
-
-  // Send Message Socket
+  /* Message Socket */
   socket.on('say', function (data) {
-
-    //chat message to the others
-    io.in(`${data.joinedRoomName}`).emit('mySaying', data);
-    console.log(data)
-    console.log(`Message Send to : ${data.joinedRoomName}`)
-    console.log(`Message Content : ${data.userId} : ${data.msg}`);
-    // Chat Message Save to DB SQL
-
+    io.in(`${data.joinedRoomName}`).emit('mySaying', data); //chat message to the others
+    /* Save chat into MongoDB */
     Chat.create({
       'roomName': data.joinedRoomName,
       'chatSender': data.userId,
       'chatReceiver': data.receiver,
       'chatMessage': data.msg,
-      'chatNotice' :1
+      'chatNotice': 1
     })
   });
 
-  // Typing... Socket Function
+  /* Someone is typing... Socket */
   socket.on('typing', function (others) {
     let whoIsTyping = [];
     if (!whoIsTyping.includes(others)) {
       whoIsTyping.push(others);
-      // console.log('who is typing now');
-      // console.log(whoIsTyping);
       socket.to(`${others.joinedRoomName}`).emit('typing', whoIsTyping);
     }
   });
 
-  // Notice Counter Socket
+  /* Notice counter Socket */
   socket.on('counter', function (data) {
-    let counterTo = data.userId;
-    // socket.join(`${data.userId}`)
-    console.log(data);
     Chat.aggregate([{
         $match: {
           chatReceiver: data.userId,
@@ -247,15 +199,12 @@ io.on('connection', function (socket) {
           }
         }
       }
-    ], (err, count) => {
+    ], (err, result) => {
       if (err) throw err;
-      // console.log(count)
-      if (count[0] == undefined) {
-        // console.log('No Count DatA')
+      if (Array.isArray(result) && result.length === 0) { // If Notice counter is 0, send data 0
+        socket.emit('noticeAlarm', 0)
       } else {
-        socket.emit('noticeAlarm', count[0].count)
-        console.log(counterTo)
-        console.log(count[0].count)
+        socket.emit('noticeAlarm', result[0].count)
       }
     })
   })
@@ -264,23 +213,13 @@ io.on('connection', function (socket) {
   socket.on('quitTyping', function (others) {
     let whoIsTyping = [];
     if (whoIsTyping.length == 0) {
-      //if it's empty
-      // console.log('emit endTyping');
       socket.emit('endTyping');
     } else {
-      //if someone else is typing
-      let index = whoIsTyping.indexOf(others);
-      // console.log(index);
+      let index = whoIsTyping.indexOf(others); //if someone else is typing
       if (index != -1) {
         whoIsTyping.splice(index, 1);
         if (whoIsTyping.length == 0) {
-          // console.log('emit endTyping');
           socket.emit('endTyping');
-        } else {
-          socket.emit('typing', whoIsTyping);
-          // console.log('emit quitTyping');
-          // console.log('whoIsTyping after quit');
-          // console.log(whoIsTyping);
         }
       }
     }
