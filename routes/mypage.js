@@ -81,57 +81,44 @@ router.get(`/admin/mypage/:userId`, async (req, res) => {
     'owner.login': userId
   }, (err, repo) => {
     if (err) throw err;
-    userNumber = repo[0].owner.id;
+    if (Array.isArray(repo) && repo.length === 0) {
+      res.render('mypage/main', {
+        userId: userId,
+        dataArray: [],
+        todayVisitors: 0,
+        chartData: [],
+        chartMaxData: [], // Use in Chart Max line
+        totalViews: 0,
+        updatedTime: updatedTime.toLocaleString()
+      })
+    } else {
+      userNumber = repo[0].owner.id;
 
-    let languageNameArray = require('../config/languageNames')
-    repo.map((repo) => {
-      {
-        let imageName = (repo.language || '').toLowerCase();
-        /* If AWS Image Exists */
-        if (repo.imageURL) {
-          // console.log('Use AWS Image')
-        } else if (languageNameArray.includes(imageName) == false) {
-          repo.imageURL = `/images/app/${repo.projectType}.png`
-        } else if (languageNameArray.includes(imageName) == true) {
-          let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
-          repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
-        } else if (repo.language == null && repo.imageURL == null) {
-          repo.imageURL = `/images/app/${repo.projectType}.png`
-        }
-        repo.homepage = repo.homepage || 'None'
-        repo.language = repo.language || 'None'
-      }
-    })
-
-    /* Total Views Count Process */
-    Counter.aggregate([{
-        $match: {
-          userName: userId,
-          userNumber: userNumber
-        }
-      },
-      {
-        $group: {
-          _id: null,
-          count: {
-            $sum: "$count"
+      let languageNameArray = require('../config/languageNames')
+      repo.map((repo) => {
+        {
+          let imageName = (repo.language || '').toLowerCase();
+          /* If AWS Image Exists */
+          if (repo.imageURL) {
+            // console.log('Use AWS Image')
+          } else if (languageNameArray.includes(imageName) == false) {
+            repo.imageURL = `/images/app/${repo.projectType}.png`
+          } else if (languageNameArray.includes(imageName) == true) {
+            let lowercaseLanguage = (repo.language || '').toLowerCase().replace(/\+/g, '%2B').replace(/\#/g, "%23");
+            repo.imageURL = `https://portfolioworld.s3.ap-northeast-2.amazonaws.com/devicon/${lowercaseLanguage}/${lowercaseLanguage}-original.svg`
+          } else if (repo.language == null && repo.imageURL == null) {
+            repo.imageURL = `/images/app/${repo.projectType}.png`
           }
+          repo.homepage = repo.homepage || 'None'
+          repo.language = repo.language || 'None'
         }
-      }
-    ], (err, totalViews) => {
-      if (err) throw err;
-      if (totalViews.length == 0) {
-        totalViews = 0;
-      } else {
-        totalViews = totalViews[0].count || 0;
-      }
+      })
 
-      /* Today Visitors Count Process */
+      /* Total Views Count Process */
       Counter.aggregate([{
           $match: {
             userName: userId,
-            userNumber: userNumber,
-            viewDate: todayDate,
+            userNumber: userNumber
           }
         },
         {
@@ -142,25 +129,51 @@ router.get(`/admin/mypage/:userId`, async (req, res) => {
             }
           }
         }
-      ], (err, todayVisitors) => {
+      ], (err, totalViews) => {
         if (err) throw err;
-        if (todayVisitors.length === 0) {
-          todayVisitors = 0;
+        if (totalViews.length == 0) {
+          totalViews = 0;
         } else {
-          todayVisitors = todayVisitors[0].count
+          totalViews = totalViews[0].count || 0;
         }
-        res.render('mypage/main', {
-          userId: userId,
-          dataArray: repo,
-          todayVisitors: todayVisitors,
-          chartData: finalArray,
-          chartMaxData: Math.max.apply(null, finalArray), // Use in Chart Max line
-          totalViews: totalViews,
-          updatedTime: updatedTime.toLocaleString()
+
+        /* Today Visitors Count Process */
+        Counter.aggregate([{
+            $match: {
+              userName: userId,
+              userNumber: userNumber,
+              viewDate: todayDate,
+            }
+          },
+          {
+            $group: {
+              _id: null,
+              count: {
+                $sum: "$count"
+              }
+            }
+          }
+        ], (err, todayVisitors) => {
+          if (err) throw err;
+          if (todayVisitors.length === 0) {
+            todayVisitors = 0;
+          } else {
+            todayVisitors = todayVisitors[0].count
+          }
+          res.render('mypage/main', {
+            userId: userId,
+            dataArray: repo,
+            todayVisitors: todayVisitors,
+            chartData: finalArray,
+            chartMaxData: Math.max.apply(null, finalArray), // Use in Chart Max line
+            totalViews: totalViews,
+            updatedTime: updatedTime.toLocaleString()
+          })
         })
       })
-    })
+    }
   })
+
 })
 
 /* GET Mypage Remove Portfolio Data */
