@@ -100,7 +100,7 @@ async function joinChat() {
                 toast: true,
                 position: 'top-end',
                 showConfirmButton: false,
-                timer: 5000,
+                timer: 2000,
                 timerProgressBar: true,
                 didOpen: (toast) => {
                     toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -124,7 +124,7 @@ function intervalCheck() {
         // console.log('Not yet Joined');
     } else {
         socket.emit('JoinRoom', {
-            joinedRoomName,
+            joinedRoomName : joinedRoomName,
             receiver: userId
         });
         // console.log(`JOINED : ${joinedRoomName}`)
@@ -146,8 +146,6 @@ function Scroll() {
 /* SocketIO Functions */
 $(function () {
     $('#message').focus(); // Init Focus to Input
-    let fontColor = 'black';
-    let nickName = '';
     let whoIsTyping = [];
 
     /* Submit Event (Keyboard Enter) */
@@ -158,7 +156,7 @@ $(function () {
                 toast: true,
                 position: 'bottom',
                 showConfirmButton: false,
-                timer: 5000,
+                timer: 2000,
                 timerProgressBar: true,
                 didOpen: (toast) => {
                     toast.addEventListener('mouseenter', Swal.stopTimer)
@@ -180,10 +178,11 @@ $(function () {
                     receiver: others,
                     joinedRoomName: joinedRoomName
                 });
+                socket.emit('quitTyping')
             }
             // Say event means someone transmitted chat
             $('#message').val('');
-            socket.emit('quitTyping')
+            
         }
         return false;
     });
