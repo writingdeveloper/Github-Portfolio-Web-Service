@@ -1,5 +1,4 @@
 /* Global */
-// let socket = io();
 
 // Request Counter Data Function
 function counter() {
@@ -8,13 +7,11 @@ function counter() {
     });
 }
 
-// Counter Receiver every 3 Seconds
-setInterval(counter, 3000);
+setInterval(counter, 3000); // Counter Receiver every 3 Seconds
 
 // Get Notice Counter Socket
 socket.on('noticeAlarm', function (count) {
-    console.log(count);
-    if (count == 0) {
+    if (count === 0) {
         document.getElementById('counter').innerHTML = ''; // If no counter Data SET NULL
     } else {
         document.getElementById('counter').innerHTML = count; // Data Exists SET to count Data
