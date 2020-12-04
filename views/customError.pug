@@ -10,10 +10,10 @@ html
             .cloud.x4
             .cloud.x5
         .c
-            ._404 500
+            ._404=`${errorStatus}`
             hr
-            ._2= `${errorExplain}`
-            ._2(style="color: red")= `ERROR MESSAGE : ${errorMessage}`
+            ._2(style="color: red")= `ERROR Message : ${errorMessage}`
+            ._2(style="color: red")= `ERROR from : ${errorFrom}`
             a.btn(href='/') Home
             -if(loginedId !== null){
             form(action=`/reportError/er/${loginedId}` id='submit' method="post")
