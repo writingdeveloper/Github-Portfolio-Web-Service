@@ -3,6 +3,7 @@ const router = express.Router();
 const request = require("request");
 const bodyParser = require("body-parser");
 const path = require("path");
+const moment = require("moment-timezone")
 
 /* Import Database Settings */
 const db = require("../lib/db");
@@ -17,10 +18,22 @@ router.use(express.static(path.join(__dirname, "public")));
 
 /* Session Check Function */
 let sessionCheck = (req, res, next) => {
-  if ((Object.keys(req.session.passport).length === 0 && req.session.passport.constructor === Object || req.session.passport.user.username !== req.params.userId)) {
+  if ((Object.keys(req.session.passport).length === 0 && req.session.passport.constructor || req.session.passport.user.username !== req.params.userId)) {
+    let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
+    let errorMessage = `You cannot access this page or perform tasks. Login data and Session data mismatching`
+    let errorFrom = req.url;
+    let errorStatus = 500;
+    let coreMessage =`ERROR TIME : ${timeData}%0A
+       ERROR MESSAGE : ${errorMessage}%0A
+       ERROR FROM : ${req.url}%0A
+       ERROR SENDER : ${req.connection.remoteAddress.split(`:`).pop()}%0A
+       ERROR STATUS : ${errorStatus}`;
+
+    request(`https://api.telegram.org/${process.env.TELEGRAM_KEY}/sendmessage?chat_id=550566016&text=${coreMessage}`)
     res.render('customError', {
-      errorExplain: `You cannot access this page or perform tasks. Login data and Session data mismatching`,
-      errorMessage: 'Invalid Access Error',
+      errorStatus: errorStatus,
+      errorMessage: errorMessage,
+      errorFrom: errorFrom
     });
   } else if ((Object.keys(req.session.passport).length !== 0 && req.session.passport.constructor !== Object) || req.session.passport.user.username === req.params.userId) {
     next();
