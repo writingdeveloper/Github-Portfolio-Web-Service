@@ -7,10 +7,11 @@ const moment = require("moment-timezone")
 
 /* Import Database Settings */
 const db = require("../lib/db");
-let User = require('../lib/models/userModel');
-let Repo = require('../lib/models/repoModel');
-let Counter = require('../lib/models/counterModel');
-let ChatRoom = require('../lib/models/chatRoomsModel');
+const User = require('../lib/models/userModel');
+const Repo = require('../lib/models/repoModel');
+const Counter = require('../lib/models/counterModel');
+const ChatRoom = require('../lib/models/chatRoomsModel');
+const errorMessageLog = require('../lib/models/errorMessageLogsModel');
 const Chat = require('../lib/models/chattingModel');
 
 router.use(bodyParser.json());
@@ -23,11 +24,21 @@ let sessionCheck = (req, res, next) => {
     let errorMessage = `You cannot access this page or perform tasks. Login data and Session data mismatching`
     let errorFrom = req.url;
     let errorStatus = 500;
-    let coreMessage =`ERROR TIME : ${timeData}%0A
+    let accessIpaddress = req.connection.remoteAddress.split(`:`).pop();
+    let coreMessage = `ERROR TIME : ${timeData}%0A
        ERROR MESSAGE : ${errorMessage}%0A
        ERROR FROM : ${req.url}%0A
-       ERROR SENDER : ${req.connection.remoteAddress.split(`:`).pop()}%0A
+       ERROR SENDER : ${accessIpaddress}%0A
        ERROR STATUS : ${errorStatus}`;
+
+    /* Save to MongoDB errorMEssageLog collection */
+    errorMessageLog.create({
+      timeData,
+      errorMessage,
+      errorFrom,
+      errorStatus,
+      accessIpaddress,
+    })
 
     request(`https://api.telegram.org/${process.env.TELEGRAM_KEY}/sendmessage?chat_id=550566016&text=${coreMessage}`)
     res.render('customError', {
