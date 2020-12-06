@@ -1,4 +1,4 @@
-require('dotenv').config()  // To load Environment Vars
+require('dotenv').config() // To load Environment Vars
 const express = require('express');
 const createError = require('http-errors');
 const path = require('path');
@@ -10,6 +10,7 @@ const rfs = require('rotating-file-stream')
 const rateLimit = require("express-rate-limit");
 const fs = require('fs')
 const app = express();
+
 
 /* HTTP(dev) HTTPS(production) settings */
 const https = require('https')
@@ -46,6 +47,8 @@ option
   socket = http.createServer(app).listen(PORT, () => {
     console.log(`Server is running at port ${PORT}`);
   });
+
+/* Attach socketIO to server */
 const io = require('socket.io')(socket);
 
 const limiter = rateLimit({
@@ -78,15 +81,14 @@ app.use('/', findUserRouter)
 app.use('/', portfolioRouter);
 app.use('/', mypageRouter);
 app.use('/reportError', errorRouter); // Error Page Router
-app.use('/telegram', server); // Telegram Bot Router
+app.use('/', server); // Telegram Bot Router
 
-/* Logger Setting */
+/* Morgan Logger Setting */
 app.use(morgan('dev'));
 let accessLogStream = rfs.createStream('access.log', {
-  size: "5M",
+  size: "20M",
   path: path.join('../')
 })
-/* Logger Format */
 app.use(morgan(':remote-addr - :remote-user [:date[iso]] ":method :url" :status :res[content-length] :referrer', {
   stream: accessLogStream
 }));
@@ -99,47 +101,36 @@ const ChatRoom = require('./lib/models/chatRoomsModel');
 const Chat = require('./lib/models/chattingModel');
 const errorMessageLog = require('./lib/models/errorMessageLogsModel')
 
+/* Report Error Function */
+/* Related with ErrorHandler Function */
+function reportError(err, req, res, next) {
+  let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
+  let errorMessage = err.message;
+  let errorFrom = req.url;
+  let errorStatus = 500;
+  let accessIpaddress = req.connection.remoteAddress.split(`:`).pop();
+  let coreMessage = `ERROR TIME : ${timeData}%0AERROR MESSAGE : ${errorMessage}%0A
+  ERROR FROM : ${req.url}%0A
+  ERROR SENDER : ${accessIpaddress}%0A
+  ERROR STATUS : ${errorStatus}`;
 
-/* catch 404 and forward to error handler */
-app.use(function (req, res, next) {
-  next(createError(404));
-});
+  /* Save to MongoDB errorMEssageLog collection */
+  errorMessageLog.create({
+    timeData,
+    errorMessage,
+    errorFrom,
+    errorStatus,
+    accessIpaddress,
+  })
 
-/* Error Handler */
-app.use(async function (err, req, res) {
-  try {
-    res.locals.message = err.message;
-    res.locals.error = req.app.get('env') === 'development' ? err : {};
-    const telegramKey = process.env.TELEGRAM_KEY;
-    let SenderIPAdress = req.headers['x-forwarded-for'] || req.connection.remoteAddress.split(`:`).pop();
-    let errorMessage = err;
-    let userAgent = req.get('User-Agent');
-    let errorURL = req.header('Referer')
-    let timeData = moment().tz("Asia/Seoul").format('YYYY-MM-DD HH:mm:ss');
-
-    await errorMessageLog.create({
-      SenderIPAdress,
-      errorMessage,
-      userAgent,
-      errorURL,
-      timeData
-    }, (err) => {
-      if (err) throw err;
-    })
-    let coreMessage =
-      `ERROR TIME : ${timeData}%0A
-   ERROR MESSAGE : ${errorMessage}%0A
-   ERROR FROM : ${errorURL}%0A
-   ERROR SENDER : ${SenderIPAdress}`;
-    /* Report to Admin */
-    request(`https://api.telegram.org/${telegramKey}/sendmessage?chat_id=550566016&text=${coreMessage}`)
-  } catch (e) {
-    throw e;
-  }
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+  /* Request telegram API to send message to Admin */
+  request(`https://api.telegram.org/${process.env.TELEGRAM_KEY}/sendmessage?chat_id=550566016&text=${coreMessage}`)
+  res.render('customError', { // Render Custom Error
+    errorStatus: errorStatus,
+    errorMessage: errorMessage,
+    errorFrom: errorFrom
+  });
+}
 
 /* Socket IO Functions */
 io.on('connection', (socket) => {
@@ -224,6 +215,25 @@ io.on('connection', (socket) => {
       }
     }
   });
+});
+
+/* ErrorHandler Function */
+/* Catch all errors in this function, except customError */
+app.get('*', function (req, res, next) {
+  let err = new Error(`${req.ip} tried to reach ${req.originalUrl}`); // Tells us which IP tried to reach a particular URL
+  err.statusCode = 404;
+  err.shouldRedirect = true; // New property on err so that our middleware will redirect
+  next(err);
+});
+
+app.use(function (err, req, res, next) {
+  // console.error(err.message);
+  if (!err.statusCode) err.statusCode = 500; // Sets a generic server error status code if none is part of the err
+  if (err.shouldRedirect) {
+    reportError(err, req, res, next);
+  } else {
+    res.status(err.statusCode).send(err.message); // If shouldRedirect is not defined in our error, sends our original err data
+  }
 });
 
 module.exports = app;
