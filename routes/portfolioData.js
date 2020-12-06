@@ -78,14 +78,15 @@ router.get(`/:userId`, (req, res, next) => {
         res.render('customError', { // User Missing Error Handling
           userId: userId, // Entered User ID
           loginedId: ownerCheck, // Logined User ID
+          errorStatus: 404,
           errorMessage: 'USER NOT EXIXTS',
-          description: 'Report Please'
+          errorFrom: req.url
         })
       } else {
         /* User Data Exists */
         Repo.find({
           'owner.login': userId
-        }, (err, repoData) => {
+        }, (err, repoData) => {d
           if (err) throw err;
           let repo = repoData;
 
@@ -317,9 +318,11 @@ router.get("/:userId/:pageId", (req, res, next) => {
       res.render('customError', { // User Missing Error Handling
         userId: userId, // Entered User ID
         loginedId: ownerCheck, // Logined User ID
+        errorStatus: 404,
         errorMessage: 'USER MISSING',
-        description: 'Report Please'
+        errorFrom: req.url
       });
+      next(err)
     } else {
       repo = repoData[0]; // To use easier
       repoNumber = repo.id;
