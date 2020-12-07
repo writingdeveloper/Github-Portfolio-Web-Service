@@ -86,7 +86,7 @@ router.get(`/:userId`, (req, res, next) => {
         /* User Data Exists */
         Repo.find({
           'owner.login': userId
-        }, (err, repoData) => {d
+        }, (err, repoData) => {
           if (err) throw err;
           let repo = repoData;
 

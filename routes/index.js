@@ -181,12 +181,16 @@ router.post("/user", function (req, res, next) {
   };
   // User Information API Process
   request(userOptions, function (error, response, data) {
-    if (error) {
-      throw `Error from index.js User Information API Process ${error}`;
-    }
+    // if (error) {
+    //   throw `Error from index.js User Information API Process ${error}`;
+    // }
     // result have JSON User Data
     let result = JSON.parse(data);
     console.log(result);
+    if(result.message){
+      console.log('PASSED')
+      // throw error;
+    } else {
     if (result.name === null) {
       result.name = result.login;
     }
@@ -194,13 +198,15 @@ router.post("/user", function (req, res, next) {
       `INSERT INTO user (loginId, displayId, avatarUrl, name, bio, registerType) VALUES (?,?,?,?,?,'Gtihub')`,
       [result.login, result.id, result.avatar_url, result.name, result.bio]
     ); // User Information INSERT SQL
+  }
   });
+  
 
   // User Repository Information API Process
   request(repositoryOptions, function (error, response, data) {
-    if (error) {
-      throw `Error from index.js User Repository Information API Process ${error}`;
-    }
+    // if (error) {
+    //   throw `Error from index.js User Repository Information API Process ${error}`;
+    // }
     let result = JSON.parse(data);
     for (i = 0; i < result.length; i++) {
       let sid = shortid.generate();
@@ -223,7 +229,9 @@ router.post("/user", function (req, res, next) {
       let sql = `INSERT INTO project (sid, userId, projectName, githubUrl, summary, projectDate1, projectDate2) VALUES (?,?,?,?,?,?,?)`;
       db.query(sql, sqlData);
     }
+    
   });
+  
   res.redirect("/");
 });
 
