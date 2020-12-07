@@ -11,7 +11,7 @@ jobs:
     - name: 📂 Sync files
       uses: writingdeveloper/Github-Portfolio-Web-Service
       with:
-        server: ${{ secrets.ftpurl }}
-        username: ${{ secrets.ftpusername }}
-        password: ${{ secrets.ftppassword }}
+        server: ${{ secrets.FTPSURL }}
+        username: ${{ secrets.FTPSUSERNAME }}
+        password: ${{ secrets.FTPSPASSWORD }}
         dry-run: true
