@@ -1,5 +1,3 @@
-name: Deploy application
- 
 on:
   push:
     branches: [ master ]
@@ -14,19 +12,12 @@ jobs:
           host: expressme.dev
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
-      - name: 👨‍💻 Project Init & Stop App
-        run: |
-          cd /home/project/build
-          pm2 stop app
-      - name: 👨‍💻 Remove Previous Project Folder & Clone new master line from Github
-        run: |
-          rm -r /home/project/build/Github-Portfolio-Web-Service
-          git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
-      - name: 👨‍💻 Copy Environment File
-        run: |
-          cp .env Github-Portfolio-Web-Service/
-          cd Github-Portfolio-Web-Service
-      - name: 👨‍💻 Project Start !
-        run: |
-          npm install # install dependencies 
-          npm start
+          script: |
+            cd /home/project/build
+            pm2 stop app
+            rm -r /home/project/build/Github-Portfolio-Web-Service
+            git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
+            cp .env Github-Portfolio-Web-Service/
+            cd Github-Portfolio-Web-Service
+            npm install
+            npm start
