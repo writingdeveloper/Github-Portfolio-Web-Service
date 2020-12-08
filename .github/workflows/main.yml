@@ -21,3 +21,4 @@ jobs:
             cd Github-Portfolio-Web-Service
             npm install
             npm start
+            systemctl restart caddy
