@@ -80,7 +80,7 @@ app.use('/', indexRouter);
 app.use('/', findUserRouter)
 app.use('/', portfolioRouter);
 app.use('/', mypageRouter);
-app.use('/reportError', errorRouter); // Error Page Router
+app.use('/', errorRouter); // Error Page Router
 app.use('/', server); // Telegram Bot Router
 
 /* Morgan Logger Setting */
