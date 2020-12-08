@@ -1,48 +1,24 @@
-# on: push
-# name: 🚀 Deploy website on push
-# jobs:
-#   web-deploy:
-#     name: 🎉 Deploy
-#     runs-on: ubuntu-latest
-#     steps:
-#     - name: 🚚 Get latest code
-#       uses: actions/checkout@v2.3.2
-
-#     - name: Use Node.js 12
-#       uses: actions/setup-node@v2-beta
-#       with:
-#         node-version: '12'
-      
-#     - name: 🔨 Build Project
-#       run: |
-#         npm install
-#         npm start
-        
-#     - name: 📂 Sync files
-#       uses: SamKirkland/FTP-Deploy-Action@4.0.0
-#       with:
-#         server: ${{ secrets.FTPSURL }}
-#         username: ${{ secrets.FTPSUSERNAME }}
-#         password: ${{ secrets.FTPSPASSWORD }}
-#         protocol: ftps
-#         port: 22 # todo replace with your web hosts ftps port
-#         server-dir: /home/project/build/
-
-on: push
-name: 🚀 Deploy website on push
+name: Deploy application
+ 
+on:
+  push:
+    branches: [ master ]
+ 
 jobs:
-  web-deploy:
-    name: 🎉 Deploy
+  deploy:
     runs-on: ubuntu-latest
     steps:
-    - name: 🚚 Get latest code
-      uses: actions/checkout@v2.3.2
-
-    - name: 📂 Sync files
-      uses: SamKirkland/FTP-Deploy-Action@4.0.0
-      with:
-        server: ${{ secrets.FTPSURL }}
-        username: ${{ secrets.FTPSUSERNAME }}
-        password: ${{ secrets.FTPSPASSWORD }}
-        protocol: ftps
-        port: 22 # todo replace with your web hosts ftps port
+      - name: Deploy NodeJS app
+        uses: appleboy/ssh-action@v0.1.2
+        with:
+          host: expressme.dev
+          username: ubuntu
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            cd /home/project/build
+            cd ~/my-express-app/ # navigate into the folder
+            git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
+            cd Github-Portfolio-Web-Service # navigate into the repo
+            npm install # install dependencies 
+            pm2 start app.js # start as a background service.
+            console.log('Finish');
