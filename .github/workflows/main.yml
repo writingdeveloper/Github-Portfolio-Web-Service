@@ -16,9 +16,9 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           script: |
             cd /home/project/build
-            cd ~/my-express-app/ # navigate into the folder
+            rm -r /home/project/build/Github-Portfolio-Web-Service
             git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
+            cp .env Github-Portfolio-Web-Service/
             cd Github-Portfolio-Web-Service # navigate into the repo
             npm install # install dependencies 
-            pm2 start app.js # start as a background service.
-            console.log('Finish');
+            npm start
