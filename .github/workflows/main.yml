@@ -20,4 +20,4 @@ jobs:
             cp .env Github-Portfolio-Web-Service/
             cd Github-Portfolio-Web-Service
             npm install
-            pm2 start app --watch
+            pm2 start app.js --watch
