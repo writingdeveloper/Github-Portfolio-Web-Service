@@ -14,4 +14,5 @@ jobs:
         server: ${{ secrets.FTPSURL }}
         username: ${{ secrets.FTPSUSERNAME }}
         password: ${{ secrets.FTPSPASSWORD }}
-        dry-run: true
+        protocol: ftps
+        port: 22 # todo replace with your web hosts ftps port
