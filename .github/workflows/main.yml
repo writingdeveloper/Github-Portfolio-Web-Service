@@ -15,22 +15,18 @@ jobs:
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
       - name: 👨‍💻 Project Init & Stop App
-        with:
-          script: |
-            cd /home/project/build
-            pm2 stop app
+        run: |
+          cd /home/project/build
+          pm2 stop app
       - name: 👨‍💻 Remove Previous Project Folder & Clone new master line from Github
-        with:
-          script: |
-            rm -r /home/project/build/Github-Portfolio-Web-Service
-            git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
+        run: |
+          rm -r /home/project/build/Github-Portfolio-Web-Service
+          git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
       - name: 👨‍💻 Copy Environment File
-        with:
-          script: |
-            cp .env Github-Portfolio-Web-Service/
-            cd Github-Portfolio-Web-Service
+        run: |
+          cp .env Github-Portfolio-Web-Service/
+          cd Github-Portfolio-Web-Service
       - name: 👨‍💻 Project Start !
-        with:
-          script: |
-            npm install # install dependencies 
-            npm start
+        run: |
+          npm install # install dependencies 
+          npm start
