@@ -20,5 +20,5 @@ jobs:
             cp .env Github-Portfolio-Web-Service/
             cd Github-Portfolio-Web-Service
             npm install
-            npm start
+            pm2 start app --watch
             systemctl restart caddy
