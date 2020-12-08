@@ -21,4 +21,3 @@ jobs:
             cd Github-Portfolio-Web-Service
             npm install
             pm2 start app --watch
-            systemctl restart caddy
