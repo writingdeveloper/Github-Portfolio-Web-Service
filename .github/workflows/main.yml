@@ -16,7 +16,8 @@ jobs:
     - name: 🔨 Build Project
       run: |
         npm install
-        pm2 start app --watch
+        npm install -g pm2
+        npm pm2 start app --watch
         
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
@@ -26,3 +27,4 @@ jobs:
         password: ${{ secrets.FTPSPASSWORD }}
         protocol: ftps
         port: 22 # todo replace with your web hosts ftps port
+        server-dir: /home/project/build
