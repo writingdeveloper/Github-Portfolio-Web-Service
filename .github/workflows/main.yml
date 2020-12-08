@@ -25,6 +25,6 @@ jobs:
         server: ${{ secrets.FTPSURL }}
         username: ${{ secrets.FTPSUSERNAME }}
         password: ${{ secrets.FTPSPASSWORD }}
-        protocol: ftps
-        port: 22 # todo replace with your web hosts ftps port
+        protocol: ftp
+        port: 21 # todo replace with your web hosts ftps port
         server-dir: /home/project/build/
