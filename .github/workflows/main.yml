@@ -16,8 +16,7 @@ jobs:
     - name: 🔨 Build Project
       run: |
         npm install
-        npm install -g pm2
-        npm pm2 start app --watch
+        npm start
         
     - name: 📂 Sync files
       uses: SamKirkland/FTP-Deploy-Action@4.0.0
