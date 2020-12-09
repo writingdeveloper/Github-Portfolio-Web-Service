@@ -13,7 +13,6 @@ jobs:
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
           
-      - uses: actions/checkout@v2
       - name: Start Script
         run: sh ./install.sh -xe
         
