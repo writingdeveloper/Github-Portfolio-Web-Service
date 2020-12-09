@@ -12,12 +12,6 @@ jobs:
           host: expressme.dev
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
-        
-      - name: Run Script
-        run: |
-          echo Nothing to see in the scirpt
-          echo Here is what is in the folder
-          ls -a
           script: |
             cd /home/project/build
             pm2 delete app
@@ -28,4 +22,4 @@ jobs:
             cd Github-Portfolio-Web-Service
             npm install
             chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
-            pm2 start app.js --watch
+            pm2 start app.js
