@@ -18,7 +18,7 @@ jobs:
             pm2 delete app
             sudo chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
             rm -r /home/project/build/Github-Portfolio-Web-Service
-            git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
+            git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service.git
             cp .env Github-Portfolio-Web-Service/
             cd Github-Portfolio-Web-Service
             npm install
