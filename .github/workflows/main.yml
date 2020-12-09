@@ -15,6 +15,7 @@ jobs:
           script: |
             cd /home/project/build
             pm2 delete app
+            chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
             rm -r /home/project/build/Github-Portfolio-Web-Service
             git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
             cp .env Github-Portfolio-Web-Service/
