@@ -13,8 +13,7 @@ jobs:
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
           run: |
-            cd /home/project/build 
-            bash install.sh -xe
+            bash /home/project/build/install.sh -xe
 #           script: |
 #             cd /home/project/build
 #             pm2 delete app
