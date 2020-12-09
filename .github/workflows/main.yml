@@ -12,6 +12,8 @@ jobs:
           host: expressme.dev
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
+          
+      - uses: checkout@v2
       - name: Start Script
         run: sh ../../install.sh -xe
         
