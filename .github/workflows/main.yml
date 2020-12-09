@@ -13,7 +13,7 @@ jobs:
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
       - name: Start Script
-        run: sh ./install.sh -xe
+        run: sh ../../../install.sh -xe
         
       - name: Testing the console
         run: |
