@@ -22,4 +22,4 @@ jobs:
             cd Github-Portfolio-Web-Service
             npm install
             chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
-            pm2 start app --watch
+            pm2 start app.js --watch
