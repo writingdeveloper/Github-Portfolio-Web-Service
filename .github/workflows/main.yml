@@ -12,8 +12,14 @@ jobs:
           host: expressme.dev
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
-          run: |
-            bash /home/project/build/install.sh -xe
+      - name: Start Script
+        run: sh ../home/project/build/install.sh -xe
+        
+      - name: Testing the console
+        run: |
+          echo Nothing to see in the scirpt
+          echo Here is what is in the folder
+          ls -a
 #           script: |
 #             cd /home/project/build
 #             pm2 delete app
