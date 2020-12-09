@@ -53,17 +53,9 @@ const io = require('socket.io')(socket);
 
 const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, // 15 minutes
-  max: 250 // limit each IP to 100 requests per windowMs
+  max: 500 // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
-
-/* Router Sequences */
-const server = require('./routes/server.js');
-const indexRouter = require('./routes/index.js');
-const findUserRouter = require('./routes/findUser.js')
-const portfolioRouter = require('./routes/portfolioData.js');
-const mypageRouter = require('./routes/mypage.js');
-const errorRouter = require('./routes/error.js');
 
 /* View Engine Setup to PUG */
 app.set('views', path.join(__dirname, 'views'));
@@ -74,6 +66,14 @@ app.use(express.urlencoded({
 }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+/* Router Sequences */
+const server = require('./routes/server.js');
+const indexRouter = require('./routes/index.js');
+const findUserRouter = require('./routes/findUser.js')
+const portfolioRouter = require('./routes/portfolioData.js');
+const mypageRouter = require('./routes/mypage.js');
+const errorRouter = require('./routes/error.js');
 
 /* Router Set */
 app.use('/', indexRouter);
