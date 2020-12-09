@@ -137,6 +137,7 @@ io.on('connection', (socket) => {
 
   /* Join & Leave previous room Socket */
   socket.on('JoinRoom', data => {
+    console.log(data);
     socket.leave(`${data.leave}`)
     socket.join(`${data.joinedRoomName}`);
     Chat.updateMany({ // When clicks the target room, target's Notice alarm will set to 0
