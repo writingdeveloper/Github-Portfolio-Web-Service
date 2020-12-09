@@ -12,23 +12,20 @@ jobs:
           host: expressme.dev
           username: ubuntu
           password: ${{ secrets.SSH_PASSWORD }}
-          
-      - name: Start Script
-        run: ../install.sh -xe
         
-      - name: Testing the console
+      - name: Run Script
         run: |
           echo Nothing to see in the scirpt
           echo Here is what is in the folder
           ls -a
-#           script: |
-#             cd /home/project/build
-#             pm2 delete app
-#             chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
-#             rm -r /home/project/build/Github-Portfolio-Web-Service
-#             git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
-#             cp .env Github-Portfolio-Web-Service/
-#             cd Github-Portfolio-Web-Service
-#             npm install
-#             chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
-#             pm2 start app.js --watch
+          script: |
+            cd /home/project/build
+            pm2 delete app
+            chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
+            rm -r /home/project/build/Github-Portfolio-Web-Service
+            git clone https://github.com/writingdeveloper/Github-Portfolio-Web-Service
+            cp .env Github-Portfolio-Web-Service/
+            cd Github-Portfolio-Web-Service
+            npm install
+            chmod 777 -R /home/project/build/Github-Portfolio-Web-Service
+            pm2 start app.js --watch
