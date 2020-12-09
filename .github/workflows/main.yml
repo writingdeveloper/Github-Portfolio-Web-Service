@@ -14,7 +14,7 @@ jobs:
           password: ${{ secrets.SSH_PASSWORD }}
           
       - name: Start Script
-        run: ./install.sh -xe
+        run: ../install.sh -xe
         
       - name: Testing the console
         run: |
