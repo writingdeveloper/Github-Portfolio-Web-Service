@@ -15,7 +15,7 @@ const app = express();
 /* HTTP(dev) HTTPS(production) settings */
 const https = require('https')
 const http = require('http')
-const PORT = process.env.PORT || 443;
+const PORT = process.env.PORT || 443; // Use 3000 port but, using reverse-proxy with Caddy
 const domain = 'expressme.dev'; // Domain Name
 const option = process.env.NODE_ENV === "production" ? {
     ca: fs.readFileSync('/etc/letsencrypt/live/' + domain + '/fullchain.pem'),
