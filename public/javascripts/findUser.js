@@ -78,7 +78,7 @@ function loadMoreUsers() {
     .then(data => {
       if (data === "NODATA") {
         // End of the Profile Data
-        removeElements(document.querySelectorAll("#loadMoreUsers"));
+        removeElements(document.querySelectorAll("#loadMoreUsers"));  // No more Data
       } else {
         for (let i = 0; i < data.length; i++) {
           let newDiv = document.createElement("div");
@@ -86,21 +86,22 @@ function loadMoreUsers() {
           // Append new profile HTML
           newDiv.innerHTML = `
             <div class="card mb-3 box-shadow"><img class="card-img-top" src="${
-              data[i].avatarUrl
+              data[i].avatar_url
             }">
             <div class="card-body">
-            <b><p class="card-name">${data[i].loginId}</p></b>
+            <b><p class="card-name">${data[i].login}</p></b>
             <p class="card-text">${data[i].bio}</p>
             <div class="d-flex justify-content-between align-items-center">
             <div class="btn-group">
             <button class="btn btn-sm btn-outline-secondary" type="button" onClick="location.href='${
-              data[i].loginId
+              data[i].login
             }'">View</button>
             <button class="btn btn-sm btn-outline-secondary" type="button" onClick="location.href='${
-              data[i].loginId
+              data[i].login
             }/contact'">Contact</button></div>
-            <small class="text-muted">View Score : ${data[i].counter}</small></div></div></div>
+            <small class="text-muted">View Score : 0</small></div></div></div>
             `;
+            // ${data[i].counter}
           document.getElementById("additional").appendChild(newDiv);
         }
       }
