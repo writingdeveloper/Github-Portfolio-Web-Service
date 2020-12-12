@@ -17,26 +17,30 @@ let loginCheck = req => {
   }
 }
 
-router.get("/find-users", function (req, res, next) {
+router.get("/find-users", async (req, res) => {
   let loginInformation = req.user;
-  console.log(loginInformation)
-  User.find({}, 'avatar_url login bio view_counter', {
-    limit: 8
-  }).sort({
-    created_at: -1
-  }).exec(function (err, result) {
-    if (err) throw err;
-    console.log(result);
-    result.forEach(results => {
-      if (results.bio === null) { // If bio is none, replace 'NO BIO' text
-        results.bio = "NO BIO";
-      }
+
+  try {
+    await User.find({}, 'avatar_url login bio view_counter', {
+      limit: 8
+    }).sort({
+      created_at: -1
+    }).exec(function (err, result) {
+      if (err) throw err;
+      // console.log(result);
+      result.forEach(results => {
+        if (results.bio === null) { // If bio is none, replace 'NO BIO' text
+          results.bio = "NO BIO";
+        }
+      });
+      res.render("find-users", {
+        dataarray: result,
+        loginData: loginCheck(req)
+      });
     });
-    res.render("find-users", {
-      dataarray: result,
-      loginData: loginCheck(req)
-    });
-  });
+  } catch (err) {
+    throw err;
+  }
 });
 
 /* Search User Router */
@@ -73,26 +77,29 @@ router.get(`/find-users/:queryString`, async function (req, res) {
 });
 
 /* More Users Button Router */
-router.get(`/find-users/moreuser/:page`, function (req, res) {
-  db.query(
-    `SELECT * FROM user ORDER BY registerDate DESC LIMIT ${req.params.page}, 8`,
-    function (error, data) {
-      if (error) {
-        if(error) throw error;
-      }
-      if (data.length === 0) {
-        res.json("NODATA"); // If no more data return string "NODATA" to process in client script
-      } else {
-        // data NULL check
-        data.forEach(results => {
-          if (results.bio === null) {
-            results.bio = "NO BIO";
-          }
-        });
-        res.json(data); // Return more user data
-      }
+router.get(`/find-users/moreuser/:page`, async (req, res) => {
+  let pageNumber = req.params.page;
+  try {
+    /* Bio data Null Check & send data to client */
+    function nullCheck() {
+      data.forEach(results => {
+        if (results.bio === null) {
+          results.bio = "NO BIO";
+        }
+      });
+      res.json(data)
     }
-  );
+    /* Query 8 more data */
+    let data = await User.find({}, 'avatar_url login bio view_counter').limit(8).skip(Number(pageNumber)).sort({
+      "registerDate": -1
+    });
+    /* If no more data, send 'NODATA', If data exists execute nullCheck() function and sned data to client */
+    data = data.length == 0 ?
+      res.json('NODATA') :
+      nullCheck();
+  } catch (err) {
+    console.log(err);
+  }
 });
 
 module.exports = router;
