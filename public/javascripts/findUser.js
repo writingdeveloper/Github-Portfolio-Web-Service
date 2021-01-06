@@ -1,4 +1,46 @@
 /* Find Users Page */
+
+/**
+ * Animate scrolling to a target position
+ * @param {string} _selector Target selector
+ * @param {number} _duration (Option) Duration time(ms) (Default. 800ms)
+ * @param {number} _adjust (Option) Adjustment value of position
+ */
+animteScrollTo = function (_selector, _duration, _adjust) {
+  const targetEle = document.querySelector(_selector);
+  if (!targetEle) return;
+
+  // - Get current &amp; target positions
+  const scrollEle = document.documentElement || window.scrollingElement,
+    currentY = scrollEle.scrollTop,
+    targetY = targetEle.offsetTop - (_adjust || 0);
+  animateScrollTo(currentY, targetY, _duration);
+
+  // - Animate and scroll to target position
+  function animateScrollTo(_startY, _endY, _duration) {
+    _duration = _duration ? _duration : 600;
+    const unitY = (targetY - currentY) / _duration;
+    const startTime = new Date().getTime();
+    const endTime = new Date().getTime() + _duration;
+
+    const scrollTo = function () {
+      let now = new Date().getTime();
+      let passed = now - startTime;
+      if (now <= endTime) {
+        scrollEle.scrollTop = currentY + (unitY * passed);
+        requestAnimationFrame(scrollTo);
+      } else {
+        console.log('End off.')
+      }
+    };
+    requestAnimationFrame(scrollTo);
+  };
+};
+
+
+
+
+
 let removeElements = elms => elms.forEach(el => el.remove());
 
 /* Search Users Button Function */
@@ -70,6 +112,8 @@ function searchUsers() {
 /* Load More Users Button Function */
 function loadMoreUsers() {
   let pageNumber = document.getElementsByClassName("col-md-3").length;
+  let scrollNumber = 0
+  console.log(pageNumber)
   /* Fetch Data */
   fetch(`/find-users/moreuser/${pageNumber}`, {
       method: "GET"
@@ -78,11 +122,14 @@ function loadMoreUsers() {
     .then(data => {
       if (data === "NODATA") {
         // End of the Profile Data
-        removeElements(document.querySelectorAll("#loadMoreUsers"));  // No more Data
+        removeElements(document.querySelectorAll("#loadMoreUsers")); // No more Data
       } else {
+        scrollNumber += 1;
         for (let i = 0; i < data.length; i++) {
           let newDiv = document.createElement("div");
-          newDiv.className = "col-md-3";
+          newDiv.id = `scroll-${scrollNumber}`
+          newDiv.className = `col-md-3`;
+
           // Append new profile HTML
           newDiv.innerHTML = `
             <div class="card mb-3 box-shadow"><img class="card-img-top" src="${
@@ -101,9 +148,16 @@ function loadMoreUsers() {
             }/contact'">Contact</button></div>
             <small class="text-muted">View Score : 0</small></div></div></div>
             `;
-            // ${data[i].counter}
+          // ${data[i].counter}
           document.getElementById("additional").appendChild(newDiv);
+
+          // animteScrollTo(`#scroll-${i}`);
         }
+
+        // let scrollCount = document.getElementsByClassName('col-md-3').length-8;
+        // let scrollClassName = document.getElementsByClassName('col-md-3')[scrollCount];
+        // console.log(scrollClassName)
+        animteScrollTo(`#scroll-${scrollNumber}`);
       }
     })
     .catch(err => {
