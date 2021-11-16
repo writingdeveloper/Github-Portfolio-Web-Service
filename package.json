@@ -6,7 +6,7 @@
     "start": "supervisor app.js"
   },
   "dependencies": {
-    "aws-sdk": "^2.491.0",
+    "aws-sdk": "^2.814.0",
     "cookie-parser": "~1.4.4",
     "crypto-random-string": "^3.3.0",
     "debug": "~4.2.0",
