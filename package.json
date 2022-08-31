@@ -18,7 +18,7 @@
     "http-errors": "~1.8.0",
     "mem": "^5.1.1",
     "moment": "^2.24.0",
-    "moment-timezone": "^0.5.26",
+    "moment-timezone": "^0.5.35",
     "mongoose": "^5.12.5",
     "morgan": "1.10.0",
     "multer": "^1.4.1",
